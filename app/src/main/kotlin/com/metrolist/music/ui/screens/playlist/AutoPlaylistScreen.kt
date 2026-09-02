@@ -126,6 +126,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -685,7 +686,7 @@ fun AutoPlaylistScreen(
                                 .only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal),
                         ).padding(16.dp),
             ) {
-                FloatingActionButton(
+                NuclearIconButton(
                     onClick = {
                         filePickerLauncher.launch(
                             arrayOf(
@@ -698,6 +699,8 @@ fun AutoPlaylistScreen(
                             ),
                         )
                     },
+                    size = 56.dp,
+                    shape = MaterialTheme.shapes.large,
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.upload),

@@ -131,6 +131,9 @@ import com.metrolist.music.viewmodels.ArtistViewModel
 import com.valentinilk.shimmer.shimmer
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.metrolist.music.ui.theme.nuclear.NuclearButton
+import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
+import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -367,26 +370,16 @@ fun ArtistScreen(
                                     verticalAlignment = Alignment.CenterVertically,
                                 ) {
                                     // Subscribe Button
-                                    OutlinedButton(
-                                        onClick = {
-                                            viewModel.toggleChannelSubscription()
+                                    NuclearButton(
+                                        onClick = { viewModel.toggleChannelSubscription() },
+                                        variant = if (isChannelSubscribed) {
+                                            NuclearButtonVariant.Tertiary
+                                        } else {
+                                            NuclearButtonVariant.Primary
                                         },
-                                        colors =
-                                            ButtonDefaults.outlinedButtonColors(
-                                                containerColor =
-                                                    if (isChannelSubscribed) {
-                                                        MaterialTheme.colorScheme.surface
-                                                    } else {
-                                                        Color.Transparent
-                                                    },
-                                            ),
-                                        shape = RoundedCornerShape(50),
-                                        modifier = Modifier.height(40.dp),
                                     ) {
                                         Text(
                                             text = stringResource(if (isChannelSubscribed) R.string.subscribed else R.string.subscribe),
-                                            fontSize = 14.sp,
-                                            color = if (!isChannelSubscribed) MaterialTheme.colorScheme.error else LocalContentColor.current,
                                         )
                                     }
 
@@ -978,27 +971,17 @@ fun ArtistScreen(
                     }
                 }
 
-                if (showLocalFab) {
-                    androidx.compose.material3.SmallFloatingActionButton(
-                        modifier = Modifier.padding(16.dp).offset(x = (-4).dp), // Align center with standard FAB (56dp vs 48dp)
-                        onClick = onPlayAllClick,
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.play),
-                            contentDescription = "Play All",
-                        )
-                    }
-                } else {
-                    androidx.compose.material3.FloatingActionButton(
-                        modifier = Modifier.padding(16.dp),
-                        onClick = onPlayAllClick,
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.play),
-                            contentDescription = "Play All",
-                            modifier = Modifier.size(32.dp),
-                        )
-                    }
+                NuclearIconButton(
+                    modifier = Modifier.padding(16.dp),
+                    onClick = onPlayAllClick,
+                    size = if (showLocalFab) 48.dp else 56.dp,
+                    shape = MaterialTheme.shapes.large,
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.play),
+                        contentDescription = stringResource(R.string.play_all),
+                        modifier = Modifier.size(if (showLocalFab) 24.dp else 32.dp),
+                    )
                 }
             }
         }

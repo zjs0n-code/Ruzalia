@@ -91,6 +91,7 @@ import com.metrolist.music.viewmodels.LibraryPlaylistsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.UUID
+import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
 
 private data class VisiblePlaylistItem(
     val key: String,
@@ -541,7 +542,7 @@ fun LibraryPlaylistsScreen(
         }
 
         // Always visible + button (no scroll hiding)
-        FloatingActionButton(
+        NuclearIconButton(
             onClick = { showCreatePlaylistDialog = true },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
@@ -549,7 +550,9 @@ fun LibraryPlaylistsScreen(
                     LocalPlayerAwareWindowInsets.current
                         .only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal)
                 )
-                .padding(16.dp)
+                .padding(16.dp),
+            size = 56.dp,
+            shape = MaterialTheme.shapes.large,
         ) {
             Icon(
                 painter = painterResource(R.drawable.add),
