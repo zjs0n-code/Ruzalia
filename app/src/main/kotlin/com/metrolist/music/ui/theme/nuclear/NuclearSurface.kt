@@ -55,7 +55,7 @@ fun NuclearSurface(
     borderColor: Color = NuclearTheme.colors.border,
     borderWidth: Dp = NuclearTheme.metrics.borderWidth,
     shadow: Boolean = true,
-    shadowColor: Color = borderColor,
+    shadowColor: Color = NuclearTheme.colors.shadow,
     enabled: Boolean = true,
     onClick: (() -> Unit)? = null,
     contentPadding: PaddingValues = PaddingValues(0.dp),

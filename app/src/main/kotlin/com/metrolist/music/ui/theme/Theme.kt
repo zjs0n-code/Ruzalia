@@ -103,3 +103,11 @@ val ColorSaver = object : Saver<Color, Int> {
     override fun restore(value: Int): Color = Color(value)
     override fun SaverScope.save(value: Color): Int = value.toArgb()
 }
+
+/** As [ColorSaver], but able to round-trip "no colour extracted yet". */
+val NullableColorSaver = object : Saver<Color?, Int> {
+    override fun restore(value: Int): Color? = if (value == NO_COLOR) null else Color(value)
+    override fun SaverScope.save(value: Color?): Int = value?.toArgb() ?: NO_COLOR
+}
+
+private const val NO_COLOR = 0

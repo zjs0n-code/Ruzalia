@@ -159,7 +159,6 @@ import com.metrolist.music.constants.PreferredLyricsProvider
 import com.metrolist.music.constants.PreferredLyricsProviderKey
 import com.metrolist.music.constants.PureBlackKey
 import com.metrolist.music.constants.SYSTEM_DEFAULT
-import com.metrolist.music.constants.SelectedThemeColorKey
 import com.metrolist.music.constants.SimpMusicMigrationDoneKey
 import com.metrolist.music.constants.SlimNavBarHeight
 import com.metrolist.music.constants.SlimNavBarKey
@@ -193,8 +192,7 @@ import com.metrolist.music.ui.screens.navigationBuilder
 import com.metrolist.music.ui.screens.settings.ChangelogScreen
 import com.metrolist.music.ui.screens.settings.DarkMode
 import com.metrolist.music.ui.screens.settings.NavigationTab
-import com.metrolist.music.ui.theme.ColorSaver
-import com.metrolist.music.ui.theme.DefaultThemeColor
+import com.metrolist.music.ui.theme.NullableColorSaver
 import com.metrolist.music.ui.theme.MetrolistTheme
 import com.metrolist.music.ui.theme.nuclear.NuclearThemeId
 import com.metrolist.music.ui.theme.extractThemeColor
@@ -594,27 +592,27 @@ class MainActivity : FragmentActivity() {
                 pureBlackEnabled && useDarkTheme
             }
 
-        val (selectedThemeColorInt) = rememberPreference(SelectedThemeColorKey, defaultValue = DefaultThemeColor.toArgb())
-        val selectedThemeColor = Color(selectedThemeColorInt)
-
         val showChangelog = rememberSaveable { mutableStateOf(false) }
 
-        var themeColor by rememberSaveable(stateSaver = ColorSaver) {
-            mutableStateOf(selectedThemeColor)
+        // Null means "no artwork colour available" - the nuclear preset's own
+        // primary is then used. Falling back to a fixed colour here would push
+        // a light-theme pink into the dark themes.
+        var themeColor by rememberSaveable(stateSaver = NullableColorSaver) {
+            mutableStateOf<Color?>(null)
         }
 
         val themeColorCache = remember { mutableMapOf<String, Color>() }
 
-        LaunchedEffect(selectedThemeColor) {
+        LaunchedEffect(enableDynamicTheme) {
             if (!enableDynamicTheme) {
-                themeColor = selectedThemeColor
+                themeColor = null
             }
         }
 
-        LaunchedEffect(playerConnection, enableDynamicTheme, selectedThemeColor) {
+        LaunchedEffect(playerConnection, enableDynamicTheme) {
             val playerConnection = playerConnection
             if (!enableDynamicTheme || playerConnection == null) {
-                themeColor = selectedThemeColor
+                themeColor = null
                 return@LaunchedEffect
             }
 
@@ -642,17 +640,19 @@ class MainActivity : FragmentActivity() {
                                             .crossfade(false)
                                             .build(),
                                     )
-                                val extractedColor = result.image?.toBitmap()?.extractThemeColor() ?: selectedThemeColor
-                                themeColorCache[song.thumbnailUrl] = extractedColor
+                                val extractedColor = result.image?.toBitmap()?.extractThemeColor()
+                                if (extractedColor != null) {
+                                    themeColorCache[song.thumbnailUrl] = extractedColor
+                                }
                                 withFrameNanos { }
                                 themeColor = extractedColor
                             } catch (e: Exception) {
                                 withFrameNanos { }
-                                themeColor = selectedThemeColor
+                                themeColor = null
                             }
                         }
                     } else {
-                        themeColor = selectedThemeColor
+                        themeColor = null
                     }
                 }
         }
@@ -661,7 +661,7 @@ class MainActivity : FragmentActivity() {
             darkTheme = useDarkTheme,
             pureBlack = pureBlack,
             nuclearTheme = nuclearTheme,
-            accentOverride = themeColor.takeIf { enableDynamicTheme },
+            accentOverride = themeColor?.takeIf { enableDynamicTheme },
         ) {
             val currentDensity = LocalDensity.current
             val windowInfo = LocalWindowInfo.current

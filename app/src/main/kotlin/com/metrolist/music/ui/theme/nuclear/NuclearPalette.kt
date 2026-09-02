@@ -73,7 +73,19 @@ data class NuclearPalette(
     val border: Color,
     val accents: NuclearAccents,
     val isDark: Boolean,
-)
+) {
+    /**
+     * Colour of the hard offset shadow.
+     *
+     * In the light themes the border is black, which is the darkest thing
+     * available and reads as a shadow. In the dark themes the border is a
+     * *lighter* rose than the page, so an offset drawn in it reads as a
+     * highlight and the chunk flattens out. The recessed input colour is the
+     * darkest token in the dark palettes, so the offset reads as a shadow in
+     * both modes.
+     */
+    val shadow: Color get() = if (isDark) backgroundInput else border
+}
 
 enum class NuclearThemeId(
     @param:StringRes val nameRes: Int,

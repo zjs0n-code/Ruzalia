@@ -387,7 +387,7 @@ private fun NewMiniPlayer(
                     .height(64.dp)
                     .offset { IntOffset(offsetXAnimatable.value.roundToInt(), 0) }
                     .padding(end = shadowOffset, bottom = shadowOffset)
-                    .nuclearHardShadow(miniPlayerShape, outlineColor, shadowOffset)
+                    .nuclearHardShadow(miniPlayerShape, NuclearTheme.colors.shadow, shadowOffset)
                     .clip(miniPlayerShape)
                     .background(color = backgroundColor)
                     .border(NuclearTheme.metrics.borderWidth, outlineColor, miniPlayerShape)
