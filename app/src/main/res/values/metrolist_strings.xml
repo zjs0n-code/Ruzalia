@@ -995,4 +995,34 @@
     <string name="cd_nuclear_theme_item">%1$s theme</string>
     <string name="album_art_accent">Album art accent</string>
     <string name="album_art_accent_desc">Recolour the accent from the artwork of the playing track. Borders, type and shadows stay the same.</string>
+
+    <!-- Ruzalia: custom and advanced themes -->
+    <string name="nuclear_theme_custom">Custom</string>
+    <string name="nuclear_pick_color">Pick a colour</string>
+    <string name="nuclear_pick_color_desc">The whole palette is built around it, the same way the five presets are built around their own hues.</string>
+    <string name="nuclear_advanced_theme">Advanced theme</string>
+    <string name="nuclear_advanced_theme_desc">Edit every colour by hand, then save, share or import a preset.</string>
+    <string name="nuclear_light_tokens">Light</string>
+    <string name="nuclear_dark_tokens">Dark</string>
+    <string name="nuclear_theme_name">Theme name</string>
+    <string name="nuclear_apply_theme">Apply</string>
+    <string name="nuclear_share_theme">Share</string>
+    <string name="nuclear_import_theme">Import</string>
+    <string name="nuclear_import_hint">Paste a theme here</string>
+    <string name="nuclear_import_failed">That does not look like a theme file.</string>
+    <string name="nuclear_reset_tokens">Reset to current theme</string>
+    <string name="token_background">Page</string>
+    <string name="token_background_secondary">Card</string>
+    <string name="token_background_input">Input</string>
+    <string name="token_foreground">Text</string>
+    <string name="token_foreground_secondary">Secondary text</string>
+    <string name="token_primary">Primary</string>
+    <string name="token_border">Border</string>
+    <string name="token_accent_green">Accent green</string>
+    <string name="token_accent_yellow">Accent yellow</string>
+    <string name="token_accent_purple">Accent purple</string>
+    <string name="token_accent_blue">Accent blue</string>
+    <string name="token_accent_orange">Accent orange</string>
+    <string name="token_accent_cyan">Accent cyan</string>
+    <string name="token_accent_red">Accent red</string>
 </resources>

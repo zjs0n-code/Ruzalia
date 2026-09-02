@@ -35,7 +35,7 @@ data class NuclearAccents(
     val cycle: List<Color> get() = listOf(purple, cyan, yellow, green, orange, blue, red)
 }
 
-private val LightAccents = NuclearAccents(
+internal val lightAccents = NuclearAccents(
     green = Color(0xFFA0EEA2),
     yellow = Color(0xFFF9D956),
     purple = Color(0xFFCEB6FC),
@@ -45,7 +45,7 @@ private val LightAccents = NuclearAccents(
     red = Color(0xFFFF4E6C),
 )
 
-private val DarkAccents = NuclearAccents(
+internal val darkAccents = NuclearAccents(
     green = Color(0xFF67BB6B),
     yellow = Color(0xFFD3B63B),
     purple = Color(0xFFAB8BE3),
@@ -139,7 +139,7 @@ enum class NuclearThemeId(
             foregroundSecondary = Color(foregroundSecondary),
             primary = Color(primary),
             border = Color(0xFF000000),
-            accents = LightAccents,
+            accents = lightAccents,
             isDark = false,
         )
 
@@ -159,7 +159,7 @@ enum class NuclearThemeId(
             foregroundSecondary = Color(foregroundSecondary),
             primary = Color(primary),
             border = Color(border),
-            accents = DarkAccents,
+            accents = darkAccents,
             isDark = true,
         )
     }

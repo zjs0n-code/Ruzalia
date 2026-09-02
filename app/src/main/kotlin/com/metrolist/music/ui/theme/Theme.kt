@@ -15,6 +15,7 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.SaverScope
@@ -26,22 +27,53 @@ import com.metrolist.music.ui.theme.nuclear.LocalNuclearMetrics
 import com.metrolist.music.ui.theme.nuclear.LocalNuclearPalette
 import com.metrolist.music.ui.theme.nuclear.NuclearMetrics
 import com.metrolist.music.ui.theme.nuclear.NuclearShapes
+import com.metrolist.music.constants.NuclearCustomThemeKey
+import com.metrolist.music.constants.NuclearSeedColorKey
+import com.metrolist.music.constants.NuclearThemeKey
+import com.metrolist.music.constants.NuclearThemeModeKey
+import com.metrolist.music.ui.theme.nuclear.NuclearPalette
+import com.metrolist.music.ui.theme.nuclear.NuclearThemeFile
 import com.metrolist.music.ui.theme.nuclear.NuclearThemeId
+import com.metrolist.music.ui.theme.nuclear.NuclearThemeMode
+import com.metrolist.music.ui.theme.nuclear.seedPalette
+import com.metrolist.music.utils.rememberEnumPreference
+import com.metrolist.music.utils.rememberPreference
 import com.metrolist.music.ui.theme.nuclear.NuclearTypography
 import com.metrolist.music.ui.theme.nuclear.nuclearColorScheme
 
 /** nuclear's default primary: the candy pink from `--primary` in light mode. */
 val DefaultThemeColor = Color(0xFFFF9CB4)
 
+/**
+ * Resolves the palette in use from the stored theme settings: one of the five
+ * ports of nuclear's presets, a full palette derived from a colour the user
+ * picked, or one edited token by token in the advanced editor.
+ */
+@Composable
+fun rememberNuclearPalette(dark: Boolean): NuclearPalette {
+    val mode by rememberEnumPreference(NuclearThemeModeKey, NuclearThemeMode.PRESET)
+    val preset by rememberEnumPreference(NuclearThemeKey, NuclearThemeId.Default)
+    val seedColor by rememberPreference(NuclearSeedColorKey, DefaultThemeColor.toArgb())
+    val customTheme by rememberPreference(NuclearCustomThemeKey, "")
+
+    return remember(mode, preset, seedColor, customTheme, dark) {
+        when (mode) {
+            NuclearThemeMode.PRESET -> preset.palette(dark)
+            NuclearThemeMode.SEED -> seedPalette(Color(seedColor), dark)
+            NuclearThemeMode.CUSTOM ->
+                NuclearThemeFile.decodeOrNull(customTheme)?.palette(dark) ?: preset.palette(dark)
+        }
+    }
+}
+
 @Composable
 fun MetrolistTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     pureBlack: Boolean = false,
-    nuclearTheme: NuclearThemeId = NuclearThemeId.Default,
+    palette: NuclearPalette = NuclearThemeId.Default.palette(darkTheme),
     accentOverride: Color? = null,
     content: @Composable () -> Unit,
 ) {
-    val palette = remember(nuclearTheme, darkTheme) { nuclearTheme.palette(darkTheme) }
     val applyPureBlack = darkTheme && pureBlack
 
     val baseColorScheme = nuclearColorScheme(palette, accentOverride)

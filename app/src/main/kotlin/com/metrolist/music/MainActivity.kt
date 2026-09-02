@@ -192,6 +192,7 @@ import com.metrolist.music.ui.screens.settings.ChangelogScreen
 import com.metrolist.music.ui.screens.settings.DarkMode
 import com.metrolist.music.ui.screens.settings.NavigationTab
 import com.metrolist.music.ui.theme.MetrolistTheme
+import com.metrolist.music.ui.theme.rememberNuclearPalette
 import com.metrolist.music.ui.theme.NullableColorSaver
 import com.metrolist.music.ui.theme.extractThemeColor
 import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
@@ -543,7 +544,6 @@ class MainActivity : FragmentActivity() {
         }
 
         val enableDynamicTheme by rememberPreference(DynamicThemeKey, defaultValue = false)
-        val nuclearTheme by rememberEnumPreference(NuclearThemeKey, NuclearThemeId.Default)
         val enableHighRefreshRate by rememberPreference(EnableHighRefreshRateKey, defaultValue = true)
 
         LaunchedEffect(enableHighRefreshRate) {
@@ -592,6 +592,8 @@ class MainActivity : FragmentActivity() {
             remember(pureBlackEnabled, useDarkTheme) {
                 pureBlackEnabled && useDarkTheme
             }
+
+        val nuclearPalette = rememberNuclearPalette(dark = useDarkTheme)
 
         val showChangelog = rememberSaveable { mutableStateOf(false) }
 
@@ -655,7 +657,7 @@ class MainActivity : FragmentActivity() {
         MetrolistTheme(
             darkTheme = useDarkTheme,
             pureBlack = pureBlack,
-            nuclearTheme = nuclearTheme,
+            palette = nuclearPalette,
             accentOverride = themeColor?.takeIf { enableDynamicTheme },
         ) {
             val currentDensity = LocalDensity.current

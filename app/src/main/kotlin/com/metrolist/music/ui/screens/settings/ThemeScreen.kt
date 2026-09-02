@@ -73,11 +73,23 @@ import com.materialkolor.rememberDynamicColorScheme
 import com.metrolist.music.R
 import com.metrolist.music.constants.DarkModeKey
 import com.metrolist.music.constants.DynamicThemeKey
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.toArgb
+import com.metrolist.music.constants.NuclearSeedColorKey
+import com.metrolist.music.constants.NuclearThemeModeKey
+import com.metrolist.music.ui.theme.nuclear.NuclearThemeMode
+import com.metrolist.music.ui.theme.nuclear.NuclearColorPicker
+import com.metrolist.music.ui.theme.nuclear.seedPalette
+import com.metrolist.music.ui.theme.nuclear.NuclearButton
+import com.metrolist.music.ui.component.DefaultDialog
 import com.metrolist.music.constants.NuclearThemeKey
 import com.metrolist.music.constants.PureBlackKey
 import com.metrolist.music.constants.PureBlackMiniPlayerKey
 import com.metrolist.music.ui.theme.DefaultThemeColor
 import com.metrolist.music.ui.theme.MetrolistTheme
+import com.metrolist.music.ui.theme.rememberNuclearPalette
 import com.metrolist.music.ui.theme.nuclear.NuclearSurface
 import com.metrolist.music.ui.theme.nuclear.NuclearTheme
 import com.metrolist.music.ui.theme.nuclear.NuclearThemeId
@@ -111,6 +123,7 @@ fun ThemeScreen(
 
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val onAdvancedClick = { navController.navigate("settings/appearance/theme/advanced") }
 
     if (isLandscape) {
         LandscapeThemeLayout(
@@ -122,7 +135,8 @@ fun ThemeScreen(
             nuclearTheme = nuclearTheme,
             onNuclearThemeChange = onNuclearThemeChange,
             albumArtAccent = albumArtAccent,
-            onAlbumArtAccentChange = onAlbumArtAccentChange
+            onAlbumArtAccentChange = onAlbumArtAccentChange,
+            onAdvancedClick = onAdvancedClick
         )
     } else {
         PortraitThemeLayout(
@@ -134,7 +148,8 @@ fun ThemeScreen(
             nuclearTheme = nuclearTheme,
             onNuclearThemeChange = onNuclearThemeChange,
             albumArtAccent = albumArtAccent,
-            onAlbumArtAccentChange = onAlbumArtAccentChange
+            onAlbumArtAccentChange = onAlbumArtAccentChange,
+            onAdvancedClick = onAdvancedClick
         )
     }
 
@@ -161,7 +176,8 @@ fun PortraitThemeLayout(
     nuclearTheme: NuclearThemeId,
     onNuclearThemeChange: (NuclearThemeId) -> Unit,
     albumArtAccent: Boolean,
-    onAlbumArtAccentChange: (Boolean) -> Unit
+    onAlbumArtAccentChange: (Boolean) -> Unit,
+    onAdvancedClick: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -194,7 +210,8 @@ fun PortraitThemeLayout(
             nuclearTheme = nuclearTheme,
             onNuclearThemeChange = onNuclearThemeChange,
             albumArtAccent = albumArtAccent,
-            onAlbumArtAccentChange = onAlbumArtAccentChange
+            onAlbumArtAccentChange = onAlbumArtAccentChange,
+            onAdvancedClick = onAdvancedClick
         )
 
         Spacer(modifier = Modifier.height(120.dp))
@@ -211,7 +228,8 @@ fun LandscapeThemeLayout(
     nuclearTheme: NuclearThemeId,
     onNuclearThemeChange: (NuclearThemeId) -> Unit,
     albumArtAccent: Boolean,
-    onAlbumArtAccentChange: (Boolean) -> Unit
+    onAlbumArtAccentChange: (Boolean) -> Unit,
+    onAdvancedClick: () -> Unit = {}
 ) {
     Row(
         modifier = Modifier
@@ -255,7 +273,8 @@ fun LandscapeThemeLayout(
                 nuclearTheme = nuclearTheme,
                 onNuclearThemeChange = onNuclearThemeChange,
                 albumArtAccent = albumArtAccent,
-                onAlbumArtAccentChange = onAlbumArtAccentChange
+                onAlbumArtAccentChange = onAlbumArtAccentChange,
+                onAdvancedClick = onAdvancedClick
             )
 
             Spacer(modifier = Modifier.height(80.dp))
@@ -272,8 +291,13 @@ fun ThemeControls(
     nuclearTheme: NuclearThemeId,
     onNuclearThemeChange: (NuclearThemeId) -> Unit,
     albumArtAccent: Boolean,
-    onAlbumArtAccentChange: (Boolean) -> Unit
+    onAlbumArtAccentChange: (Boolean) -> Unit,
+    onAdvancedClick: () -> Unit = {}
 ) {
+    val (themeMode, onThemeModeChange) = rememberEnumPreference(NuclearThemeModeKey, NuclearThemeMode.PRESET)
+    val (seedColorInt, onSeedColorChange) = rememberPreference(NuclearSeedColorKey, DefaultThemeColor.toArgb())
+    var pickingSeed by rememberSaveable { mutableStateOf(false) }
+
     // The swatches have to preview the mode the app is actually in. Keying them
     // to the system setting shows dark palettes while the app renders light.
     val isSystemDark = isSystemInDarkTheme()
@@ -383,12 +407,50 @@ fun ThemeControls(
                     items(NuclearThemeId.entries) { theme ->
                         NuclearThemeItem(
                             theme = theme,
-                            isSelected = theme == nuclearTheme,
+                            isSelected = themeMode == NuclearThemeMode.PRESET && theme == nuclearTheme,
                             dark = previewDark,
-                            onClick = { onNuclearThemeChange(theme) }
+                            onClick = {
+                                onNuclearThemeChange(theme)
+                                onThemeModeChange(NuclearThemeMode.PRESET)
+                            }
+                        )
+                    }
+
+                    item {
+                        NuclearCustomThemeItem(
+                            seed = Color(seedColorInt),
+                            dark = previewDark,
+                            isSelected = themeMode == NuclearThemeMode.SEED,
+                            onClick = { pickingSeed = true }
                         )
                     }
                 }
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = onAdvancedClick),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.nuclear_advanced_theme),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = stringResource(R.string.nuclear_advanced_theme_desc),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Icon(
+                    painter = painterResource(R.drawable.arrow_forward),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
 
             Row(
@@ -416,6 +478,100 @@ fun ThemeControls(
                 )
             }
         }
+    }
+
+    if (pickingSeed) {
+        DefaultDialog(onDismiss = { pickingSeed = false }) {
+            Text(
+                text = stringResource(R.string.nuclear_pick_color),
+                style = MaterialTheme.typography.titleMedium
+            )
+            Spacer(Modifier.height(6.dp))
+            Text(
+                text = stringResource(R.string.nuclear_pick_color_desc),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(Modifier.height(12.dp))
+            NuclearColorPicker(
+                color = Color(seedColorInt),
+                onColorChange = {
+                    onSeedColorChange(it.toArgb())
+                    onThemeModeChange(NuclearThemeMode.SEED)
+                }
+            )
+            Spacer(Modifier.height(12.dp))
+            NuclearButton(onClick = { pickingSeed = false }) {
+                Text(stringResource(android.R.string.ok))
+            }
+        }
+    }
+}
+
+/**
+ * The sixth swatch: a colour of the user's choosing, from which the whole
+ * palette is generated the same way the five presets are generated from theirs.
+ */
+@Composable
+fun NuclearCustomThemeItem(
+    seed: Color,
+    dark: Boolean,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    val palette = seedPalette(seed, dark)
+    val scale by animateFloatAsState(
+        targetValue = if (isSelected) 1.08f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium
+        ),
+        label = "customThemeScale"
+    )
+    val name = stringResource(R.string.nuclear_theme_custom)
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+        modifier = Modifier.graphicsLayer {
+            scaleX = scale
+            scaleY = scale
+        }
+    ) {
+        NuclearSurface(
+            modifier = Modifier
+                .size(64.dp)
+                .semantics { contentDescription = name },
+            color = palette.background,
+            borderColor = palette.border,
+            shadowColor = palette.border,
+            onClick = onClick,
+            contentPadding = PaddingValues(8.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(MaterialTheme.shapes.small)
+                    .background(palette.primary)
+                    .border(
+                        NuclearTheme.metrics.borderWidth,
+                        palette.border,
+                        MaterialTheme.shapes.small,
+                    )
+            )
+        }
+
+        Text(
+            text = name,
+            style = MaterialTheme.typography.labelSmall,
+            color = if (isSelected) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                MaterialTheme.colorScheme.onSurfaceVariant
+            },
+            fontWeight = if (isSelected) FontWeight(800) else FontWeight.Normal
+        )
     }
 }
 
@@ -627,7 +783,7 @@ fun ModeCircle(
 fun ThemeMockup(
     darkMode: DarkMode,
     pureBlack: Boolean,
-    nuclearTheme: NuclearThemeId
+    nuclearTheme: NuclearThemeId,
 ) {
     val isSystemDark = isSystemInDarkTheme()
     val useDark = when (darkMode) {
@@ -639,7 +795,9 @@ fun ThemeMockup(
     MetrolistTheme(
         darkTheme = useDark,
         pureBlack = pureBlack,
-        nuclearTheme = nuclearTheme
+        // Preview whatever is actually applied, which may be a picked colour
+        // or a hand-edited theme rather than the highlighted preset.
+        palette = rememberNuclearPalette(dark = useDark),
     ) {
         Card(
             modifier = Modifier
@@ -735,7 +893,7 @@ fun ThemeMockup(
 fun ThemeMockupPortrait(
     darkMode: DarkMode,
     pureBlack: Boolean,
-    nuclearTheme: NuclearThemeId
+    nuclearTheme: NuclearThemeId,
 ) {
     val isSystemDark = isSystemInDarkTheme()
     val useDark = when (darkMode) {
@@ -747,7 +905,9 @@ fun ThemeMockupPortrait(
     MetrolistTheme(
         darkTheme = useDark,
         pureBlack = pureBlack,
-        nuclearTheme = nuclearTheme
+        // Preview whatever is actually applied, which may be a picked colour
+        // or a hand-edited theme rather than the highlighted preset.
+        palette = rememberNuclearPalette(dark = useDark),
     ) {
         Card(
             modifier = Modifier

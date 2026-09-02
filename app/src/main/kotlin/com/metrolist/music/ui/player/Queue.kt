@@ -125,6 +125,7 @@ import com.metrolist.music.ui.component.MediaMetadataListItem
 import com.metrolist.music.ui.menu.PlayerMenu
 import com.metrolist.music.ui.menu.QueueMenu
 import com.metrolist.music.ui.menu.SelectionMediaMetadataMenu
+import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
 import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
 import com.metrolist.music.ui.theme.nuclear.NuclearSurface
 import com.metrolist.music.ui.theme.nuclear.NuclearTheme
@@ -1065,8 +1066,16 @@ fun Queue(
                     exit = fadeOut() + slideOutVertically { it },
                 ) {
                     Row {
-                        IconButton(
+                        NuclearIconButton(
                             onClick = { locked = !locked },
+                            // Filled while locked, page-coloured while not, the
+                            // same on/off convention as the queue's other controls.
+                            variant = if (locked) {
+                                NuclearButtonVariant.Primary
+                            } else {
+                                NuclearButtonVariant.Secondary
+                            },
+                            size = 48.dp,
                             modifier = Modifier.padding(horizontal = 6.dp),
                         ) {
                             Icon(
@@ -1198,9 +1207,15 @@ fun Queue(
                             .only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal),
                     ).padding(12.dp),
         ) {
-            IconButton(
+            NuclearIconButton(
                 enabled = !isListenTogetherGuest,
                 modifier = Modifier.align(Alignment.CenterStart),
+                variant = if (shuffleModeEnabled) {
+                    NuclearButtonVariant.Primary
+                } else {
+                    NuclearButtonVariant.Secondary
+                },
+                size = 48.dp,
                 onClick = {
                     coroutineScope
                         .launch {
@@ -1213,28 +1228,35 @@ fun Queue(
                         }
                 },
             ) {
-                val baseAlpha = if (shuffleModeEnabled) 1f else 0.5f
-                val finalAlpha = if (!isListenTogetherGuest) baseAlpha else 0.3f
                 Icon(
                     painter = painterResource(R.drawable.shuffle),
-                    contentDescription = null,
-                    modifier = Modifier.alpha(finalAlpha),
+                    contentDescription = stringResource(R.string.shuffle),
                 )
             }
 
-            Icon(
-                painter = painterResource(R.drawable.expand_more),
-                contentDescription = null,
+            NuclearIconButton(
+                onClick = { state.collapseSoft() },
                 modifier = Modifier.align(Alignment.Center),
-            )
+                variant = NuclearButtonVariant.Secondary,
+                size = 48.dp,
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.expand_more),
+                    contentDescription = null,
+                )
+            }
 
-            IconButton(
+            NuclearIconButton(
                 enabled = !isListenTogetherGuest,
                 modifier = Modifier.align(Alignment.CenterEnd),
+                variant = if (repeatMode == Player.REPEAT_MODE_OFF) {
+                    NuclearButtonVariant.Secondary
+                } else {
+                    NuclearButtonVariant.Primary
+                },
+                size = 48.dp,
                 onClick = playerConnection.player::toggleRepeatMode,
             ) {
-                val baseAlpha = if (repeatMode == Player.REPEAT_MODE_OFF) 0.5f else 1f
-                val finalAlpha = if (!isListenTogetherGuest) baseAlpha else 0.3f
                 Icon(
                     painter =
                         painterResource(
@@ -1244,8 +1266,7 @@ fun Queue(
                                 else -> throw IllegalStateException()
                             },
                         ),
-                    contentDescription = null,
-                    modifier = Modifier.alpha(finalAlpha),
+                    contentDescription = stringResource(R.string.repeat_mode_off),
                 )
             }
         }
