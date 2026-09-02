@@ -54,60 +54,68 @@ fun nuclearColorScheme(
     val onFill = palette.contentColorOn(fill)
     val accents = palette.accents
 
-    return seeded.copy(
-        primary = ink,
-        onPrimary = palette.contentColorOn(ink),
-        primaryContainer = fill,
-        onPrimaryContainer = onFill,
+    // MaterialTheme hands this to LocalColorScheme, which is a
+    // staticCompositionLocalOf: a new instance invalidates every composable
+    // below it, not just the ones reading a colour. Without this remember a
+    // fresh ColorScheme was built on every recomposition of the theme call
+    // site, so the whole UI re-rendered whenever anything above it changed -
+    // including the playback position, which ticks ten times a second.
+    return remember(seeded, palette, fill, ink, muted, onFill) {
+        seeded.copy(
+            primary = ink,
+            onPrimary = palette.contentColorOn(ink),
+            primaryContainer = fill,
+            onPrimaryContainer = onFill,
 
-        // Metrolist uses `secondary` almost exclusively as a muted *text and
-        // icon* colour - 36 of its 55 references are `color =` on a Text - so
-        // it maps to nuclear's foreground-secondary, not to an accent.
-        // `secondaryContainer` is the one that behaves like a container
-        // (navigation pill, playing-row highlight, FAB), and that is primary.
-        secondary = muted,
-        onSecondary = palette.contentColorOn(muted),
-        secondaryContainer = fill,
-        onSecondaryContainer = onFill,
+            // Metrolist uses `secondary` almost exclusively as a muted *text and
+            // icon* colour - 36 of its 55 references are `color =` on a Text - so
+            // it maps to nuclear's foreground-secondary, not to an accent.
+            // `secondaryContainer` is the one that behaves like a container
+            // (navigation pill, playing-row highlight, FAB), and that is primary.
+            secondary = muted,
+            onSecondary = palette.contentColorOn(muted),
+            secondaryContainer = fill,
+            onSecondaryContainer = onFill,
 
-        tertiary = accents.purple,
-        onTertiary = palette.contentColorOn(accents.purple),
-        tertiaryContainer = accents.purple,
-        onTertiaryContainer = palette.contentColorOn(accents.purple),
+            tertiary = accents.purple,
+            onTertiary = palette.contentColorOn(accents.purple),
+            tertiaryContainer = accents.purple,
+            onTertiaryContainer = palette.contentColorOn(accents.purple),
 
-        background = palette.background,
-        onBackground = palette.foreground,
+            background = palette.background,
+            onBackground = palette.foreground,
 
-        surface = palette.background,
-        onSurface = palette.foreground,
-        surfaceVariant = palette.backgroundSecondary,
-        onSurfaceVariant = muted,
+            surface = palette.background,
+            onSurface = palette.foreground,
+            surfaceVariant = palette.backgroundSecondary,
+            onSurfaceVariant = muted,
 
-        surfaceContainerLowest = palette.backgroundInput,
-        surfaceContainerLow = palette.background,
-        surfaceContainer = palette.backgroundSecondary,
-        surfaceContainerHigh = palette.backgroundSecondary,
-        surfaceContainerHighest = palette.backgroundSecondary,
-        surfaceBright = palette.backgroundSecondary,
-        surfaceDim = palette.background,
+            surfaceContainerLowest = palette.backgroundInput,
+            surfaceContainerLow = palette.background,
+            surfaceContainer = palette.backgroundSecondary,
+            surfaceContainerHigh = palette.backgroundSecondary,
+            surfaceContainerHighest = palette.backgroundSecondary,
+            surfaceBright = palette.backgroundSecondary,
+            surfaceDim = palette.background,
 
-        // nuclear is flat: cards are separated by an outline, never by an
-        // elevation tint. Tinting toward the surface itself makes Material's
-        // elevation overlay a no-op instead of muddying every raised surface.
-        surfaceTint = palette.background,
+            // nuclear is flat: cards are separated by an outline, never by an
+            // elevation tint. Tinting toward the surface itself makes Material's
+            // elevation overlay a no-op instead of muddying every raised surface.
+            surfaceTint = palette.background,
 
-        outline = palette.border,
-        outlineVariant = palette.border,
+            outline = palette.border,
+            outlineVariant = palette.border,
 
-        error = accents.red,
-        onError = palette.contentColorOn(accents.red),
-        errorContainer = accents.red,
-        onErrorContainer = palette.contentColorOn(accents.red),
+            error = accents.red,
+            onError = palette.contentColorOn(accents.red),
+            errorContainer = accents.red,
+            onErrorContainer = palette.contentColorOn(accents.red),
 
-        inverseSurface = palette.foreground,
-        inverseOnSurface = palette.background,
-        scrim = Color.Black,
-    )
+            inverseSurface = palette.foreground,
+            inverseOnSurface = palette.background,
+            scrim = Color.Black,
+        )
+    }
 }
 
 /** WCAG relative contrast between two opaque colours. */

@@ -41,6 +41,9 @@ val NuclearShapes = Shapes(
     extraLarge = RoundedCornerShape(12.dp),
 )
 
+/** The default metrics, hoisted so the static local is handed a stable instance. */
+val DefaultNuclearMetrics = NuclearMetrics()
+
 val LocalNuclearPalette = staticCompositionLocalOf { NuclearThemeId.DEFAULT.palette(dark = true) }
 val LocalNuclearMetrics = staticCompositionLocalOf { NuclearMetrics() }
 

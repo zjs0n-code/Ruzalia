@@ -25,7 +25,7 @@ import androidx.palette.graphics.Palette
 import com.materialkolor.score.Score
 import com.metrolist.music.ui.theme.nuclear.LocalNuclearMetrics
 import com.metrolist.music.ui.theme.nuclear.LocalNuclearPalette
-import com.metrolist.music.ui.theme.nuclear.NuclearMetrics
+import com.metrolist.music.ui.theme.nuclear.DefaultNuclearMetrics
 import com.metrolist.music.ui.theme.nuclear.NuclearShapes
 import com.metrolist.music.constants.NuclearCustomThemeKey
 import com.metrolist.music.constants.NuclearSeedColorKey
@@ -93,7 +93,7 @@ fun MetrolistTheme(
 
     CompositionLocalProvider(
         LocalNuclearPalette provides effectivePalette,
-        LocalNuclearMetrics provides NuclearMetrics(),
+        LocalNuclearMetrics provides DefaultNuclearMetrics,
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
