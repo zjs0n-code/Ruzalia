@@ -140,6 +140,7 @@ import com.metrolist.music.constants.SleepTimerFadeOutKey
 import com.metrolist.music.constants.SleepTimerStopAfterCurrentSongKey
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.material3.Button
+import com.metrolist.music.ui.theme.nuclear.NuclearTheme
 
 
 @SuppressLint("UnrememberedMutableState")
@@ -387,8 +388,14 @@ fun Queue(
                         modifier =
                             Modifier
                                 .size(buttonSize)
-                                .clip(CircleShape)
+                                // nuclear has no circular buttons; radii stop at 12dp.
+                                .clip(MaterialTheme.shapes.large)
                                 .background(textButtonColor)
+                                .border(
+                                    NuclearTheme.metrics.borderWidth,
+                                    NuclearTheme.colors.border,
+                                    MaterialTheme.shapes.large,
+                                )
                                 .clickable {
                                     menuState.show {
                                         PlayerMenu(
@@ -1297,8 +1304,10 @@ private fun PlayerQueueButton(
             modifier
                 .then(
                     buttonModifier.border(
-                        width = 1.dp,
-                        color = textButtonColor.copy(alpha = 0.3f),
+                        // A 30%-alpha tint is Material's idea of an outline;
+                        // nuclear draws the real thing.
+                        width = NuclearTheme.metrics.borderWidth,
+                        color = NuclearTheme.colors.border,
                         shape = shape,
                     ),
                 ).alpha(alphaFactor)

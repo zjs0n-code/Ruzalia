@@ -122,6 +122,8 @@ import coil3.toBitmap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import com.metrolist.music.ui.theme.PlayerColorExtractor
+import com.metrolist.music.ui.theme.nuclear.NuclearTheme
+import com.metrolist.music.ui.theme.nuclear.nuclearHardShadow
 
 /**
  * Stable wrapper for progress state - reads values only during draw phase
@@ -373,15 +375,22 @@ private fun NewMiniPlayer(
                 },
     ) {
         val interactionSource = remember { MutableInteractionSource() }
+        // nuclear has no pills; this is a chunk with a real outline and a hard
+        // offset shadow. The end/bottom padding is what the shadow drops into,
+        // so it never bleeds over the navigation bar.
+        val miniPlayerShape = RoundedCornerShape(12.dp)
+        val shadowOffset = NuclearTheme.metrics.shadowOffset
         Box(
             modifier =
                 Modifier
                     .then(if (isTabletLandscape) Modifier.width(500.dp).align(Alignment.Center) else Modifier.fillMaxWidth())
                     .height(64.dp)
                     .offset { IntOffset(offsetXAnimatable.value.roundToInt(), 0) }
-                    .clip(RoundedCornerShape(32.dp))
+                    .padding(end = shadowOffset, bottom = shadowOffset)
+                    .nuclearHardShadow(miniPlayerShape, outlineColor, shadowOffset)
+                    .clip(miniPlayerShape)
                     .background(color = backgroundColor)
-                    .border(1.dp, outlineColor.copy(alpha = 0.3f), RoundedCornerShape(32.dp))
+                    .border(NuclearTheme.metrics.borderWidth, outlineColor, miniPlayerShape)
                     .clickable(
                         interactionSource = interactionSource,
                         indication = LocalIndication.current,
@@ -942,7 +951,7 @@ private fun LegacyMiniMediaInfo(
     modifier: Modifier = Modifier,
 ) {
     val error by LocalPlayerConnection.current?.error?.collectAsState() ?: remember { mutableStateOf(null) }
-    val cropAlbumArt by rememberPreference(CropAlbumArtKey, false)
+    val cropAlbumArt by rememberPreference(CropAlbumArtKey, true)
 
     Row(
         verticalAlignment = Alignment.CenterVertically,

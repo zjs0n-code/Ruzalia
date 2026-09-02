@@ -1,71 +1,75 @@
 /**
  * Metrolist Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
+ *
+ * Ruzalia: the scheme is no longer derived from a Material seed colour. It is
+ * built from one of nuclear's theme presets, which also brings its typography,
+ * corner radii and border/shadow metrics along. See ui/theme/nuclear/.
  */
 
 package com.metrolist.music.ui.theme
 
 import android.graphics.Bitmap
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.SaverScope
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
 import androidx.palette.graphics.Palette
-import com.materialkolor.PaletteStyle
-import com.materialkolor.dynamiccolor.ColorSpec
-import com.materialkolor.rememberDynamicColorScheme
 import com.materialkolor.score.Score
+import com.metrolist.music.ui.theme.nuclear.LocalNuclearMetrics
+import com.metrolist.music.ui.theme.nuclear.LocalNuclearPalette
+import com.metrolist.music.ui.theme.nuclear.NuclearMetrics
+import com.metrolist.music.ui.theme.nuclear.NuclearShapes
+import com.metrolist.music.ui.theme.nuclear.NuclearThemeId
+import com.metrolist.music.ui.theme.nuclear.NuclearTypography
+import com.metrolist.music.ui.theme.nuclear.nuclearColorScheme
 
-val DefaultThemeColor = Color(0xFFED5564)
+/** nuclear's default primary: the candy pink from `--primary` in light mode. */
+val DefaultThemeColor = Color(0xFFFF9CB4)
 
 @Composable
 fun MetrolistTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     pureBlack: Boolean = false,
-    themeColor: Color = DefaultThemeColor,
+    nuclearTheme: NuclearThemeId = NuclearThemeId.Default,
+    accentOverride: Color? = null,
     content: @Composable () -> Unit,
 ) {
-    val context = LocalContext.current
-    // Determine if system dynamic colors should be used (Android S+ and default theme color)
-    val useSystemDynamicColor = (themeColor == DefaultThemeColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+    val palette = remember(nuclearTheme, darkTheme) { nuclearTheme.palette(darkTheme) }
+    val applyPureBlack = darkTheme && pureBlack
 
-    // Select the appropriate color scheme generation method
-    val baseColorScheme = if (useSystemDynamicColor) {
-        // Use standard Material 3 dynamic color functions for system wallpaper colors
-        if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-    } else {
-        // Use materialKolor only when a specific seed color is provided
-        rememberDynamicColorScheme(
-            seedColor = themeColor, // themeColor is guaranteed non-default here
-            isDark = darkTheme,
-            specVersion = ColorSpec.SpecVersion.SPEC_2025,
-            style = PaletteStyle.TonalSpot // Keep existing style
-        )
+    val baseColorScheme = nuclearColorScheme(palette, accentOverride)
+    val colorScheme = remember(baseColorScheme, applyPureBlack) {
+        baseColorScheme.pureBlack(applyPureBlack)
     }
 
-    // Apply pureBlack modification if needed, similar to original logic
-    val colorScheme = remember(baseColorScheme, pureBlack, darkTheme) {
-        if (darkTheme && pureBlack) {
-            baseColorScheme.pureBlack(true)
+    // Keep the nuclear tokens in step with pure black, so borders are still
+    // drawn against the surface they actually sit on.
+    val effectivePalette = remember(palette, applyPureBlack) {
+        if (applyPureBlack) {
+            palette.copy(background = Color.Black, backgroundInput = Color.Black)
         } else {
-            baseColorScheme
+            palette
         }
     }
 
-    // Use standard MaterialTheme instead of MaterialExpressiveTheme
-    MaterialTheme(
-        colorScheme = colorScheme,
-        content = content,
-    )
+    CompositionLocalProvider(
+        LocalNuclearPalette provides effectivePalette,
+        LocalNuclearMetrics provides NuclearMetrics(),
+    ) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = NuclearTypography,
+            shapes = NuclearShapes,
+            content = content,
+        )
+    }
 }
 
 fun Bitmap.extractThemeColor(): Color = Color(
@@ -89,7 +93,10 @@ internal fun Palette.rankedColors(
 fun ColorScheme.pureBlack(apply: Boolean) =
     if (apply) copy(
         surface = Color.Black,
-        background = Color.Black
+        background = Color.Black,
+        surfaceContainerLow = Color.Black,
+        surfaceDim = Color.Black,
+        surfaceTint = Color.Black,
     ) else this
 
 val ColorSaver = object : Saver<Color, Int> {

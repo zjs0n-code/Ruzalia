@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -136,6 +137,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
 import kotlin.jvm.JvmName
+import com.metrolist.music.ui.theme.nuclear.NuclearSurface
+import com.metrolist.music.ui.theme.nuclear.NuclearTheme
+import com.metrolist.music.ui.theme.nuclear.nuclearBorder
 
 const val ActiveBoxAlpha = 0.6f
 
@@ -271,12 +275,22 @@ inline fun ListItem(
                         if (isSelected == true) MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
                         else MaterialTheme.colorScheme.secondaryContainer
                 )
+                .nuclearBorder(
+                    RoundedCornerShape(8.dp),
+                    NuclearTheme.colors.border,
+                    NuclearTheme.metrics.borderWidth,
+                )
         } else if (isSelected == true) {
             modifier // inactive selected
                 .height(ListItemHeight)
                 .padding(horizontal = 8.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .background(color = MaterialTheme.colorScheme.inversePrimary.copy(alpha = 0.4f))
+                .nuclearBorder(
+                    RoundedCornerShape(8.dp),
+                    NuclearTheme.colors.border,
+                    NuclearTheme.metrics.borderWidth,
+                )
         } else {
             modifier // default
                 .height(ListItemHeight)
@@ -408,37 +422,38 @@ fun GridItem(
     fillMaxWidth: Boolean = false,
 ) {
     val gridHeight = currentGridThumbnailHeight()
-    Column(
-        modifier = if (fillMaxWidth) {
-            modifier
-                .padding(12.dp)
-                .fillMaxWidth()
-        } else {
-            modifier
-                .padding(12.dp)
-                .width(gridHeight * thumbnailRatio)
-        }
+
+    // nuclear's Card: a primary-filled panel with a hard outline and an offset
+    // shadow, holding the artwork and its caption. See Card.tsx / Box.tsx.
+    NuclearSurface(
+        modifier = modifier.padding(6.dp),
+        color = NuclearTheme.colors.primary,
+        contentPadding = PaddingValues(6.dp),
     ) {
-        BoxWithConstraints(
-            contentAlignment = Alignment.Center,
-            modifier = if (fillMaxWidth) {
-                Modifier.fillMaxWidth()
-            } else {
-                Modifier.height(gridHeight)
-            }
-                .aspectRatio(thumbnailRatio)
+        Column(
+            modifier = if (fillMaxWidth) Modifier.fillMaxWidth() else Modifier.width(gridHeight * thumbnailRatio)
         ) {
-            thumbnailContent()
-        }
+            BoxWithConstraints(
+                contentAlignment = Alignment.Center,
+                modifier = if (fillMaxWidth) {
+                    Modifier.fillMaxWidth()
+                } else {
+                    Modifier.height(gridHeight)
+                }
+                    .aspectRatio(thumbnailRatio)
+            ) {
+                thumbnailContent()
+            }
 
-        Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
-        title()
+            title()
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            badges()
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                badges()
 
-            subtitle()
+                subtitle()
+            }
         }
     }
 }
@@ -469,7 +484,7 @@ fun GridItem(
         Text(
             text = subtitle,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.secondary,
+            color = LocalContentColor.current.copy(alpha = 0.6f),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
@@ -1477,7 +1492,7 @@ fun ItemThumbnail(
     isSelected: Boolean = false,
     thumbnailRatio: Float = 1f
 ) {
-    val cropAlbumArt by rememberPreference(CropAlbumArtKey, false)
+    val cropAlbumArt by rememberPreference(CropAlbumArtKey, true)
     
     Box(
         contentAlignment = Alignment.Center,
@@ -1485,6 +1500,7 @@ fun ItemThumbnail(
             .fillMaxSize()
             .aspectRatio(thumbnailRatio)
             .clip(shape)
+            .nuclearBorder(shape, NuclearTheme.colors.border, NuclearTheme.metrics.borderWidth)
     ) {
         if (albumIndex == null) {
             AsyncImage(
@@ -1559,7 +1575,7 @@ fun LocalThumbnail(
     playButtonVisible: Boolean = false,
     thumbnailRatio: Float = 1f
 ) {
-    val cropAlbumArt by rememberPreference(CropAlbumArtKey, false)
+    val cropAlbumArt by rememberPreference(CropAlbumArtKey, true)
     
     Box(
         contentAlignment = Alignment.Center,
@@ -1665,7 +1681,7 @@ fun PlaylistThumbnail(
     shape: Shape,
     cacheKey: String? = null
 ) {
-    val cropAlbumArt by rememberPreference(CropAlbumArtKey, false)
+    val cropAlbumArt by rememberPreference(CropAlbumArtKey, true)
     
     when (thumbnails.size) {
         0 -> Box(

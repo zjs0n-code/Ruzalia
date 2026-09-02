@@ -694,7 +694,7 @@ fun OriginalLyrics(
                             CardDefaults.cardColors(
                                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                             ),
-                        shape = RoundedCornerShape(16.dp),
+                        shape = RoundedCornerShape(12.dp),
                         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                     ) {
                         Row(
@@ -722,7 +722,7 @@ fun OriginalLyrics(
                             CardDefaults.cardColors(
                                 containerColor = MaterialTheme.colorScheme.errorContainer,
                             ),
-                        shape = RoundedCornerShape(16.dp),
+                        shape = RoundedCornerShape(12.dp),
                         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                     ) {
                         Row(
@@ -751,7 +751,7 @@ fun OriginalLyrics(
                             CardDefaults.cardColors(
                                 containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                             ),
-                        shape = RoundedCornerShape(16.dp),
+                        shape = RoundedCornerShape(12.dp),
                         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                     ) {
                         Row(
@@ -1998,7 +1998,7 @@ fun OriginalLyrics(
 
             BasicAlertDialog(onDismissRequest = { showColorPickerDialog = false }) {
                 Card(
-                    shape = RoundedCornerShape(20.dp),
+                    shape = RoundedCornerShape(12.dp),
                     modifier =
                         Modifier
                             .fillMaxWidth()

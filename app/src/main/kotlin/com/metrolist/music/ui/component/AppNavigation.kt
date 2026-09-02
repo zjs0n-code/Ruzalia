@@ -32,6 +32,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import com.metrolist.music.ui.screens.Screens
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Size
+import com.metrolist.music.ui.theme.nuclear.NuclearTheme
 
 @Stable
 private fun isRouteSelected(currentRoute: String?, screenRoute: String, navigationItems: List<Screens>): Boolean {
@@ -141,8 +144,16 @@ fun AppNavigationBar(
     val haptics = LocalHapticFeedback.current
     val viewConfiguration = LocalViewConfiguration.current
 
+    val borderColor = NuclearTheme.colors.border
+    val borderWidth = NuclearTheme.metrics.borderWidth
+
     NavigationBar(
-        modifier = modifier,
+        // Drawn over the bar rather than behind it, so the container colour
+        // does not swallow the rule that separates it from the content.
+        modifier = modifier.drawWithContent {
+            drawContent()
+            drawRect(color = borderColor, size = Size(size.width, borderWidth.toPx()))
+        },
         containerColor = containerColor,
         contentColor = contentColor
     ) {

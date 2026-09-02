@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
@@ -54,6 +55,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.metrolist.music.R
 import com.metrolist.music.ui.screens.OptionStats
+import com.metrolist.music.ui.theme.nuclear.NuclearTheme
 
 @Composable
 fun <E> ChipsRow(
@@ -80,8 +82,8 @@ fun <E> ChipsRow(
                     containerColor = containerColor,
                 ),
                 onClick = { onValueUpdate(value) },
-                shape = RoundedCornerShape(16.dp),
-                border = null
+                shape = MaterialTheme.shapes.medium,
+                border = BorderStroke(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border),
             )
 
             Spacer(Modifier.width(8.dp))
@@ -141,8 +143,8 @@ fun <Int> ChoiceChipsRow(
                         modifier = Modifier.graphicsLayer(rotationZ = rotationAnimation),
                     )
                 },
-                shape = RoundedCornerShape(16.dp),
-                border = null,
+                shape = MaterialTheme.shapes.medium,
+                border = BorderStroke(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border),
                 colors = AssistChipDefaults.assistChipColors(
                     containerColor = containerColor,
                     labelColor = MaterialTheme.colorScheme.onSurface
@@ -198,8 +200,8 @@ fun <Int> ChoiceChipsRow(
                             containerColor = containerColor,
                         ),
                         onClick = { onValueUpdate(value) },
-                        shape = RoundedCornerShape(16.dp),
-                        border = null
+                        shape = MaterialTheme.shapes.medium,
+                        border = BorderStroke(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border),
                     )
                 }
             }

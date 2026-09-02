@@ -124,10 +124,13 @@ fun AppearanceSettings(
     navController: NavController,
     snackbarHostState: SnackbarHostState,
 ) {
+    // nuclear's presets are the default now; album-art accent is opt-in.
+    // This default must match MainActivity and ThemeScreen or the switch will
+    // disagree with what the app is actually doing.
     val (dynamicTheme, onDynamicThemeChange) =
         rememberPreference(
             DynamicThemeKey,
-            defaultValue = true,
+            defaultValue = false,
         )
     val (enableDynamicIcon, onEnableDynamicIconPrefChange) =
         rememberPreference(
@@ -188,7 +191,7 @@ fun AppearanceSettings(
     val (cropAlbumArt, onCropAlbumArtChange) =
         rememberPreference(
             CropAlbumArtKey,
-            defaultValue = false,
+            defaultValue = true,
         )
     val (playerBackground, onPlayerBackgroundChange) =
         rememberEnumPreference(
@@ -722,7 +725,7 @@ fun AppearanceSettings(
                             Modifier
                                 .aspectRatio(1f)
                                 .weight(1f)
-                                .clip(RoundedCornerShape(16.dp))
+                                .clip(RoundedCornerShape(12.dp))
                                 .border(
                                     1.dp,
                                     if (sliderStyle == SliderStyle.DEFAULT &&
@@ -732,7 +735,7 @@ fun AppearanceSettings(
                                     } else {
                                         MaterialTheme.colorScheme.outlineVariant
                                     },
-                                    RoundedCornerShape(16.dp),
+                                    RoundedCornerShape(12.dp),
                                 ).clickable {
                                     onSliderStyleChange(SliderStyle.DEFAULT)
                                     onSquigglySliderChange(false)
@@ -762,7 +765,7 @@ fun AppearanceSettings(
                             Modifier
                                 .aspectRatio(1f)
                                 .weight(1f)
-                                .clip(RoundedCornerShape(16.dp))
+                                .clip(RoundedCornerShape(12.dp))
                                 .border(
                                     1.dp,
                                     if (sliderStyle == SliderStyle.WAVY &&
@@ -772,7 +775,7 @@ fun AppearanceSettings(
                                     } else {
                                         MaterialTheme.colorScheme.outlineVariant
                                     },
-                                    RoundedCornerShape(16.dp),
+                                    RoundedCornerShape(12.dp),
                                 ).clickable {
                                     onSliderStyleChange(SliderStyle.WAVY)
                                     onSquigglySliderChange(false)
@@ -807,7 +810,7 @@ fun AppearanceSettings(
                             Modifier
                                 .aspectRatio(1f)
                                 .weight(1f)
-                                .clip(RoundedCornerShape(16.dp))
+                                .clip(RoundedCornerShape(12.dp))
                                 .border(
                                     1.dp,
                                     if (sliderStyle ==
@@ -817,7 +820,7 @@ fun AppearanceSettings(
                                     } else {
                                         MaterialTheme.colorScheme.outlineVariant
                                     },
-                                    RoundedCornerShape(16.dp),
+                                    RoundedCornerShape(12.dp),
                                 ).clickable {
                                     onSliderStyleChange(SliderStyle.SLIM)
                                     onSquigglySliderChange(false)
@@ -855,7 +858,7 @@ fun AppearanceSettings(
                             Modifier
                                 .aspectRatio(1f)
                                 .weight(1f)
-                                .clip(RoundedCornerShape(16.dp))
+                                .clip(RoundedCornerShape(12.dp))
                                 .border(
                                     1.dp,
                                     if (sliderStyle == SliderStyle.WAVY &&
@@ -865,7 +868,7 @@ fun AppearanceSettings(
                                     } else {
                                         MaterialTheme.colorScheme.outlineVariant
                                     },
-                                    RoundedCornerShape(16.dp),
+                                    RoundedCornerShape(12.dp),
                                 ).clickable {
                                     onSliderStyleChange(SliderStyle.WAVY)
                                     onSquigglySliderChange(true)

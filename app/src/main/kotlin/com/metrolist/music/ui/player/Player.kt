@@ -28,6 +28,8 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
@@ -152,6 +154,7 @@ import com.metrolist.music.constants.QueuePeekHeight
 import com.metrolist.music.constants.SleepTimerDefaultKey
 import com.metrolist.music.constants.SleepTimerFadeOutKey
 import com.metrolist.music.constants.SleepTimerStopAfterCurrentSongKey
+import com.metrolist.music.ui.theme.nuclear.NuclearTheme
 import com.metrolist.music.constants.SliderStyle
 import com.metrolist.music.constants.SliderStyleKey
 import com.metrolist.music.constants.SquigglySliderKey
@@ -223,7 +226,7 @@ fun BottomSheetPlayer(
         )
     val (hidePlayerThumbnail, onHidePlayerThumbnailChange) = rememberPreference(HidePlayerThumbnailKey, false)
     val (hideStatusBarOnFullscreen) = rememberPreference(HideStatusBarOnFullscreenKey, false)
-    val cropAlbumArt by rememberPreference(CropAlbumArtKey, false)
+    val cropAlbumArt by rememberPreference(CropAlbumArtKey, true)
 
     var showInlineLyrics by rememberSaveable {
         mutableStateOf(false)
@@ -503,11 +506,13 @@ fun BottomSheetPlayer(
             else -> {
                 when (playerButtonsStyle) {
                     PlayerButtonsStyle.DEFAULT -> {
-                        if (useDarkTheme) {
-                            Pair(Color.White, Color.Black)
-                        } else {
-                            Pair(Color.Black, Color.White)
-                        }
+                        // nuclear fills its primary control with --primary and
+                        // sets the label in --foreground. A black slab is
+                        // Material's idea of a play button, not nuclear's.
+                        Pair(
+                            MaterialTheme.colorScheme.primaryContainer,
+                            MaterialTheme.colorScheme.onPrimaryContainer,
+                        )
                     }
 
                     PlayerButtonsStyle.PRIMARY -> {
@@ -1156,7 +1161,7 @@ fun BottomSheetPlayer(
                                             containerColor = textButtonColor,
                                             contentColor = iconButtonColor,
                                         ),
-                                    modifier = Modifier.size(42.dp),
+                                    modifier = Modifier.size(42.dp).border(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border, shareShape),
                                 ) {
                                     Icon(
                                         painter = painterResource(R.drawable.fullscreen),
@@ -1184,7 +1189,7 @@ fun BottomSheetPlayer(
                                             containerColor = textButtonColor,
                                             contentColor = iconButtonColor,
                                         ),
-                                    modifier = Modifier.size(42.dp),
+                                    modifier = Modifier.size(42.dp).border(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border, shareShape),
                                 ) {
                                     Icon(
                                         painter = painterResource(R.drawable.share),
@@ -1222,7 +1227,7 @@ fun BottomSheetPlayer(
                                             containerColor = textButtonColor,
                                             contentColor = iconButtonColor,
                                         ),
-                                    modifier = Modifier.size(42.dp),
+                                    modifier = Modifier.size(42.dp).border(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border, favShape),
                                 ) {
                                     Icon(
                                         painter = painterResource(R.drawable.more_horiz),
@@ -1242,7 +1247,7 @@ fun BottomSheetPlayer(
                                             containerColor = textButtonColor,
                                             contentColor = iconButtonColor,
                                         ),
-                                    modifier = Modifier.size(42.dp),
+                                    modifier = Modifier.size(42.dp).border(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border, favShape),
                                 ) {
                                     Icon(
                                         painter =
@@ -1267,8 +1272,9 @@ fun BottomSheetPlayer(
                                 modifier =
                                     Modifier
                                         .size(40.dp)
-                                        .clip(RoundedCornerShape(24.dp))
+                                        .clip(RoundedCornerShape(12.dp))
                                         .background(textButtonColor)
+                                        .border(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border, RoundedCornerShape(12.dp))
                                         .clickable { isFullScreen = !isFullScreen },
                             ) {
                                 Icon(
@@ -1286,8 +1292,9 @@ fun BottomSheetPlayer(
                                 modifier =
                                     Modifier
                                         .size(40.dp)
-                                        .clip(RoundedCornerShape(24.dp))
+                                        .clip(RoundedCornerShape(12.dp))
                                         .background(textButtonColor)
+                                        .border(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border, RoundedCornerShape(12.dp))
                                         .clickable {
                                             val intent =
                                                 Intent().apply {
@@ -1323,8 +1330,9 @@ fun BottomSheetPlayer(
                                 modifier =
                                     Modifier
                                         .size(40.dp)
-                                        .clip(RoundedCornerShape(24.dp))
+                                        .clip(RoundedCornerShape(12.dp))
                                         .background(textButtonColor)
+                                        .border(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border, RoundedCornerShape(12.dp))
                                         .clickable {
                                             menuState.show {
                                                 com.metrolist.music.ui.menu.LyricsMenu(
@@ -1589,7 +1597,7 @@ fun BottomSheetPlayer(
                             FilledIconButton(
                                 onClick = playerConnection::seekToPrevious,
                                 enabled = canSkipPrevious && !isListenTogetherGuest,
-                                shape = RoundedCornerShape(50),
+                                shape = MaterialTheme.shapes.large,
                                 interactionSource = backInteractionSource,
                                 colors =
                                     IconButtonDefaults.filledIconButtonColors(
@@ -1599,7 +1607,8 @@ fun BottomSheetPlayer(
                                 modifier =
                                     Modifier
                                         .height(68.dp)
-                                        .weight(backButtonWeight),
+                                        .weight(backButtonWeight)
+                                        .border(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border, MaterialTheme.shapes.large),
                             ) {
                                 Icon(
                                     painter = painterResource(R.drawable.skip_previous),
@@ -1629,7 +1638,7 @@ fun BottomSheetPlayer(
                                         playerConnection.togglePlayPause()
                                     }
                                 },
-                                shape = RoundedCornerShape(50),
+                                shape = MaterialTheme.shapes.large,
                                 interactionSource = playPauseInteractionSource,
                                 colors =
                                     IconButtonDefaults.filledIconButtonColors(
@@ -1640,6 +1649,7 @@ fun BottomSheetPlayer(
                                     Modifier
                                         .height(68.dp)
                                         .weight(playPauseWeight)
+                                        .border(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border, MaterialTheme.shapes.large)
                                         .focusRequester(focusRequester),
                             ) {
                                 Row(
@@ -1681,7 +1691,7 @@ fun BottomSheetPlayer(
                             FilledIconButton(
                                 onClick = playerConnection::seekToNext,
                                 enabled = canSkipNext && !isListenTogetherGuest,
-                                shape = RoundedCornerShape(50),
+                                shape = MaterialTheme.shapes.large,
                                 interactionSource = nextInteractionSource,
                                 colors =
                                     IconButtonDefaults.filledIconButtonColors(
@@ -1691,7 +1701,8 @@ fun BottomSheetPlayer(
                                 modifier =
                                     Modifier
                                         .height(68.dp)
-                                        .weight(nextButtonWeight),
+                                        .weight(nextButtonWeight)
+                                        .border(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border, MaterialTheme.shapes.large),
                             ) {
                                 Icon(
                                     painter = painterResource(R.drawable.skip_next),
@@ -1754,6 +1765,7 @@ fun BottomSheetPlayer(
                                         .size(72.dp)
                                         .clip(RoundedCornerShape(playPauseRoundness))
                                         .background(textButtonColor)
+                                        .border(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border, RoundedCornerShape(playPauseRoundness))
                                         .clickable {
                                             if (isListenTogetherGuest) {
                                                 playerConnection.toggleMute()
@@ -2148,8 +2160,9 @@ private fun PlayerMoreMenuButton(
         modifier =
             Modifier
                 .size(40.dp)
-                .clip(RoundedCornerShape(24.dp))
+                .clip(RoundedCornerShape(12.dp))
                 .background(textButtonColor)
+                .border(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border, RoundedCornerShape(12.dp))
                 .clickable {
                     menuState.show {
                         PlayerMenu(

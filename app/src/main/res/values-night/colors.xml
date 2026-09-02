@@ -3,4 +3,7 @@
     <!-- Widget colors for dark mode -->
     <color name="widget_text_primary">#E6E1E5</color>
     <color name="widget_text_secondary">#CAC4D0</color>
+
+    <!-- Ruzalia: nuclear default theme, dark page colour -->
+    <color name="nuclear_window_background">#261519</color>
 </resources>

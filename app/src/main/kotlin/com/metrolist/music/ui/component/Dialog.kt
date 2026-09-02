@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -61,6 +62,7 @@ import com.metrolist.music.LocalNavController
 import com.metrolist.music.R
 import com.metrolist.music.ui.screens.settings.AccountSettings
 import kotlinx.coroutines.delay
+import com.metrolist.music.ui.theme.nuclear.NuclearTheme
 
 @Composable
 fun DefaultDialog(
@@ -81,6 +83,7 @@ fun DefaultDialog(
             shape = AlertDialogDefaults.shape,
             color = AlertDialogDefaults.containerColor,
             tonalElevation = AlertDialogDefaults.TonalElevation,
+            border = BorderStroke(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border),
         ) {
             Column(
                 horizontalAlignment = horizontalAlignment,
@@ -166,10 +169,11 @@ fun AccountSettingsDialog(
                     Modifier
                         .fillMaxWidth()
                         .padding(top = 72.dp, start = 16.dp, end = 16.dp)
-                        .clip(RoundedCornerShape(28.dp)),
+                        .clip(RoundedCornerShape(12.dp)),
                 shape = MaterialTheme.shapes.large,
                 color = MaterialTheme.colorScheme.surface,
                 tonalElevation = 8.dp,
+                border = BorderStroke(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border),
             ) {
                 AccountSettings(
                     navController = navController,
@@ -254,6 +258,7 @@ fun ListDialog(
             shape = AlertDialogDefaults.shape,
             color = AlertDialogDefaults.containerColor,
             tonalElevation = AlertDialogDefaults.TonalElevation,
+            border = BorderStroke(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border),
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,

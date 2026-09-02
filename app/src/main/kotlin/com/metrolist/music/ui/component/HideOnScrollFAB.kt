@@ -32,6 +32,10 @@ import androidx.compose.ui.unit.dp
 import com.metrolist.music.LocalPlayerAwareWindowInsets
 import com.metrolist.music.R
 import com.metrolist.music.ui.utils.isScrollingUp
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.material3.FloatingActionButtonDefaults
+import com.metrolist.music.ui.theme.nuclear.NuclearTheme
 
 @Composable
 fun BoxScope.HideOnScrollFAB(
@@ -62,7 +66,15 @@ fun BoxScope.HideOnScrollFAB(
                     onClick = onRecognitionClick,
                     containerColor = MaterialTheme.colorScheme.secondaryContainer,
                     contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                    modifier = Modifier.size(40.dp)
+                    shape = MaterialTheme.shapes.medium,
+                    elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
+                    modifier = Modifier
+                        .size(40.dp)
+                        .border(
+                            NuclearTheme.metrics.borderWidth,
+                            NuclearTheme.colors.border,
+                            MaterialTheme.shapes.medium,
+                        )
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.mic),
@@ -72,8 +84,18 @@ fun BoxScope.HideOnScrollFAB(
                 }
                 Spacer(modifier = Modifier.height(12.dp))
             }
+            // nuclear is flat: the outline does the lifting, not a drop shadow.
             FloatingActionButton(
                 onClick = onClick,
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                shape = MaterialTheme.shapes.large,
+                elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
+                modifier = Modifier.border(
+                    NuclearTheme.metrics.borderWidth,
+                    NuclearTheme.colors.border,
+                    MaterialTheme.shapes.large,
+                ),
             ) {
                 Icon(
                     painter = painterResource(icon),

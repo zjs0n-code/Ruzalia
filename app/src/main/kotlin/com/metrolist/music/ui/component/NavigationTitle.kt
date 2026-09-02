@@ -72,8 +72,10 @@ fun NavigationTitle(
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
+                // nuclear sets h1 in Bricolage Grotesque at 800.
+                fontWeight = FontWeight(800),
+                // nuclear sets h1 in --foreground; the accent is for fills.
+                color = MaterialTheme.colorScheme.onBackground,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
             )

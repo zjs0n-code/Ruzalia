@@ -2,6 +2,10 @@
 <resources>
     <color name="ic_launcher_static_background">#000000</color>
 
+    <!-- Ruzalia: nuclear default theme, page colour -->
+    <color name="nuclear_window_background">#FADADF</color>
+    <color name="nuclear_launcher_background">#FF9CB4</color>
+
     <!-- Widget colors for light mode -->
     <color name="widget_text_primary">#1C1B1F</color>
     <color name="widget_text_secondary">#49454F</color>

@@ -984,4 +984,15 @@
     <string name="stream_source_android_vr_desc">Android VR clients (all versions).</string>
     <string name="stream_source_web_creator">WEB_CREATOR</string>
     <string name="stream_source_web_creator_desc">Creator web client.</string>
+
+    <!-- Ruzalia: nuclear theme presets -->
+    <string name="nuclear_themes">Theme</string>
+    <string name="nuclear_theme_default">Default</string>
+    <string name="nuclear_theme_aurora">Aurora</string>
+    <string name="nuclear_theme_ember">Ember</string>
+    <string name="nuclear_theme_lagoon">Lagoon</string>
+    <string name="nuclear_theme_arctic_moss">Arctic Moss</string>
+    <string name="cd_nuclear_theme_item">%1$s theme</string>
+    <string name="album_art_accent">Album art accent</string>
+    <string name="album_art_accent_desc">Recolour the accent from the artwork of the playing track. Borders, type and shadows stay the same.</string>
 </resources>

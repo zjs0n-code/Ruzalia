@@ -1278,7 +1278,7 @@ fun ListenTogetherDialog(
                     Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(12.dp),
                 color =
                     when (connectionState) {
                         ConnectionState.CONNECTED -> MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
@@ -1404,7 +1404,7 @@ fun ListenTogetherDialog(
                             Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 16.dp),
-                        shape = RoundedCornerShape(16.dp),
+                        shape = RoundedCornerShape(12.dp),
                         color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
                     ) {
                         Column(
@@ -1853,7 +1853,7 @@ fun ListenTogetherDialog(
                         Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp),
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(12.dp),
                     color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
                 ) {
                     Column(

@@ -82,34 +82,12 @@ import com.metrolist.music.ui.theme.DefaultThemeColor
 import com.metrolist.music.ui.theme.MetrolistTheme
 import com.metrolist.music.utils.rememberEnumPreference
 import com.metrolist.music.utils.rememberPreference
-
-data class ThemePalette(
-    val nameRes: Int,
-    val seedColor: Color
-)
-
-val PaletteColors = listOf(
-    ThemePalette(R.string.palette_dynamic, Color.Transparent), // Sentinel for System/Dynamic colors
-    ThemePalette(R.string.palette_crimson, Color(0xFFEC5464)), // Slightly shifted from DefaultThemeColor (0xFFED5564) to avoid conflict
-    ThemePalette(R.string.palette_rose, Color(0xFFD81B60)),
-    ThemePalette(R.string.palette_purple, Color(0xFF8E24AA)),
-    ThemePalette(R.string.palette_deep_purple, Color(0xFF5E35B1)),
-    ThemePalette(R.string.palette_indigo, Color(0xFF3949AB)),
-    ThemePalette(R.string.palette_blue, Color(0xFF1E88E5)),
-    ThemePalette(R.string.palette_sky_blue, Color(0xFF039BE5)),
-    ThemePalette(R.string.palette_cyan, Color(0xFF00ACC1)),
-    ThemePalette(R.string.palette_teal, Color(0xFF00897B)),
-    ThemePalette(R.string.palette_green, Color(0xFF43A047)),
-    ThemePalette(R.string.palette_light_green, Color(0xFF7CB342)),
-    ThemePalette(R.string.palette_lime, Color(0xFFC0CA33)),
-    ThemePalette(R.string.palette_yellow, Color(0xFFFDD835)),
-    ThemePalette(R.string.palette_amber, Color(0xFFFFB300)),
-    ThemePalette(R.string.palette_orange, Color(0xFFFB8C00)),
-    ThemePalette(R.string.palette_deep_orange, Color(0xFFF4511E)),
-    ThemePalette(R.string.palette_brown, Color(0xFF6D4C41)),
-    ThemePalette(R.string.palette_grey, Color(0xFF757575)),
-    ThemePalette(R.string.palette_blue_grey, Color(0xFF546E7A)),
-)
+import androidx.compose.material3.Switch
+import androidx.compose.ui.text.font.FontWeight
+import com.metrolist.music.constants.NuclearThemeKey
+import com.metrolist.music.ui.theme.nuclear.NuclearSurface
+import com.metrolist.music.ui.theme.nuclear.NuclearTheme
+import com.metrolist.music.ui.theme.nuclear.NuclearThemeId
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -127,24 +105,17 @@ fun ThemeScreen(
         onPureBlackChangeRaw(enabled)
         onPureBlackMiniPlayerChange(enabled)
     }
-    val (selectedThemeColorInt, onSelectedThemeColorChange) = rememberPreference(
-        SelectedThemeColorKey,
-        DefaultThemeColor.toArgb()
+    val (nuclearTheme, onNuclearThemeChange) = rememberEnumPreference(
+        NuclearThemeKey,
+        NuclearThemeId.Default
     )
-    val (_, onDynamicThemeChange) = rememberPreference(DynamicThemeKey, defaultValue = true)
+    val (albumArtAccent, onAlbumArtAccentChange) = rememberPreference(
+        DynamicThemeKey,
+        defaultValue = false
+    )
 
-    val selectedThemeColor = Color(selectedThemeColorInt)
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-
-    // Helper function to handle color selection with dynamic theme toggle
-    val handleColorSelection: (Color) -> Unit = { color ->
-        onSelectedThemeColorChange(color.toArgb())
-        // Enable dynamic theme only when selecting the default/dynamic color
-        // Disable it when selecting any other color
-        val isDynamicColor = color == DefaultThemeColor
-        onDynamicThemeChange(isDynamicColor)
-    }
 
     if (isLandscape) {
         LandscapeThemeLayout(
@@ -153,8 +124,10 @@ fun ThemeScreen(
             onDarkModeChange = onDarkModeChange,
             pureBlack = pureBlack,
             onPureBlackChange = onPureBlackChange,
-            selectedThemeColor = selectedThemeColor,
-            onSelectedThemeColorChange = handleColorSelection
+            nuclearTheme = nuclearTheme,
+            onNuclearThemeChange = onNuclearThemeChange,
+            albumArtAccent = albumArtAccent,
+            onAlbumArtAccentChange = onAlbumArtAccentChange
         )
     } else {
         PortraitThemeLayout(
@@ -163,8 +136,10 @@ fun ThemeScreen(
             onDarkModeChange = onDarkModeChange,
             pureBlack = pureBlack,
             onPureBlackChange = onPureBlackChange,
-            selectedThemeColor = selectedThemeColor,
-            onSelectedThemeColorChange = handleColorSelection
+            nuclearTheme = nuclearTheme,
+            onNuclearThemeChange = onNuclearThemeChange,
+            albumArtAccent = albumArtAccent,
+            onAlbumArtAccentChange = onAlbumArtAccentChange
         )
     }
 
@@ -188,8 +163,10 @@ fun PortraitThemeLayout(
     onDarkModeChange: (DarkMode) -> Unit,
     pureBlack: Boolean,
     onPureBlackChange: (Boolean) -> Unit,
-    selectedThemeColor: Color,
-    onSelectedThemeColorChange: (Color) -> Unit
+    nuclearTheme: NuclearThemeId,
+    onNuclearThemeChange: (NuclearThemeId) -> Unit,
+    albumArtAccent: Boolean,
+    onAlbumArtAccentChange: (Boolean) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -208,7 +185,7 @@ fun PortraitThemeLayout(
             ThemeMockupPortrait(
                 darkMode = darkMode,
                 pureBlack = pureBlack,
-                themeColor = selectedThemeColor
+                nuclearTheme = nuclearTheme
             )
         }
 
@@ -219,8 +196,10 @@ fun PortraitThemeLayout(
             onDarkModeChange = onDarkModeChange,
             pureBlack = pureBlack,
             onPureBlackChange = onPureBlackChange,
-            selectedThemeColor = selectedThemeColor,
-            onSelectedThemeColorChange = onSelectedThemeColorChange
+            nuclearTheme = nuclearTheme,
+            onNuclearThemeChange = onNuclearThemeChange,
+            albumArtAccent = albumArtAccent,
+            onAlbumArtAccentChange = onAlbumArtAccentChange
         )
 
         Spacer(modifier = Modifier.height(120.dp))
@@ -234,8 +213,10 @@ fun LandscapeThemeLayout(
     onDarkModeChange: (DarkMode) -> Unit,
     pureBlack: Boolean,
     onPureBlackChange: (Boolean) -> Unit,
-    selectedThemeColor: Color,
-    onSelectedThemeColorChange: (Color) -> Unit
+    nuclearTheme: NuclearThemeId,
+    onNuclearThemeChange: (NuclearThemeId) -> Unit,
+    albumArtAccent: Boolean,
+    onAlbumArtAccentChange: (Boolean) -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -259,7 +240,7 @@ fun LandscapeThemeLayout(
                 ThemeMockup(
                     darkMode = darkMode,
                     pureBlack = pureBlack,
-                    themeColor = selectedThemeColor
+                    nuclearTheme = nuclearTheme
                 )
             }
         }
@@ -276,8 +257,10 @@ fun LandscapeThemeLayout(
                 onDarkModeChange = onDarkModeChange,
                 pureBlack = pureBlack,
                 onPureBlackChange = onPureBlackChange,
-                selectedThemeColor = selectedThemeColor,
-                onSelectedThemeColorChange = onSelectedThemeColorChange
+                nuclearTheme = nuclearTheme,
+                onNuclearThemeChange = onNuclearThemeChange,
+                albumArtAccent = albumArtAccent,
+                onAlbumArtAccentChange = onAlbumArtAccentChange
             )
 
             Spacer(modifier = Modifier.height(80.dp))
@@ -291,18 +274,30 @@ fun ThemeControls(
     onDarkModeChange: (DarkMode) -> Unit,
     pureBlack: Boolean,
     onPureBlackChange: (Boolean) -> Unit,
-    selectedThemeColor: Color,
-    onSelectedThemeColorChange: (Color) -> Unit
+    nuclearTheme: NuclearThemeId,
+    onNuclearThemeChange: (NuclearThemeId) -> Unit,
+    albumArtAccent: Boolean,
+    onAlbumArtAccentChange: (Boolean) -> Unit
 ) {
+    // The swatches have to preview the mode the app is actually in. Keying them
+    // to the system setting shows dark palettes while the app renders light.
+    val isSystemDark = isSystemInDarkTheme()
+    val previewDark = when (darkMode) {
+        DarkMode.AUTO -> isSystemDark
+        DarkMode.ON -> true
+        DarkMode.OFF -> false
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        border = BorderStroke(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
             modifier = Modifier.padding(20.dp),
@@ -381,35 +376,124 @@ fun ThemeControls(
 
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(
-                    text = stringResource(R.string.color_palette),
+                    text = stringResource(R.string.nuclear_themes),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                
+
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
                     contentPadding = PaddingValues(horizontal = 4.dp)
                 ) {
-                    items(PaletteColors) { palette ->
-                        val isDynamicPalette = palette.seedColor == Color.Transparent
-                        val isSelected = if (isDynamicPalette) {
-                            selectedThemeColor == DefaultThemeColor
-                        } else {
-                            selectedThemeColor == palette.seedColor
-                        }
-                        
-                        PaletteItem(
-                            palette = palette,
-                            isSelected = isSelected,
-                            onClick = { 
-                                val colorToSave = if (isDynamicPalette) DefaultThemeColor else palette.seedColor
-                                onSelectedThemeColorChange(colorToSave) 
-                            }
+                    items(NuclearThemeId.entries) { theme ->
+                        NuclearThemeItem(
+                            theme = theme,
+                            isSelected = theme == nuclearTheme,
+                            dark = previewDark,
+                            onClick = { onNuclearThemeChange(theme) }
                         )
                     }
                 }
             }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onAlbumArtAccentChange(!albumArtAccent) },
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.album_art_accent),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = stringResource(R.string.album_art_accent_desc),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Switch(
+                    checked = albumArtAccent,
+                    onCheckedChange = onAlbumArtAccentChange
+                )
+            }
         }
+    }
+}
+
+/**
+ * One preset in the picker. The swatch is the theme itself in miniature -
+ * page colour behind, primary panel in front, drawn with nuclear's outline
+ * and hard shadow so the picker demonstrates the style it is selecting.
+ */
+@Composable
+fun NuclearThemeItem(
+    theme: NuclearThemeId,
+    isSelected: Boolean,
+    dark: Boolean,
+    onClick: () -> Unit
+) {
+    val palette = theme.palette(dark = dark)
+
+    val scale by animateFloatAsState(
+        targetValue = if (isSelected) 1.08f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium
+        ),
+        label = "nuclearThemeScale"
+    )
+
+    val themeName = stringResource(theme.nameRes)
+    val contentDesc = stringResource(R.string.cd_nuclear_theme_item, themeName)
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+        modifier = Modifier.graphicsLayer {
+            scaleX = scale
+            scaleY = scale
+        }
+    ) {
+        NuclearSurface(
+            modifier = Modifier
+                .size(64.dp)
+                .semantics { contentDescription = contentDesc },
+            color = palette.background,
+            borderColor = palette.border,
+            shadowColor = palette.border,
+            onClick = onClick,
+            contentPadding = PaddingValues(8.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            // A plain Box, not a nested NuclearSurface: that composable sizes
+            // its face to its content, so an empty one collapses to nothing.
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(MaterialTheme.shapes.small)
+                    .background(palette.primary)
+                    .border(
+                        NuclearTheme.metrics.borderWidth,
+                        palette.border,
+                        MaterialTheme.shapes.small,
+                    )
+            )
+        }
+
+        Text(
+            text = themeName,
+            style = MaterialTheme.typography.labelSmall,
+            color = if (isSelected) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                MaterialTheme.colorScheme.onSurfaceVariant
+            },
+            fontWeight = if (isSelected) FontWeight(800) else FontWeight.Normal
+        )
     }
 }
 
@@ -545,127 +629,10 @@ fun ModeCircle(
 }
 
 @Composable
-fun PaletteItem(
-    palette: ThemePalette,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    val isSystemDark = isSystemInDarkTheme()
-    
-    val colorScheme = rememberDynamicColorScheme(
-        seedColor = palette.seedColor,
-        isDark = isSystemDark,
-        style = PaletteStyle.TonalSpot
-    )
-    
-    val cornerRadius by animateDpAsState(
-        targetValue = if (isSelected) 48.dp * 0.25f else 24.dp,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioLowBouncy,
-            stiffness = Spring.StiffnessMedium
-        ),
-        label = "cornerRadius"
-    )
-    
-    val borderWidth by animateDpAsState(
-        targetValue = if (isSelected) 3.dp else 0.dp,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessMedium
-        ),
-        label = "borderWidth"
-    )
-    
-    val scale by animateFloatAsState(
-        targetValue = if (isSelected) 1.08f else 1f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessMedium
-        ),
-        label = "scale"
-    )
-    
-    val shape = RoundedCornerShape(cornerRadius)
-    val interactionSource = remember { MutableInteractionSource() }
-    
-    val paletteName = stringResource(palette.nameRes)
-    val contentDesc = stringResource(R.string.cd_palette_item, paletteName)
-    
-    Box(
-        modifier = Modifier
-            .size(48.dp)
-            .graphicsLayer {
-                scaleX = scale
-                scaleY = scale
-            }
-            .clip(shape)
-            .then(
-                if (borderWidth > 0.dp) {
-                    Modifier.border(
-                        width = borderWidth,
-                        color = MaterialTheme.colorScheme.inversePrimary,
-                        shape = shape
-                    )
-                } else {
-                    Modifier
-                }
-            )
-            .clickable(
-                interactionSource = interactionSource,
-                indication = ripple(),
-                onClick = onClick
-            )
-            .semantics {
-                contentDescription = contentDesc
-            }
-    ) {
-        if (palette.seedColor == Color.Transparent) {
-            // Draw Dynamic/System icon using Material Design icon
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.palette),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-        } else {
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                val width = size.width
-                val height = size.height
-                
-                drawRect(
-                    color = colorScheme.onPrimary,
-                    topLeft = Offset(0f, 0f),
-                    size = Size(width, height / 2)
-                )
-                
-                drawRect(
-                    color = colorScheme.secondary,
-                    topLeft = Offset(0f, height / 2),
-                    size = Size(width / 2, height / 2)
-                )
-                
-                drawRect(
-                    color = colorScheme.tertiary,
-                    topLeft = Offset(width / 2, height / 2),
-                    size = Size(width / 2, height / 2)
-                )
-            }
-        }
-    }
-}
-
-@Composable
 fun ThemeMockup(
     darkMode: DarkMode,
     pureBlack: Boolean,
-    themeColor: Color
+    nuclearTheme: NuclearThemeId
 ) {
     val isSystemDark = isSystemInDarkTheme()
     val useDark = when (darkMode) {
@@ -677,13 +644,13 @@ fun ThemeMockup(
     MetrolistTheme(
         darkTheme = useDark,
         pureBlack = pureBlack,
-        themeColor = themeColor
+        nuclearTheme = nuclearTheme
     ) {
         Card(
             modifier = Modifier
                 .fillMaxSize()
                 .aspectRatio(9f / 18f),
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(12.dp),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surface
             ),
@@ -773,7 +740,7 @@ fun ThemeMockup(
 fun ThemeMockupPortrait(
     darkMode: DarkMode,
     pureBlack: Boolean,
-    themeColor: Color
+    nuclearTheme: NuclearThemeId
 ) {
     val isSystemDark = isSystemInDarkTheme()
     val useDark = when (darkMode) {
@@ -785,7 +752,7 @@ fun ThemeMockupPortrait(
     MetrolistTheme(
         darkTheme = useDark,
         pureBlack = pureBlack,
-        themeColor = themeColor
+        nuclearTheme = nuclearTheme
     ) {
         Card(
             modifier = Modifier
