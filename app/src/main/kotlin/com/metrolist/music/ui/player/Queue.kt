@@ -140,6 +140,9 @@ import com.metrolist.music.constants.SleepTimerFadeOutKey
 import com.metrolist.music.constants.SleepTimerStopAfterCurrentSongKey
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.material3.Button
+import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
+import com.metrolist.music.ui.theme.nuclear.NuclearFaceFill
+import com.metrolist.music.ui.theme.nuclear.NuclearSurface
 import com.metrolist.music.ui.theme.nuclear.NuclearTheme
 
 
@@ -384,35 +387,26 @@ fun Queue(
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    Box(
-                        modifier =
-                            Modifier
-                                .size(buttonSize)
-                                // nuclear has no circular buttons; radii stop at 12dp.
-                                .clip(MaterialTheme.shapes.large)
-                                .background(textButtonColor)
-                                .border(
-                                    NuclearTheme.metrics.borderWidth,
-                                    NuclearTheme.colors.border,
-                                    MaterialTheme.shapes.large,
+                    NuclearIconButton(
+                        onClick = {
+                            menuState.show {
+                                PlayerMenu(
+                                    mediaMetadata = mediaMetadata,
+                                    playerBottomSheetState = playerBottomSheetState,
+                                    onShowDetailsDialog = {
+                                        mediaMetadata?.id?.let {
+                                            bottomSheetPageState.show {
+                                                ShowMediaInfo(it)
+                                            }
+                                        }
+                                    },
+                                    onDismiss = menuState::dismiss,
                                 )
-                                .clickable {
-                                    menuState.show {
-                                        PlayerMenu(
-                                            mediaMetadata = mediaMetadata,
-                                            playerBottomSheetState = playerBottomSheetState,
-                                            onShowDetailsDialog = {
-                                                mediaMetadata?.id?.let {
-                                                    bottomSheetPageState.show {
-                                                        ShowMediaInfo(it)
-                                                    }
-                                                }
-                                            },
-                                            onDismiss = menuState::dismiss,
-                                        )
-                                    }
-                                },
-                        contentAlignment = Alignment.Center,
+                            }
+                        },
+                        size = buttonSize,
+                        color = textButtonColor,
+                        contentColor = iconButtonColor,
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.more_vert),
@@ -1290,32 +1284,21 @@ private fun PlayerQueueButton(
     textBackgroundColor: Color,
     playerBackground: PlayerBackgroundStyle,
 ) {
-    val buttonModifier =
-        Modifier
-            .clip(shape)
-            .clickable(enabled = enabled, onClick = onClick)
-
     val alphaFactor = if (enabled) 1f else 0.35f
 
-    val appliedModifier =
-        if (isActive) {
-            modifier.then(buttonModifier.background(textButtonColor)).alpha(alphaFactor)
-        } else {
-            modifier
-                .then(
-                    buttonModifier.border(
-                        // A 30%-alpha tint is Material's idea of an outline;
-                        // nuclear draws the real thing.
-                        width = NuclearTheme.metrics.borderWidth,
-                        color = NuclearTheme.colors.border,
-                        shape = shape,
-                    ),
-                ).alpha(alphaFactor)
-        }
-
-    Box(
-        modifier = appliedModifier,
+    // These five get pressed constantly, so they are real nuclear buttons -
+    // filled, outlined, and sliding onto their own shadow - rather than icons
+    // in an outlined box. Inactive ones use the page colour so the active one
+    // still reads as the one that is on.
+    NuclearSurface(
+        modifier = modifier.alpha(alphaFactor),
+        shape = shape,
+        color = if (isActive) textButtonColor else NuclearTheme.colors.background,
+        borderColor = NuclearTheme.colors.border,
+        enabled = enabled,
+        onClick = onClick,
         contentAlignment = Alignment.Center,
+        faceFill = NuclearFaceFill.Both,
     ) {
         if (text != null) {
             Text(

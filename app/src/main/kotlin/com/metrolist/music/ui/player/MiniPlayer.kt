@@ -122,6 +122,7 @@ import coil3.toBitmap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import com.metrolist.music.ui.theme.PlayerColorExtractor
+import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
 import com.metrolist.music.ui.theme.nuclear.NuclearTheme
 import com.metrolist.music.ui.theme.nuclear.nuclearHardShadow
 
@@ -1050,43 +1051,33 @@ private fun SubscribeButton(
     val isSubscribed = libraryArtist?.artist?.bookmarkedAt != null
 
 
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier =
-            Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .border(
-                    width = 1.dp,
-                    color = if (isSubscribed) primaryColor.copy(alpha = 0.5f) else outlineColor.copy(alpha = 0.3f),
-                    shape = CircleShape,
-                ).background(
-                    color = if (isSubscribed) primaryColor.copy(alpha = 0.1f) else Color.Transparent,
-                    shape = CircleShape,
-                ).clickable {
-                    database.transaction {
-                        val artist = libraryArtist?.artist
-                        if (artist != null) {
-                            update(artist.toggleLike())
-                        } else {
-                            metadata.artists.firstOrNull()?.let { artistInfo ->
-                                insert(
-                                    ArtistEntity(
-                                        id = artistInfo.id ?: "",
-                                        name = artistInfo.name,
-                                        channelId = null,
-                                        thumbnailUrl = null,
-                                    ).toggleLike(),
-                                )
-                            }
-                        }
+    NuclearIconButton(
+        onClick = {
+            database.transaction {
+                val artist = libraryArtist?.artist
+                if (artist != null) {
+                    update(artist.toggleLike())
+                } else {
+                    metadata.artists.firstOrNull()?.let { artistInfo ->
+                        insert(
+                            ArtistEntity(
+                                id = artistInfo.id ?: "",
+                                name = artistInfo.name,
+                                channelId = null,
+                                thumbnailUrl = null,
+                            ).toggleLike(),
+                        )
                     }
-                },
+                }
+            }
+
+        },
+        size = 40.dp,
+        color = if (isSubscribed) primaryColor else NuclearTheme.colors.backgroundSecondary,
     ) {
         Icon(
             painter = painterResource(if (isSubscribed) R.drawable.subscribed else R.drawable.subscribe),
             contentDescription = null,
-            tint = if (isSubscribed) primaryColor else onSurfaceColor.copy(alpha = 0.7f),
             modifier = Modifier.size(20.dp),
         )
     }
@@ -1106,25 +1097,16 @@ private fun FavoriteButton(
     val isEpisode = librarySong?.song?.isEpisode == true
     val isLiked = if (isEpisode) librarySong?.song?.inLibrary != null else librarySong?.song?.liked == true
 
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier =
-            Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .border(
-                    width = 1.dp,
-                    color = if (isLiked) errorColor.copy(alpha = 0.5f) else outlineColor.copy(alpha = 0.3f),
-                    shape = CircleShape,
-                ).background(
-                    color = if (isLiked) errorColor.copy(alpha = 0.1f) else Color.Transparent,
-                    shape = CircleShape,
-                ).clickable { playerConnection.service.toggleLike() },
+    NuclearIconButton(
+        onClick = {
+            playerConnection.service.toggleLike() 
+        },
+        size = 40.dp,
+        color = if (isLiked) errorColor else NuclearTheme.colors.backgroundSecondary,
     ) {
         Icon(
             painter = painterResource(if (isLiked) R.drawable.favorite else R.drawable.favorite_border),
             contentDescription = null,
-            tint = if (isLiked) errorColor else onSurfaceColor.copy(alpha = 0.7f),
             modifier = Modifier.size(20.dp),
         )
     }

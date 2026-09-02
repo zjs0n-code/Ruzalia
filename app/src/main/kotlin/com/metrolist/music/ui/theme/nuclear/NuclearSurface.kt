@@ -15,6 +15,8 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -63,6 +65,7 @@ fun NuclearSurface(
     onClick: (() -> Unit)? = null,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     contentAlignment: Alignment = Alignment.TopStart,
+    faceFill: NuclearFaceFill = NuclearFaceFill.None,
     interactionSource: MutableInteractionSource? = null,
     content: @Composable BoxScope.() -> Unit,
 ) {
@@ -90,6 +93,13 @@ fun NuclearSurface(
         Box(
             modifier = Modifier
                 .padding(end = offset, bottom = offset)
+                .then(
+                    when (faceFill) {
+                        NuclearFaceFill.None -> Modifier
+                        NuclearFaceFill.Height -> Modifier.fillMaxHeight()
+                        NuclearFaceFill.Both -> Modifier.fillMaxSize()
+                    },
+                )
                 .offset(press)
                 .clip(shape)
                 .background(color)
@@ -117,6 +127,17 @@ fun NuclearSurface(
         }
     }
 }
+
+/**
+ * How much of the space reserved by [NuclearSurface] the visible face should
+ * take up.
+ *
+ * A Box sizes its children to their content, so a surface given a fixed size
+ * would paint a full-size shadow behind a face only as big as its icon. Any
+ * caller that imposes a size - an icon button, a weighted transport control -
+ * has to say so here.
+ */
+enum class NuclearFaceFill { None, Height, Both }
 
 /** Equal x/y translation that does not disturb the parent's measurement. */
 private fun Modifier.offset(amount: Dp) = layout { measurable, constraints ->

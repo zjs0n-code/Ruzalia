@@ -34,6 +34,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.metrolist.music.R
+import com.metrolist.music.ui.theme.nuclear.NuclearButton
+import com.metrolist.music.ui.theme.nuclear.NuclearButtonSize
+import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
 
 @Composable
 fun NavigationTitle(
@@ -82,16 +85,10 @@ fun NavigationTitle(
         }
 
         onPlayAllClick?.let { playAllClick ->
-            OutlinedButton(
+            NuclearButton(
                 onClick = playAllClick,
-                shape = RoundedCornerShape(12.dp),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = MaterialTheme.colorScheme.primary
-                ),
-                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 2.dp),
-                modifier = Modifier
-                    .height(24.dp)
+                variant = NuclearButtonVariant.Tertiary,
+                size = NuclearButtonSize.ExtraSmall,
             ) {
                 Text(
                     text = stringResource(R.string.play_all),

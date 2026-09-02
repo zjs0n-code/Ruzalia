@@ -194,6 +194,8 @@ import com.metrolist.music.ui.screens.settings.DarkMode
 import com.metrolist.music.ui.screens.settings.NavigationTab
 import com.metrolist.music.ui.theme.NullableColorSaver
 import com.metrolist.music.ui.theme.MetrolistTheme
+import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
+import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
 import com.metrolist.music.ui.theme.nuclear.NuclearThemeId
 import com.metrolist.music.ui.theme.extractThemeColor
 import com.metrolist.music.ui.utils.appBarScrollBehavior
@@ -1046,28 +1048,44 @@ class MainActivity : FragmentActivity() {
                                         },
                                         actions = {
                                             if (showHistoryButton) {
-                                                IconButton(onClick = { navController.navigate("history") }) {
+                                                NuclearIconButton(
+                                                    onClick = { navController.navigate("history") },
+                                                    variant = NuclearButtonVariant.Tertiary,
+                                                    size = 36.dp,
+                                                ) {
                                                     Icon(
                                                         painter = painterResource(R.drawable.history),
                                                         contentDescription = stringResource(R.string.history),
                                                     )
                                                 }
                                             }
-                                            IconButton(onClick = { navController.navigate("stats") }) {
+                                            NuclearIconButton(
+                                                onClick = { navController.navigate("stats") },
+                                                variant = NuclearButtonVariant.Tertiary,
+                                                size = 36.dp,
+                                            ) {
                                                 Icon(
                                                     painter = painterResource(R.drawable.stats),
                                                     contentDescription = stringResource(R.string.stats),
                                                 )
                                             }
                                             if (listenTogetherInTopBar) {
-                                                IconButton(onClick = { navController.navigate("listen_together_from_topbar") }) {
+                                                NuclearIconButton(
+                                                    onClick = { navController.navigate("listen_together_from_topbar") },
+                                                    variant = NuclearButtonVariant.Tertiary,
+                                                    size = 36.dp,
+                                                ) {
                                                     Icon(
                                                         painter = painterResource(R.drawable.group_outlined),
                                                         contentDescription = stringResource(R.string.together),
                                                     )
                                                 }
                                             }
-                                            IconButton(onClick = { showAccountDialog = true }) {
+                                            NuclearIconButton(
+                                                onClick = { showAccountDialog = true },
+                                                variant = NuclearButtonVariant.Tertiary,
+                                                size = 36.dp,
+                                            ) {
                                                 BadgedBox(badge = {
                                                     if (latestVersionName != BuildConfig.BASE_VERSION_NAME) {
                                                         Badge()

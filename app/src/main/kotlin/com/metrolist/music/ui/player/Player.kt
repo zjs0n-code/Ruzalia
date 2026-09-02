@@ -154,6 +154,9 @@ import com.metrolist.music.constants.QueuePeekHeight
 import com.metrolist.music.constants.SleepTimerDefaultKey
 import com.metrolist.music.constants.SleepTimerFadeOutKey
 import com.metrolist.music.constants.SleepTimerStopAfterCurrentSongKey
+import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
+import com.metrolist.music.ui.theme.nuclear.NuclearFaceFill
+import com.metrolist.music.ui.theme.nuclear.NuclearSurface
 import com.metrolist.music.ui.theme.nuclear.NuclearTheme
 import com.metrolist.music.constants.SliderStyle
 import com.metrolist.music.constants.SliderStyleKey
@@ -1153,15 +1156,12 @@ fun BottomSheetPlayer(
                     ) {
                         AnimatedContent(targetState = showInlineLyrics, label = "ShareButton") { showLyrics ->
                             if (showLyrics) {
-                                FilledIconButton(
+                                NuclearIconButton(
                                     onClick = { isFullScreen = !isFullScreen },
                                     shape = shareShape,
-                                    colors =
-                                        IconButtonDefaults.filledIconButtonColors(
-                                            containerColor = textButtonColor,
-                                            contentColor = iconButtonColor,
-                                        ),
-                                    modifier = Modifier.size(42.dp).border(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border, shareShape),
+                                    size = 42.dp,
+                                    color = textButtonColor,
+                                    contentColor = iconButtonColor,
                                 ) {
                                     Icon(
                                         painter = painterResource(R.drawable.fullscreen),
@@ -1170,7 +1170,7 @@ fun BottomSheetPlayer(
                                     )
                                 }
                             } else {
-                                FilledIconButton(
+                                NuclearIconButton(
                                     onClick = {
                                         val intent =
                                             Intent().apply {
@@ -1184,12 +1184,9 @@ fun BottomSheetPlayer(
                                         context.startActivity(Intent.createChooser(intent, null))
                                     },
                                     shape = shareShape,
-                                    colors =
-                                        IconButtonDefaults.filledIconButtonColors(
-                                            containerColor = textButtonColor,
-                                            contentColor = iconButtonColor,
-                                        ),
-                                    modifier = Modifier.size(42.dp).border(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border, shareShape),
+                                    size = 42.dp,
+                                    color = textButtonColor,
+                                    contentColor = iconButtonColor,
                                 ) {
                                     Icon(
                                         painter = painterResource(R.drawable.share),
@@ -1203,7 +1200,7 @@ fun BottomSheetPlayer(
                         AnimatedContent(targetState = showInlineLyrics, label = "LikeButton") { showLyrics ->
                             if (showLyrics) {
                                 val currentLyrics by playerConnection.currentLyrics.collectAsStateWithLifecycle(initialValue = null)
-                                FilledIconButton(
+                                NuclearIconButton(
                                     onClick = {
                                         menuState.show {
                                             com.metrolist.music.ui.menu.LyricsMenu(
@@ -1222,12 +1219,9 @@ fun BottomSheetPlayer(
                                         }
                                     },
                                     shape = favShape,
-                                    colors =
-                                        IconButtonDefaults.filledIconButtonColors(
-                                            containerColor = textButtonColor,
-                                            contentColor = iconButtonColor,
-                                        ),
-                                    modifier = Modifier.size(42.dp).border(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border, favShape),
+                                    size = 42.dp,
+                                    color = textButtonColor,
+                                    contentColor = iconButtonColor,
                                 ) {
                                     Icon(
                                         painter = painterResource(R.drawable.more_horiz),
@@ -1239,15 +1233,12 @@ fun BottomSheetPlayer(
                                 // For episodes, show saved state (inLibrary); for songs, show liked state
                                 val isEpisode = currentSong?.song?.isEpisode == true
                                 val isFavorite = if (isEpisode) currentSong?.song?.inLibrary != null else currentSong?.song?.liked == true
-                                FilledIconButton(
+                                NuclearIconButton(
                                     onClick = playerConnection::toggleLike,
                                     shape = favShape,
-                                    colors =
-                                        IconButtonDefaults.filledIconButtonColors(
-                                            containerColor = textButtonColor,
-                                            contentColor = iconButtonColor,
-                                        ),
-                                    modifier = Modifier.size(42.dp).border(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border, favShape),
+                                    size = 42.dp,
+                                    color = textButtonColor,
+                                    contentColor = iconButtonColor,
                                 ) {
                                     Icon(
                                         painter =
@@ -1594,21 +1585,19 @@ fun BottomSheetPlayer(
                                 label = "nextButtonWeight",
                             )
 
-                            FilledIconButton(
+                            NuclearSurface(
                                 onClick = playerConnection::seekToPrevious,
                                 enabled = canSkipPrevious && !isListenTogetherGuest,
                                 shape = MaterialTheme.shapes.large,
                                 interactionSource = backInteractionSource,
-                                colors =
-                                    IconButtonDefaults.filledIconButtonColors(
-                                        containerColor = sideButtonContainerColor,
-                                        contentColor = sideButtonContentColor,
-                                    ),
                                 modifier =
                                     Modifier
                                         .height(68.dp)
-                                        .weight(backButtonWeight)
-                                        .border(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border, MaterialTheme.shapes.large),
+                                        .weight(backButtonWeight),
+                                color = sideButtonContainerColor,
+                                contentColor = sideButtonContentColor,
+                                contentAlignment = Alignment.Center,
+                                faceFill = NuclearFaceFill.Both,
                             ) {
                                 Icon(
                                     painter = painterResource(R.drawable.skip_previous),
@@ -1619,11 +1608,11 @@ fun BottomSheetPlayer(
 
                             Spacer(modifier = Modifier.width(8.dp))
 
-                            FilledIconButton(
+                            NuclearSurface(
                                 onClick = {
                                     if (isListenTogetherGuest) {
                                         playerConnection.toggleMute()
-                                        return@FilledIconButton
+                                        return@NuclearSurface
                                     }
                                     if (isCasting) {
                                         if (castIsPlaying) {
@@ -1640,17 +1629,15 @@ fun BottomSheetPlayer(
                                 },
                                 shape = MaterialTheme.shapes.large,
                                 interactionSource = playPauseInteractionSource,
-                                colors =
-                                    IconButtonDefaults.filledIconButtonColors(
-                                        containerColor = textButtonColor,
-                                        contentColor = iconButtonColor,
-                                    ),
                                 modifier =
                                     Modifier
                                         .height(68.dp)
                                         .weight(playPauseWeight)
-                                        .border(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border, MaterialTheme.shapes.large)
                                         .focusRequester(focusRequester),
+                                color = textButtonColor,
+                                contentColor = iconButtonColor,
+                                contentAlignment = Alignment.Center,
+                                faceFill = NuclearFaceFill.Both,
                             ) {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
@@ -1688,21 +1675,19 @@ fun BottomSheetPlayer(
 
                             Spacer(modifier = Modifier.width(8.dp))
 
-                            FilledIconButton(
+                            NuclearSurface(
                                 onClick = playerConnection::seekToNext,
                                 enabled = canSkipNext && !isListenTogetherGuest,
                                 shape = MaterialTheme.shapes.large,
                                 interactionSource = nextInteractionSource,
-                                colors =
-                                    IconButtonDefaults.filledIconButtonColors(
-                                        containerColor = sideButtonContainerColor,
-                                        contentColor = sideButtonContentColor,
-                                    ),
                                 modifier =
                                     Modifier
                                         .height(68.dp)
-                                        .weight(nextButtonWeight)
-                                        .border(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border, MaterialTheme.shapes.large),
+                                        .weight(nextButtonWeight),
+                                color = sideButtonContainerColor,
+                                contentColor = sideButtonContentColor,
+                                contentAlignment = Alignment.Center,
+                                faceFill = NuclearFaceFill.Both,
                             ) {
                                 Icon(
                                     painter = painterResource(R.drawable.skip_next),
@@ -2155,30 +2140,26 @@ private fun PlayerMoreMenuButton(
     val menuState = LocalMenuState.current
     val bottomSheetPageState = LocalBottomSheetPageState.current
 
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier =
-            Modifier
-                .size(40.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(textButtonColor)
-                .border(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border, RoundedCornerShape(12.dp))
-                .clickable {
-                    menuState.show {
-                        PlayerMenu(
-                            mediaMetadata = mediaMetadata,
-                            playerBottomSheetState = state,
-                            onShowDetailsDialog = {
-                                mediaMetadata.id.let {
-                                    bottomSheetPageState.show {
-                                        ShowMediaInfo(it)
-                                    }
-                                }
-                            },
-                            onDismiss = menuState::dismiss,
-                        )
-                    }
-                },
+    NuclearIconButton(
+        onClick = {
+            menuState.show {
+                PlayerMenu(
+                    mediaMetadata = mediaMetadata,
+                    playerBottomSheetState = state,
+                    onShowDetailsDialog = {
+                        mediaMetadata.id.let {
+                            bottomSheetPageState.show {
+                                ShowMediaInfo(it)
+                            }
+                        }
+                    },
+                    onDismiss = menuState::dismiss,
+                )
+            }
+        },
+        size = 40.dp,
+        color = textButtonColor,
+        contentColor = iconButtonColor,
     ) {
         Image(
             painter = painterResource(R.drawable.more_horiz),

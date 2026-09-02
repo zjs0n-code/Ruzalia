@@ -36,7 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.metrolist.music.ui.theme.nuclear.NuclearTheme
+import com.metrolist.music.ui.theme.nuclear.NuclearSurface
 
 @Composable
 private fun NewActionButton(
@@ -69,17 +69,15 @@ private fun NewActionButton(
         }
     }
 
-    Card(
-        modifier =
-            modifier
-                .clickable(enabled = enabled) { performAction = true },
-        colors =
-            CardDefaults.cardColors(
-                containerColor = animatedBackground,
-            ),
+    // These are the menu's primary actions, so they get nuclear's full button
+    // treatment rather than a flat outlined card.
+    NuclearSurface(
+        modifier = modifier,
         shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        color = animatedBackground,
+        contentColor = animatedContent,
+        enabled = enabled,
+        onClick = { performAction = true },
     ) {
         Column(
             modifier =
