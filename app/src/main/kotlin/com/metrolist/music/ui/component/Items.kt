@@ -140,6 +140,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.ui.platform.LocalDensity
 
 const val ActiveBoxAlpha = 0.6f
 
@@ -449,7 +451,17 @@ fun GridItem(
 
             title()
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            // Reserve exactly one line whether or not there is a subtitle, so
+            // every card in a row is the same height. Auto playlists have no
+            // subtitle at all, and a wrapped one used to make its card taller
+            // than its neighbours.
+            val captionHeight = with(LocalDensity.current) {
+                MaterialTheme.typography.bodyMedium.lineHeight.toDp()
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.heightIn(min = captionHeight),
+            ) {
                 badges()
 
                 subtitle()
@@ -633,7 +645,7 @@ fun SongGridItem(
             ),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.secondary,
-            maxLines = 2,
+            maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
     },
@@ -858,7 +870,7 @@ fun AlbumGridItem(
              text = album.artists.joinToArtistString(" ${stringResource(R.string.and)} ") { it.name },
              style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.secondary,
-            maxLines = 2,
+            maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
     },
@@ -1041,7 +1053,7 @@ fun PlaylistGridItem(
             text = subtitle,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.secondary,
-            maxLines = 2,
+            maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
     },
@@ -1306,7 +1318,7 @@ fun YouTubeGridItem(
                 text = subtitle,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.secondary,
-                maxLines = 2,
+                maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
         }

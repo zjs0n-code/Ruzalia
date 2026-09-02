@@ -1044,7 +1044,7 @@ class MainActivity : FragmentActivity() {
                                                 NuclearIconButton(
                                                     onClick = { navController.navigate("history") },
                                                     variant = NuclearButtonVariant.Tertiary,
-                                                    size = 36.dp,
+                                                    size = 48.dp,
                                                 ) {
                                                     Icon(
                                                         painter = painterResource(R.drawable.history),
@@ -1055,7 +1055,7 @@ class MainActivity : FragmentActivity() {
                                             NuclearIconButton(
                                                 onClick = { navController.navigate("stats") },
                                                 variant = NuclearButtonVariant.Tertiary,
-                                                size = 36.dp,
+                                                size = 48.dp,
                                             ) {
                                                 Icon(
                                                     painter = painterResource(R.drawable.stats),
@@ -1066,7 +1066,7 @@ class MainActivity : FragmentActivity() {
                                                 NuclearIconButton(
                                                     onClick = { navController.navigate("listen_together_from_topbar") },
                                                     variant = NuclearButtonVariant.Tertiary,
-                                                    size = 36.dp,
+                                                    size = 48.dp,
                                                 ) {
                                                     Icon(
                                                         painter = painterResource(R.drawable.group_outlined),
@@ -1077,7 +1077,7 @@ class MainActivity : FragmentActivity() {
                                             NuclearIconButton(
                                                 onClick = { showAccountDialog = true },
                                                 variant = NuclearButtonVariant.Tertiary,
-                                                size = 36.dp,
+                                                size = 48.dp,
                                             ) {
                                                 BadgedBox(badge = {
                                                     if (latestVersionName != BuildConfig.BASE_VERSION_NAME) {

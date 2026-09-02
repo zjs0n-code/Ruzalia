@@ -292,7 +292,9 @@ fun PlayerMenu(
                         }
                     },
                     modifier = Modifier.weight(1f),
-                    accentColor = MaterialTheme.colorScheme.primary,
+                    // The fill, not the derived text ink - and it follows the
+                    // album-art accent when that is on, since both live here.
+                    accentColor = MaterialTheme.colorScheme.primaryContainer,
                 )
             }
         }

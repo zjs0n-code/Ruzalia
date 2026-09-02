@@ -13,6 +13,8 @@
 
 package com.metrolist.music.ui.component
 
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,6 +36,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.metrolist.music.R
+import com.metrolist.music.ui.theme.nuclear.NuclearTheme
+import com.metrolist.music.ui.theme.nuclear.contentColorOn
 
 /**
  * Material 3 Expressive Volume Slider dimensions (Size M)
@@ -57,7 +61,7 @@ fun VolumeSlider(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     onValueChangeFinished: (() -> Unit)? = null,
-    accentColor: Color = MaterialTheme.colorScheme.primary
+    accentColor: Color = MaterialTheme.colorScheme.primaryContainer
 ) {
     val interactionSource = remember { MutableInteractionSource() }
 
@@ -73,15 +77,16 @@ fun VolumeSlider(
         else -> volumeUpIcon
     }
 
+    val palette = NuclearTheme.colors
     val colors = SliderDefaults.colors(
-        thumbColor = accentColor,
+        thumbColor = palette.border,
         activeTrackColor = accentColor,
-        activeTickColor = MaterialTheme.colorScheme.onPrimary,
-        inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant,
-        inactiveTickColor = MaterialTheme.colorScheme.onSurfaceVariant
+        activeTickColor = palette.contentColorOn(accentColor),
+        inactiveTrackColor = palette.background,
+        inactiveTickColor = palette.contentColorOn(palette.background)
     )
-    
-    val stopIndicatorColor = MaterialTheme.colorScheme.onSurfaceVariant
+
+    val stopIndicatorColor = palette.border
 
     Slider(
         value = value,
@@ -101,6 +106,11 @@ fun VolumeSlider(
                 sliderState = sliderState,
                 modifier = Modifier
                     .height(VolumeSliderDefaults.TrackHeight)
+                    .border(
+                        NuclearTheme.metrics.borderWidth,
+                        palette.border,
+                        RoundedCornerShape(VolumeSliderDefaults.TrackCornerRadius),
+                    )
                     .drawWithContent {
                         drawContent()
                         val yOffset = size.height / 2 - iconSize.toSize().height / 2

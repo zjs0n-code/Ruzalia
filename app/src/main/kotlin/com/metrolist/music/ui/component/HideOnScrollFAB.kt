@@ -61,7 +61,7 @@ fun BoxScope.HideOnScrollFAB(
                 NuclearIconButton(
                     onClick = onRecognitionClick,
                     variant = NuclearButtonVariant.Tertiary,
-                    size = 40.dp,
+                    size = 48.dp,
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.mic),

@@ -1066,7 +1066,7 @@ private fun SubscribeButton(
             }
 
         },
-        size = 40.dp,
+        size = 48.dp,
         color = if (isSubscribed) primaryColor else NuclearTheme.colors.backgroundSecondary,
     ) {
         Icon(
@@ -1093,7 +1093,7 @@ private fun FavoriteButton(
         onClick = {
             playerConnection.service.toggleLike() 
         },
-        size = 40.dp,
+        size = 48.dp,
         color = if (isLiked) errorColor else NuclearTheme.colors.backgroundSecondary,
     ) {
         Icon(

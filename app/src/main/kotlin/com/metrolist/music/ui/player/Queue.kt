@@ -278,7 +278,7 @@ fun Queue(
                                 ),
                             ),
                 ) {
-                    val buttonSize = 42.dp
+                    val buttonSize = 48.dp
                     val iconSize = 24.dp
                     val queueShape =
                         RoundedCornerShape(

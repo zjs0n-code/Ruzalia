@@ -2145,7 +2145,7 @@ private fun PlayerMoreMenuButton(
                 )
             }
         },
-        size = 40.dp,
+        size = 48.dp,
         color = textButtonColor,
         contentColor = iconButtonColor,
     ) {
