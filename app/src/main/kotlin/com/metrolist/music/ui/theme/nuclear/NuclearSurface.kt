@@ -26,9 +26,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawOutline
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.Dp
@@ -149,5 +152,34 @@ fun Modifier.nuclearHardShadow(
     val px = offset.toPx()
     translate(left = px, top = px) {
         drawOutline(outline, color = color)
+    }
+}
+
+/**
+ * Strokes [shape] *over* the element's own drawing, inset so the whole stroke
+ * stays inside the bounds.
+ *
+ * `Modifier.border` on a composable that paints its own background - a
+ * Material `Surface`, or `ModalBottomSheet` - is drawn first and then covered
+ * by that background. This runs after, so the outline survives.
+ */
+fun Modifier.nuclearOutlineOverlay(
+    shape: Shape,
+    color: Color,
+    width: Dp,
+) = drawWithContent {
+    drawContent()
+    val stroke = width.toPx()
+    val inset = stroke / 2f
+    val outline = shape.createOutline(
+        Size(
+            (size.width - stroke).coerceAtLeast(0f),
+            (size.height - stroke).coerceAtLeast(0f),
+        ),
+        layoutDirection,
+        this,
+    )
+    translate(inset, inset) {
+        drawOutline(outline, color = color, style = Stroke(stroke))
     }
 }

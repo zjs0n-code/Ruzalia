@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,6 +41,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.metrolist.music.ui.theme.nuclear.NuclearTheme
+import com.metrolist.music.ui.theme.nuclear.nuclearOutlineOverlay
 
 val LocalMenuState = compositionLocalOf { MenuState() }
 
@@ -105,7 +105,7 @@ fun AnimatedBottomSheet(
         onDismissRequest = onDismissRequest,
         // Every bottom sheet in the app funnels through here, so this is the
         // one place nuclear's outline has to be applied.
-        modifier = modifier.border(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border, shape),
+        modifier = modifier.nuclearOutlineOverlay(shape, NuclearTheme.colors.border, NuclearTheme.metrics.borderWidth),
         sheetState = sheetState,
         sheetMaxWidth = sheetMaxWidth,
         shape = shape,
