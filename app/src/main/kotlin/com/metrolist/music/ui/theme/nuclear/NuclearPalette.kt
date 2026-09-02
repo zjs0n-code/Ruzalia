@@ -14,6 +14,7 @@ package com.metrolist.music.ui.theme.nuclear
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import com.metrolist.music.R
 
 /**
@@ -77,14 +78,22 @@ data class NuclearPalette(
     /**
      * Colour of the hard offset shadow.
      *
-     * In the light themes the border is black, which is the darkest thing
-     * available and reads as a shadow. In the dark themes the border is a
-     * *lighter* rose than the page, so an offset drawn in it reads as a
-     * highlight and the chunk flattens out. The recessed input colour is the
-     * darkest token in the dark palettes, so the offset reads as a shadow in
-     * both modes.
+     * In the light themes the border is black - the darkest thing available -
+     * and reads as a shadow. In the dark themes the border is a *lighter* rose
+     * than the page, so an offset drawn in it reads as a highlight and the
+     * chunk flattens out; there the recessed input colour is darkest.
+     *
+     * Picking whichever of the two separates further from the page keeps that
+     * working when the page is not the palette's own. Under pure black the
+     * input colour is also black, and only the border is still visible.
      */
-    val shadow: Color get() = if (isDark) backgroundInput else border
+    val shadow: Color
+        get() {
+            val page = background.luminance()
+            val fromInput = kotlin.math.abs(backgroundInput.luminance() - page)
+            val fromBorder = kotlin.math.abs(border.luminance() - page)
+            return if (fromInput >= fromBorder) backgroundInput else border
+        }
 }
 
 enum class NuclearThemeId(

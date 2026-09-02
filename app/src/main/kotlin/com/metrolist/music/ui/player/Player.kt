@@ -5,7 +5,6 @@
 
 package com.metrolist.music.ui.player
 
-import androidx.activity.compose.BackHandler
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -13,6 +12,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
@@ -28,11 +28,10 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.border
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -74,9 +73,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableLongStateOf
@@ -91,6 +89,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -112,8 +112,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
@@ -124,12 +122,12 @@ import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.C
 import androidx.media3.common.Player
 import androidx.media3.common.Player.STATE_ENDED
 import androidx.navigation.NavController
 import androidx.palette.graphics.Palette
-import com.metrolist.music.LocalNavController
 import coil3.compose.AsyncImage
 import coil3.imageLoader
 import coil3.request.ImageRequest
@@ -138,6 +136,7 @@ import coil3.toBitmap
 import com.metrolist.music.LocalDatabase
 import com.metrolist.music.LocalDownloadUtil
 import com.metrolist.music.LocalListenTogetherManager
+import com.metrolist.music.LocalNavController
 import com.metrolist.music.LocalPlayerConnection
 import com.metrolist.music.R
 import com.metrolist.music.constants.CropAlbumArtKey
@@ -154,10 +153,6 @@ import com.metrolist.music.constants.QueuePeekHeight
 import com.metrolist.music.constants.SleepTimerDefaultKey
 import com.metrolist.music.constants.SleepTimerFadeOutKey
 import com.metrolist.music.constants.SleepTimerStopAfterCurrentSongKey
-import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
-import com.metrolist.music.ui.theme.nuclear.NuclearFaceFill
-import com.metrolist.music.ui.theme.nuclear.NuclearSurface
-import com.metrolist.music.ui.theme.nuclear.NuclearTheme
 import com.metrolist.music.constants.SliderStyle
 import com.metrolist.music.constants.SliderStyleKey
 import com.metrolist.music.constants.SquigglySliderKey
@@ -171,6 +166,7 @@ import com.metrolist.music.listentogether.RoomRole
 import com.metrolist.music.models.MediaMetadata
 import com.metrolist.music.ui.component.BottomSheet
 import com.metrolist.music.ui.component.BottomSheetState
+import com.metrolist.music.ui.component.Icon as MIcon
 import com.metrolist.music.ui.component.LocalBottomSheetPageState
 import com.metrolist.music.ui.component.LocalMenuState
 import com.metrolist.music.ui.component.Lyrics
@@ -183,6 +179,9 @@ import com.metrolist.music.ui.menu.PlayerMenu
 import com.metrolist.music.ui.screens.settings.DarkMode
 import com.metrolist.music.ui.theme.PlayerColorExtractor
 import com.metrolist.music.ui.theme.PlayerSliderColors
+import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
+import com.metrolist.music.ui.theme.nuclear.NuclearSurface
+import com.metrolist.music.ui.theme.nuclear.NuclearTheme
 import com.metrolist.music.ui.utils.ShowMediaInfo
 import com.metrolist.music.ui.utils.ShowOffsetDialog
 import com.metrolist.music.utils.dataStore
@@ -191,18 +190,14 @@ import com.metrolist.music.utils.rememberEnumPreference
 import com.metrolist.music.utils.rememberPreference
 import com.metrolist.music.utils.safeDataStoreEdit
 import dagger.hilt.android.EntryPointAccessors
+import kotlin.math.max
+import kotlin.math.roundToInt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.math.max
-import kotlin.math.roundToInt
-import com.metrolist.music.ui.component.Icon as MIcon
-import com.metrolist.music.constants.SleepTimerDefaultKey
-import com.metrolist.music.constants.SleepTimerFadeOutKey
-import com.metrolist.music.constants.SleepTimerStopAfterCurrentSongKey
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -1259,14 +1254,14 @@ fun BottomSheetPlayer(
                 } else {
                     AnimatedContent(targetState = showInlineLyrics, label = "ShareButton") { showLyrics ->
                         if (showLyrics) {
-                            Box(
-                                modifier =
-                                    Modifier
-                                        .size(40.dp)
-                                        .clip(RoundedCornerShape(12.dp))
-                                        .background(textButtonColor)
-                                        .border(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border, RoundedCornerShape(12.dp))
-                                        .clickable { isFullScreen = !isFullScreen },
+                            NuclearIconButton(
+                                onClick = {
+                                    isFullScreen = !isFullScreen 
+                                },
+                                size = 40.dp,
+                                shape = RoundedCornerShape(12.dp),
+                                color = textButtonColor,
+                                contentColor = iconButtonColor,
                             ) {
                                 Icon(
                                     painter = painterResource(R.drawable.fullscreen),
@@ -1279,25 +1274,24 @@ fun BottomSheetPlayer(
                                 )
                             }
                         } else {
-                            Box(
-                                modifier =
-                                    Modifier
-                                        .size(40.dp)
-                                        .clip(RoundedCornerShape(12.dp))
-                                        .background(textButtonColor)
-                                        .border(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border, RoundedCornerShape(12.dp))
-                                        .clickable {
-                                            val intent =
-                                                Intent().apply {
-                                                    action = Intent.ACTION_SEND
-                                                    type = "text/plain"
-                                                    putExtra(
-                                                        Intent.EXTRA_TEXT,
-                                                        "https://music.youtube.com/watch?v=${mediaMetadata.id}",
-                                                    )
-                                                }
-                                            context.startActivity(Intent.createChooser(intent, null))
-                                        },
+                            NuclearIconButton(
+                                onClick = {
+                                    val intent =
+                                        Intent().apply {
+                                            action = Intent.ACTION_SEND
+                                            type = "text/plain"
+                                            putExtra(
+                                                Intent.EXTRA_TEXT,
+                                                "https://music.youtube.com/watch?v=${mediaMetadata.id}",
+                                            )
+                                        }
+                                    context.startActivity(Intent.createChooser(intent, null))
+
+                                },
+                                size = 40.dp,
+                                shape = RoundedCornerShape(12.dp),
+                                color = textButtonColor,
+                                contentColor = iconButtonColor,
                             ) {
                                 Icon(
                                     painter = painterResource(R.drawable.share),
@@ -1317,30 +1311,29 @@ fun BottomSheetPlayer(
                     AnimatedContent(targetState = showInlineLyrics, label = "LikeButton") { showLyrics ->
                         if (showLyrics) {
                             val currentLyrics by playerConnection.currentLyrics.collectAsStateWithLifecycle(initialValue = null)
-                            Box(
-                                modifier =
-                                    Modifier
-                                        .size(40.dp)
-                                        .clip(RoundedCornerShape(12.dp))
-                                        .background(textButtonColor)
-                                        .border(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border, RoundedCornerShape(12.dp))
-                                        .clickable {
-                                            menuState.show {
-                                                com.metrolist.music.ui.menu.LyricsMenu(
-                                                    lyricsProvider = { currentLyrics },
-                                                    songProvider = { currentSong?.song },
-                                                    mediaMetadataProvider = { mediaMetadata },
-                                                    onDismiss = menuState::dismiss,
-                                                    onShowOffsetDialog = {
-                                                        bottomSheetPageState.show {
-                                                            ShowOffsetDialog(
-                                                                songProvider = { currentSong?.song },
-                                                            )
-                                                        }
-                                                    },
-                                                )
-                                            }
-                                        },
+                            NuclearIconButton(
+                                onClick = {
+                                    menuState.show {
+                                        com.metrolist.music.ui.menu.LyricsMenu(
+                                            lyricsProvider = { currentLyrics },
+                                            songProvider = { currentSong?.song },
+                                            mediaMetadataProvider = { mediaMetadata },
+                                            onDismiss = menuState::dismiss,
+                                            onShowOffsetDialog = {
+                                                bottomSheetPageState.show {
+                                                    ShowOffsetDialog(
+                                                        songProvider = { currentSong?.song },
+                                                    )
+                                                }
+                                            },
+                                        )
+                                    }
+
+                                },
+                                size = 40.dp,
+                                shape = RoundedCornerShape(12.dp),
+                                color = textButtonColor,
+                                contentColor = iconButtonColor,
                             ) {
                                 Icon(
                                     painter = painterResource(R.drawable.more_horiz),
@@ -1597,7 +1590,6 @@ fun BottomSheetPlayer(
                                 color = sideButtonContainerColor,
                                 contentColor = sideButtonContentColor,
                                 contentAlignment = Alignment.Center,
-                                faceFill = NuclearFaceFill.Both,
                             ) {
                                 Icon(
                                     painter = painterResource(R.drawable.skip_previous),
@@ -1637,7 +1629,6 @@ fun BottomSheetPlayer(
                                 color = textButtonColor,
                                 contentColor = iconButtonColor,
                                 contentAlignment = Alignment.Center,
-                                faceFill = NuclearFaceFill.Both,
                             ) {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
@@ -1687,7 +1678,6 @@ fun BottomSheetPlayer(
                                 color = sideButtonContainerColor,
                                 contentColor = sideButtonContentColor,
                                 contentAlignment = Alignment.Center,
-                                faceFill = NuclearFaceFill.Both,
                             ) {
                                 Icon(
                                     painter = painterResource(R.drawable.skip_next),
@@ -1744,32 +1734,30 @@ fun BottomSheetPlayer(
 
                             Spacer(Modifier.width(8.dp))
 
-                            Box(
-                                modifier =
-                                    Modifier
-                                        .size(72.dp)
-                                        .clip(RoundedCornerShape(playPauseRoundness))
-                                        .background(textButtonColor)
-                                        .border(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border, RoundedCornerShape(playPauseRoundness))
-                                        .clickable {
-                                            if (isListenTogetherGuest) {
-                                                playerConnection.toggleMute()
-                                                return@clickable
-                                            }
-                                            if (isCasting) {
-                                                if (castIsPlaying) {
-                                                    castHandler?.pause()
-                                                } else {
-                                                    castHandler?.play()
-                                                }
-                                            } else if (playbackState == STATE_ENDED) {
-                                                playerConnection.player.seekTo(0, 0)
-                                                playerConnection.player.playWhenReady = true
-                                            } else {
-                                                playerConnection.player.togglePlayPause()
-                                            }
+                            NuclearIconButton(
+                                onClick = {
+                                    if (isListenTogetherGuest) {
+                                        playerConnection.toggleMute()
+                                        return@NuclearIconButton
+                                    }
+                                    if (isCasting) {
+                                        if (castIsPlaying) {
+                                            castHandler?.pause()
+                                        } else {
+                                            castHandler?.play()
                                         }
-                                        .focusRequester(focusRequester),
+                                    } else if (playbackState == STATE_ENDED) {
+                                        playerConnection.player.seekTo(0, 0)
+                                        playerConnection.player.playWhenReady = true
+                                    } else {
+                                        playerConnection.player.togglePlayPause()
+                                    }
+
+                                },
+                                size = 72.dp,
+                                shape = RoundedCornerShape(playPauseRoundness),
+                                color = textButtonColor,
+                                contentColor = iconButtonColor,
                             ) {
                                 Image(
                                     painter =

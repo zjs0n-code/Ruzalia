@@ -7,6 +7,7 @@ package com.metrolist.music.ui.theme.nuclear
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -19,7 +20,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
@@ -109,7 +109,6 @@ fun NuclearButton(
 
     NuclearSurface(
         modifier = modifier
-            .alpha(if (enabled) 1f else 0.5f)
             .defaultMinSize(minHeight = boxHeight),
         shape = shape,
         color = colors.fill,
@@ -121,7 +120,6 @@ fun NuclearButton(
         onClick = onClick,
         contentPadding = PaddingValues(horizontal = size.horizontalPadding),
         contentAlignment = Alignment.Center,
-        faceFill = NuclearFaceFill.Height,
         interactionSource = interactionSource,
     ) {
         CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.labelLarge) {
@@ -155,7 +153,7 @@ fun NuclearIconButton(
     color: Color? = null,
     contentColor: Color? = null,
     interactionSource: MutableInteractionSource? = null,
-    content: @Composable () -> Unit,
+    content: @Composable BoxScope.() -> Unit,
 ) {
     val colors = nuclearButtonColors(variant)
     val metrics = NuclearTheme.metrics
@@ -165,7 +163,6 @@ fun NuclearIconButton(
 
     NuclearSurface(
         modifier = modifier
-            .alpha(if (enabled) 1f else 0.5f)
             .size(box),
         shape = shape,
         color = fill,
@@ -176,7 +173,6 @@ fun NuclearIconButton(
         enabled = enabled,
         onClick = onClick,
         contentAlignment = Alignment.Center,
-        faceFill = NuclearFaceFill.Both,
         interactionSource = interactionSource,
     ) {
         content()

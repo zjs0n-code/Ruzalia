@@ -15,29 +15,32 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawOutline
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.translate
-import androidx.compose.ui.layout.layout
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.offset
 
 /**
  * The one primitive the whole skin is built from: a flat panel with a drawn
@@ -45,11 +48,13 @@ import androidx.compose.ui.unit.dp
  * it slides the panel onto its own shadow, which is nuclear's
  * `hover:translate-x-shadow-x hover:shadow-none` translated to touch.
  *
- * The shadow is laid out *inside* this composable's bounds rather than painted
- * outside them, so it can never bleed into a neighbour or be clipped away by
- * an ancestor. That means the visible panel is [NuclearMetrics.shadowOffset]
- * narrower and shorter than the space this occupies - size it the way you
- * would size a card, and it will look right.
+ * The shadow is laid out *inside* these bounds rather than painted outside
+ * them, so it can never bleed into a neighbour or be clipped by an ancestor.
+ *
+ * The face is measured with the incoming constraints minus the shadow offset.
+ * That is what makes a surface given a fixed size produce a face that fills it,
+ * and one given loose constraints produce a face that wraps its content -
+ * without the call site needing to know how any of this is put together.
  */
 @Composable
 fun NuclearSurface(
@@ -65,87 +70,78 @@ fun NuclearSurface(
     onClick: (() -> Unit)? = null,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     contentAlignment: Alignment = Alignment.TopStart,
-    faceFill: NuclearFaceFill = NuclearFaceFill.None,
     interactionSource: MutableInteractionSource? = null,
     content: @Composable BoxScope.() -> Unit,
 ) {
-    val source = interactionSource ?: remember { MutableInteractionSource() }
-    val pressed by source.collectIsPressedAsState()
-    val offset = if (shadow) NuclearTheme.metrics.shadowOffset else 0.dp
+    val gap = if (shadow) NuclearTheme.metrics.shadowOffset else 0.dp
+    val isClickable = onClick != null
 
-    // Springy rather than linear: the panel should feel like it snaps down.
-    val press by animateDpAsState(
-        targetValue = if (pressed && enabled) offset else 0.dp,
-        animationSpec = spring<Dp>(),
-        label = "nuclearPress",
-    )
-
-    Box(modifier) {
-        if (shadow) {
-            Box(
-                Modifier
-                    .matchParentSize()
-                    .padding(start = offset, top = offset)
-                    .background(shadowColor, shape),
+    // Only a clickable, shadowed surface can animate, and most surfaces are
+    // neither - GridItem alone backs dozens of lazy-grid call sites and should
+    // not pay for an Animatable and a flow collector that can never fire.
+    val source = if (isClickable) interactionSource ?: remember { MutableInteractionSource() } else null
+    val press: State<Dp> =
+        if (isClickable && shadow && source != null) {
+            val pressed = source.collectIsPressedAsState()
+            animateDpAsState(
+                targetValue = if (pressed.value && enabled) gap else 0.dp,
+                animationSpec = spring(),
+                label = "nuclearPress",
             )
+        } else {
+            remember { mutableStateOf(0.dp) }
         }
 
-        Box(
-            modifier = Modifier
-                .padding(end = offset, bottom = offset)
-                .then(
-                    when (faceFill) {
-                        NuclearFaceFill.None -> Modifier
-                        NuclearFaceFill.Height -> Modifier.fillMaxHeight()
-                        NuclearFaceFill.Both -> Modifier.fillMaxSize()
-                    },
+    val faceModifier = Modifier
+        .clip(shape)
+        .background(color)
+        .border(borderWidth, borderColor, shape)
+        .then(
+            if (onClick != null) {
+                Modifier.clickable(
+                    interactionSource = source,
+                    // nuclear has no ripple; the press *is* the feedback.
+                    indication = null,
+                    enabled = enabled,
+                    role = Role.Button,
+                    onClick = onClick,
                 )
-                .offset(press)
-                .clip(shape)
-                .background(color)
-                .border(borderWidth, borderColor, shape)
-                .then(
-                    if (onClick != null) {
-                        Modifier.clickable(
-                            enabled = enabled,
-                            interactionSource = source,
-                            // nuclear has no ripple; the press *is* the feedback.
-                            indication = null,
-                            onClick = onClick,
-                        )
-                    } else {
-                        Modifier
-                    },
-                )
-                .padding(contentPadding),
-            contentAlignment = contentAlignment,
-        ) {
-            val boxScope = this
-            CompositionLocalProvider(LocalContentColor provides contentColor) {
-                with(boxScope) { content() }
+            } else {
+                Modifier
+            },
+        )
+        .padding(contentPadding)
+
+    Layout(
+        modifier = modifier.alpha(if (isClickable && !enabled) 0.5f else 1f),
+        content = {
+            if (shadow) {
+                Box(Modifier.background(shadowColor, shape))
             }
+            Box(modifier = faceModifier, contentAlignment = contentAlignment) {
+                val scope = this
+                CompositionLocalProvider(LocalContentColor provides contentColor) {
+                    with(scope) { content() }
+                }
+            }
+        },
+    ) { measurables, constraints ->
+        val gapPx = gap.roundToPx()
+        val faceIndex = if (shadow) 1 else 0
+
+        val face = measurables[faceIndex].measure(constraints.offset(-gapPx, -gapPx))
+        val shadowPlaceable =
+            if (shadow) {
+                measurables[0].measure(Constraints.fixed(face.width, face.height))
+            } else {
+                null
+            }
+
+        val pressPx = press.value.roundToPx()
+        layout(face.width + gapPx, face.height + gapPx) {
+            shadowPlaceable?.place(gapPx, gapPx)
+            face.place(pressPx, pressPx)
         }
-    }
-}
-
-/**
- * How much of the space reserved by [NuclearSurface] the visible face should
- * take up.
- *
- * A Box sizes its children to their content, so a surface given a fixed size
- * would paint a full-size shadow behind a face only as big as its icon. Any
- * caller that imposes a size - an icon button, a weighted transport control -
- * has to say so here.
- */
-enum class NuclearFaceFill { None, Height, Both }
-
-/** Equal x/y translation that does not disturb the parent's measurement. */
-private fun Modifier.offset(amount: Dp) = layout { measurable, constraints ->
-    val placeable = measurable.measure(constraints)
-    // roundToPx needs a Density, and the placement block is not one.
-    val px = amount.roundToPx()
-    layout(placeable.width, placeable.height) {
-        placeable.placeRelative(px, px)
     }
 }
 

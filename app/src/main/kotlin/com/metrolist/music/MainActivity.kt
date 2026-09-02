@@ -19,7 +19,6 @@ import android.os.IBinder
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
-import androidx.fragment.app.FragmentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
@@ -58,7 +57,6 @@ import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -112,6 +110,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.util.Consumer
 import androidx.core.view.WindowCompat
+import androidx.fragment.app.FragmentActivity
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.coroutineScope
@@ -141,7 +140,6 @@ import com.metrolist.music.constants.DefaultOpenTabKey
 import com.metrolist.music.constants.DensityScaleKey
 import com.metrolist.music.constants.DisableScreenshotKey
 import com.metrolist.music.constants.DynamicThemeKey
-import com.metrolist.music.constants.NuclearThemeKey
 import com.metrolist.music.constants.EnableHighRefreshRateKey
 import com.metrolist.music.constants.EnableLandscapeScalingKey
 import com.metrolist.music.constants.ExperimentalLyricsKey
@@ -153,6 +151,7 @@ import com.metrolist.music.constants.MiniPlayerBottomSpacing
 import com.metrolist.music.constants.MiniPlayerHeight
 import com.metrolist.music.constants.NavigationBarAnimationSpec
 import com.metrolist.music.constants.NavigationBarHeight
+import com.metrolist.music.constants.NuclearThemeKey
 import com.metrolist.music.constants.PauseListenHistoryKey
 import com.metrolist.music.constants.PauseSearchHistoryKey
 import com.metrolist.music.constants.PreferredLyricsProvider
@@ -192,30 +191,32 @@ import com.metrolist.music.ui.screens.navigationBuilder
 import com.metrolist.music.ui.screens.settings.ChangelogScreen
 import com.metrolist.music.ui.screens.settings.DarkMode
 import com.metrolist.music.ui.screens.settings.NavigationTab
-import com.metrolist.music.ui.theme.NullableColorSaver
 import com.metrolist.music.ui.theme.MetrolistTheme
+import com.metrolist.music.ui.theme.NullableColorSaver
+import com.metrolist.music.ui.theme.extractThemeColor
 import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
 import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
 import com.metrolist.music.ui.theme.nuclear.NuclearThemeId
-import com.metrolist.music.ui.theme.extractThemeColor
 import com.metrolist.music.ui.utils.appBarScrollBehavior
 import com.metrolist.music.ui.utils.resetHeightOffset
+import com.metrolist.music.utils.ArtistNameAliases
 import com.metrolist.music.utils.ReleaseInfo
 import com.metrolist.music.utils.SearchRoutes
 import com.metrolist.music.utils.SyncUtils
-import com.metrolist.music.utils.ArtistNameAliases
 import com.metrolist.music.utils.Updater
 import com.metrolist.music.utils.dataStore
-import com.metrolist.music.utils.safeDataStoreEdit
 import com.metrolist.music.utils.get
 import com.metrolist.music.utils.rememberEnumPreference
 import com.metrolist.music.utils.rememberPreference
 import com.metrolist.music.utils.reportException
+import com.metrolist.music.utils.safeDataStoreEdit
 import com.metrolist.music.utils.setAppLocale
 import com.metrolist.music.viewmodels.HomeViewModel
 import com.metrolist.music.widget.PlaylistWidgetReceiver
 import com.valentinilk.shimmer.LocalShimmerTheme
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Locale
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -224,8 +225,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.Locale
-import javax.inject.Inject
 
 @Suppress("DEPRECATION", "ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
 @AndroidEntryPoint
@@ -604,12 +603,6 @@ class MainActivity : FragmentActivity() {
         }
 
         val themeColorCache = remember { mutableMapOf<String, Color>() }
-
-        LaunchedEffect(enableDynamicTheme) {
-            if (!enableDynamicTheme) {
-                themeColor = null
-            }
-        }
 
         LaunchedEffect(playerConnection, enableDynamicTheme) {
             val playerConnection = playerConnection

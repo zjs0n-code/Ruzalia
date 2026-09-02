@@ -114,9 +114,9 @@ import com.metrolist.music.ui.utils.backToMain
 import com.metrolist.music.utils.IconUtils
 import com.metrolist.music.utils.rememberEnumPreference
 import com.metrolist.music.utils.rememberPreference
-import kotlinx.coroutines.launch
 import java.util.Locale
 import kotlin.math.roundToInt
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -152,13 +152,6 @@ fun AppearanceSettings(
             EnableLandscapeScalingKey,
             defaultValue = false,
         )
-    val (selectedThemeColorInt) =
-        rememberPreference(
-            SelectedThemeColorKey,
-            defaultValue = DefaultThemeColor.toArgb(),
-        )
-    // Check if user has selected a custom color (not the default/dynamic color)
-    val isUsingCustomColor = selectedThemeColorInt != DefaultThemeColor.toArgb()
 
     val (useNewPlayerDesign, onUseNewPlayerDesignChange) =
         rememberPreference(
@@ -955,9 +948,7 @@ fun AppearanceSettings(
                             onClick = { onEnableLandscapeScalingChange(!enableLandscapeScaling) },
                         ),
                     )
-                    // Only show dynamic theme option when using the default/dynamic color
-                    // When a custom color is selected, dynamic theme is automatically disabled
-                    if (!isUsingCustomColor) {
+                    run {
                         add(
                             Material3SettingsItem(
                                 icon = painterResource(R.drawable.palette),

@@ -5,6 +5,7 @@
 
 package com.metrolist.music.ui.component
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -23,7 +24,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -61,8 +61,8 @@ import androidx.compose.ui.window.DialogProperties
 import com.metrolist.music.LocalNavController
 import com.metrolist.music.R
 import com.metrolist.music.ui.screens.settings.AccountSettings
-import kotlinx.coroutines.delay
 import com.metrolist.music.ui.theme.nuclear.NuclearTheme
+import kotlinx.coroutines.delay
 
 @Composable
 fun DefaultDialog(

@@ -6,6 +6,7 @@
 package com.metrolist.music.ui.player
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -44,8 +45,8 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -65,7 +66,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableLongStateOf
@@ -81,7 +82,6 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -96,16 +96,20 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.edit
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.Player
 import androidx.media3.common.Timeline
 import androidx.media3.exoplayer.source.ShuffleOrder.DefaultShuffleOrder
-import com.metrolist.music.LocalNavController
 import com.metrolist.music.LocalListenTogetherManager
+import com.metrolist.music.LocalNavController
 import com.metrolist.music.LocalPlayerConnection
 import com.metrolist.music.R
 import com.metrolist.music.constants.ListItemHeight
 import com.metrolist.music.constants.PlayerBackgroundStyle
 import com.metrolist.music.constants.QueueEditLockKey
+import com.metrolist.music.constants.SleepTimerDefaultKey
+import com.metrolist.music.constants.SleepTimerFadeOutKey
+import com.metrolist.music.constants.SleepTimerStopAfterCurrentSongKey
 import com.metrolist.music.constants.UseNewPlayerDesignKey
 import com.metrolist.music.extensions.metadata
 import com.metrolist.music.extensions.move
@@ -121,29 +125,21 @@ import com.metrolist.music.ui.component.MediaMetadataListItem
 import com.metrolist.music.ui.menu.PlayerMenu
 import com.metrolist.music.ui.menu.QueueMenu
 import com.metrolist.music.ui.menu.SelectionMediaMetadataMenu
+import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
+import com.metrolist.music.ui.theme.nuclear.NuclearSurface
+import com.metrolist.music.ui.theme.nuclear.NuclearTheme
 import com.metrolist.music.ui.utils.ShowMediaInfo
 import com.metrolist.music.utils.dataStore
 import com.metrolist.music.utils.makeTimeString
 import com.metrolist.music.utils.rememberPreference
 import com.metrolist.music.utils.safeDataStoreEdit
+import kotlin.math.roundToInt
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
-import kotlin.math.roundToInt
-import com.metrolist.music.constants.SleepTimerDefaultKey
-import android.widget.Toast
-import androidx.compose.runtime.derivedStateOf
-import com.metrolist.music.constants.SleepTimerFadeOutKey
-import com.metrolist.music.constants.SleepTimerStopAfterCurrentSongKey
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.material3.Button
-import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
-import com.metrolist.music.ui.theme.nuclear.NuclearFaceFill
-import com.metrolist.music.ui.theme.nuclear.NuclearSurface
-import com.metrolist.music.ui.theme.nuclear.NuclearTheme
 
 
 @SuppressLint("UnrememberedMutableState")
@@ -1298,7 +1294,6 @@ private fun PlayerQueueButton(
         enabled = enabled,
         onClick = onClick,
         contentAlignment = Alignment.Center,
-        faceFill = NuclearFaceFill.Both,
     ) {
         if (text != null) {
             Text(

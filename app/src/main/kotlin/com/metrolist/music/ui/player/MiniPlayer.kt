@@ -14,15 +14,15 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -46,9 +46,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableLongState
 import androidx.compose.runtime.Stable
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -59,16 +59,19 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalWindowInfo
@@ -80,14 +83,22 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.Player
+import androidx.palette.graphics.Palette
 import coil3.compose.AsyncImage
+import coil3.imageLoader
+import coil3.request.ImageRequest
+import coil3.request.allowHardware
+import coil3.toBitmap
 import com.metrolist.music.LocalDatabase
 import com.metrolist.music.LocalListenTogetherManager
 import com.metrolist.music.LocalPlayerConnection
 import com.metrolist.music.R
 import com.metrolist.music.constants.CropAlbumArtKey
 import com.metrolist.music.constants.DarkModeKey
+import com.metrolist.music.constants.MiniPlayerBackgroundStyle
+import com.metrolist.music.constants.MiniPlayerBackgroundStyleKey
 import com.metrolist.music.constants.MiniPlayerHeight
 import com.metrolist.music.constants.PureBlackMiniPlayerKey
 import com.metrolist.music.constants.SwipeSensitivityKey
@@ -99,32 +110,21 @@ import com.metrolist.music.listentogether.ListenTogetherManager
 import com.metrolist.music.models.MediaMetadata
 import com.metrolist.music.playback.CastConnectionHandler
 import com.metrolist.music.playback.PlayerConnection
-import com.metrolist.music.ui.screens.settings.DarkMode
-import com.metrolist.music.ui.utils.resize
-import com.metrolist.music.utils.joinToArtistString
-import com.metrolist.music.utils.rememberEnumPreference
-import com.metrolist.music.utils.rememberPreference
-import kotlinx.coroutines.launch
-import kotlin.math.absoluteValue
-import kotlin.math.roundToInt
 import com.metrolist.music.ui.component.Icon as MIcon
-import androidx.compose.ui.draw.blur
-import com.metrolist.music.constants.MiniPlayerBackgroundStyle
-import com.metrolist.music.constants.MiniPlayerBackgroundStyleKey
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.platform.LocalContext
-import androidx.palette.graphics.Palette
-import coil3.imageLoader
-import coil3.request.ImageRequest
-import coil3.request.allowHardware
-import coil3.toBitmap
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import com.metrolist.music.ui.screens.settings.DarkMode
 import com.metrolist.music.ui.theme.PlayerColorExtractor
 import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
 import com.metrolist.music.ui.theme.nuclear.NuclearTheme
 import com.metrolist.music.ui.theme.nuclear.nuclearHardShadow
+import com.metrolist.music.ui.utils.resize
+import com.metrolist.music.utils.joinToArtistString
+import com.metrolist.music.utils.rememberEnumPreference
+import com.metrolist.music.utils.rememberPreference
+import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * Stable wrapper for progress state - reads values only during draw phase
@@ -481,8 +481,6 @@ private fun NewMiniPlayer(
                         artistId = artistId,
                         metadata = mediaMetadata!!,
                         primaryColor = primaryColor,
-                        outlineColor = outlineColor,
-                        onSurfaceColor = onSurfaceColor,
                     )
                 }
 
@@ -492,8 +490,6 @@ private fun NewMiniPlayer(
                 mediaMetadata?.let { FavoriteButton(
                     songId = it.id,
                     errorColor = errorColor,
-                    outlineColor = outlineColor,
-                    onSurfaceColor = onSurfaceColor,
                 )
                 }
             }
@@ -1043,8 +1039,6 @@ private fun SubscribeButton(
     artistId: String,
     metadata: MediaMetadata,
     primaryColor: Color,
-    outlineColor: Color,
-    onSurfaceColor: Color,
 ) {
     val database = LocalDatabase.current
     val libraryArtist by database.artist(artistId).collectAsStateWithLifecycle(initialValue = null)
@@ -1087,8 +1081,6 @@ private fun SubscribeButton(
 private fun FavoriteButton(
     songId: String,
     errorColor: Color,
-    outlineColor: Color,
-    onSurfaceColor: Color,
 ) {
     val database = LocalDatabase.current
     val playerConnection = LocalPlayerConnection.current ?: return

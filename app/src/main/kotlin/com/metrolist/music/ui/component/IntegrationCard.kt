@@ -6,6 +6,7 @@
 package com.metrolist.music.ui.component
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
+import com.metrolist.music.ui.theme.nuclear.NuclearTheme
 
 /**
  * A Material 3 Expressive style settings group component
@@ -66,19 +68,22 @@ fun IntegrationCard(
             items.forEachIndexed { index, item ->
                 val shape = when {
                     items.size == 1 -> RoundedCornerShape(12.dp)
-                    index == 0 -> RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp, bottomStart = 6.dp, bottomEnd = 6.dp)
-                    index == items.size - 1 -> RoundedCornerShape(topStart = 6.dp, topEnd = 6.dp, bottomStart = 24.dp, bottomEnd = 24.dp)
-                    else -> RoundedCornerShape(6.dp)
+                    index == 0 -> RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp, bottomStart = 4.dp, bottomEnd = 4.dp)
+                    index == items.size - 1 -> RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp, bottomStart = 12.dp, bottomEnd = 12.dp)
+                    else -> RoundedCornerShape(4.dp)
                 }
 
+                // Matches Material3SettingsGroup and Menu: nuclear's radii and a
+                // drawn outline, not a barely-there tint.
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .animateContentSize(),
                     shape = shape,
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer
                     ),
+                    border = BorderStroke(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border),
                     elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                 ) {
                     IntegrationCardItemRow(item = item)

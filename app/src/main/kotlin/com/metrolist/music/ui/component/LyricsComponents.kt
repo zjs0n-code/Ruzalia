@@ -11,7 +11,6 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.text.Layout
 import android.widget.Toast
-import timber.log.Timber
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -84,6 +83,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @Composable
 internal fun LyricsTranslationHeader(

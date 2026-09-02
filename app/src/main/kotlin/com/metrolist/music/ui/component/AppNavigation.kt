@@ -22,6 +22,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -30,11 +32,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import com.metrolist.music.ui.screens.Screens
+import com.metrolist.music.ui.theme.nuclear.NuclearTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.geometry.Size
-import com.metrolist.music.ui.theme.nuclear.NuclearTheme
 
 @Stable
 private fun isRouteSelected(currentRoute: String?, screenRoute: String, navigationItems: List<Screens>): Boolean {

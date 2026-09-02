@@ -172,13 +172,13 @@ import com.metrolist.music.ui.utils.fadingEdge
 import com.metrolist.music.utils.ComposeToImage
 import com.metrolist.music.utils.rememberEnumPreference
 import com.metrolist.music.utils.rememberPreference
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.time.Duration.Companion.seconds
 
 /**
  * A composable function that displays lyrics for the currently playing song.
