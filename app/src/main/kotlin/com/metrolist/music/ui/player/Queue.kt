@@ -844,7 +844,7 @@ fun Queue(
                                             )
                                         } else {
                                             if (!isListenTogetherGuest) {
-                                                IconButton(
+                                                NuclearIconButton(
                                                     onClick = {
                                                         menuState.show {
                                                             QueueMenu(
@@ -861,6 +861,8 @@ fun Queue(
                                                             )
                                                         }
                                                     },
+                                                    variant = NuclearButtonVariant.Tertiary,
+                                                    size = 40.dp,
                                                 ) {
                                                     Icon(
                                                         painter = painterResource(R.drawable.more_vert),
@@ -1154,7 +1156,7 @@ fun Queue(
                             }
                         },
                     )
-                    IconButton(
+                    NuclearIconButton(
                         enabled = count > 0,
                         onClick = {
                             menuState.show {
@@ -1166,6 +1168,8 @@ fun Queue(
                                 )
                             }
                         },
+                        variant = NuclearButtonVariant.Tertiary,
+                        size = 40.dp,
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.more_vert),

@@ -97,6 +97,8 @@ import com.metrolist.music.ui.menu.TopPlaylistMenu
 import com.metrolist.music.ui.utils.backToMain
 import com.metrolist.music.utils.makeTimeString
 import com.metrolist.music.viewmodels.TopPlaylistViewModel
+import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
+import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -326,7 +328,7 @@ fun TopPlaylistScreen(
                                         onCheckedChange = onCheckedChange
                                     )
                                 } else {
-                                    IconButton(
+                                    NuclearIconButton(
                                         onClick = {
                                             menuState.show {
                                                 SongMenu(
@@ -335,6 +337,8 @@ fun TopPlaylistScreen(
                                                 )
                                             }
                                         },
+                                        variant = NuclearButtonVariant.Tertiary,
+                                        size = 40.dp,
                                     ) {
                                         Icon(
                                             painter = painterResource(R.drawable.more_vert),
@@ -488,7 +492,7 @@ fun TopPlaylistScreen(
                             }
                         }
                     )
-                    IconButton(
+                    NuclearIconButton(
                         enabled = selection.isNotEmpty(),
                         onClick = {
                             menuState.show {
@@ -499,6 +503,8 @@ fun TopPlaylistScreen(
                                 )
                             }
                         },
+                        variant = NuclearButtonVariant.Tertiary,
+                        size = 40.dp,
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.more_vert),

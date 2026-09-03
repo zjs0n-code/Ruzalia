@@ -108,6 +108,8 @@ import com.metrolist.music.viewmodels.OnlinePlaylistViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
+import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -330,11 +332,14 @@ fun OnlinePlaylistScreen(
                                         onCheckedChange = onCheckedChange,
                                     )
                                 } else {
-                                    IconButton(onClick = {
+                                    NuclearIconButton(onClick = {
                                         menuState.show {
                                             YouTubeSongMenu(songItem, menuState::dismiss)
                                         }
-                                    }) {
+                                    },
+                                        variant = NuclearButtonVariant.Tertiary,
+                                        size = 40.dp,
+                                    ) {
                                         Icon(painterResource(R.drawable.more_vert), null)
                                     }
                                 }
@@ -402,7 +407,7 @@ fun OnlinePlaylistScreen(
                 }
             },
             navigationIcon = {
-                IconButton(
+                NuclearIconButton(
                     onClick = {
                         if (isSearching) {
                             isSearching = false
@@ -418,6 +423,8 @@ fun OnlinePlaylistScreen(
                             navController.backToMain()
                         }
                     },
+                    variant = NuclearButtonVariant.Tertiary,
+                    size = 40.dp,
                 ) {
                     Icon(
                         painter =
@@ -441,7 +448,7 @@ fun OnlinePlaylistScreen(
                             }
                         },
                     )
-                    IconButton(
+                    NuclearIconButton(
                         enabled = selection.isNotEmpty(),
                         onClick = {
                             menuState.show {
@@ -455,6 +462,8 @@ fun OnlinePlaylistScreen(
                                 )
                             }
                         },
+                        variant = NuclearButtonVariant.Tertiary,
+                        size = 40.dp,
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.more_vert),
@@ -462,8 +471,10 @@ fun OnlinePlaylistScreen(
                         )
                     }
                 } else if (!isSearching) {
-                    IconButton(
+                    NuclearIconButton(
                         onClick = { isSearching = true },
+                        variant = NuclearButtonVariant.Tertiary,
+                        size = 40.dp,
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.search),
@@ -621,7 +632,7 @@ private fun OnlinePlaylistHeader(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             // Like Button - Smaller secondary button
-            Surface(
+            NuclearIconButton(
                 onClick = {
                     if (dbPlaylist != null) {
                         database.transaction {
@@ -658,9 +669,8 @@ private fun OnlinePlaylistHeader(
                         }
                     }
                 },
-                shape = CircleShape,
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                modifier = Modifier.size(48.dp),
+                variant = NuclearButtonVariant.Tertiary,
+                size = 48.dp,
             ) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -684,7 +694,7 @@ private fun OnlinePlaylistHeader(
             }
 
             // Play Button - Larger primary circular button
-            Surface(
+            NuclearIconButton(
                 onClick = {
                     if (!isListenTogetherGuest && songs.isNotEmpty()) {
                         playerConnection.playQueue(
@@ -697,9 +707,9 @@ private fun OnlinePlaylistHeader(
                         )
                     }
                 },
-                color = MaterialTheme.colorScheme.primary,
-                shape = CircleShape,
-                modifier = Modifier.size(72.dp),
+                variant = NuclearButtonVariant.Primary,
+                size = 72.dp,
+                shape = MaterialTheme.shapes.large,
             ) {
                 Box(
                     contentAlignment = Alignment.Center,
@@ -715,7 +725,7 @@ private fun OnlinePlaylistHeader(
             }
 
             // Menu Button - Smaller secondary button
-            Surface(
+            NuclearIconButton(
                 onClick = {
                     menuState.show {
                         YouTubePlaylistMenu(
@@ -726,9 +736,8 @@ private fun OnlinePlaylistHeader(
                         )
                     }
                 },
-                shape = CircleShape,
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                modifier = Modifier.size(48.dp),
+                variant = NuclearButtonVariant.Tertiary,
+                size = 48.dp,
             ) {
                 Box(
                     modifier = Modifier.fillMaxSize(),

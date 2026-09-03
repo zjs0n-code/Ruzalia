@@ -96,6 +96,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
+import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -441,7 +443,7 @@ fun LibrarySongsScreen(
                     showLikedIcon = true,
                     showDownloadIcon = filter != SongFilter.DOWNLOADED,
                     trailingContent = {
-                        IconButton(
+                        NuclearIconButton(
                             onClick = {
                                 menuState.show {
                                     SongMenu(
@@ -450,6 +452,8 @@ fun LibrarySongsScreen(
                                     )
                                 }
                             },
+                            variant = NuclearButtonVariant.Tertiary,
+                            size = 40.dp,
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.more_vert),

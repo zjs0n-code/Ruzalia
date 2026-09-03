@@ -96,6 +96,8 @@ import com.metrolist.music.utils.rememberPreference
 import com.metrolist.music.viewmodels.StatsViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
+import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -755,10 +757,12 @@ fun StatsScreen(
                     onCheckedChange = {
                     },
                 )
-                androidx.compose.material3.IconButton(
+                NuclearIconButton(
                     enabled = selection.isNotEmpty(),
                     onClick = {
                     },
+                    variant = NuclearButtonVariant.Tertiary,
+                    size = 40.dp,
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.more_vert),

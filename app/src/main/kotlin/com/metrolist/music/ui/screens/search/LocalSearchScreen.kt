@@ -67,6 +67,8 @@ import com.metrolist.music.ui.menu.SongMenu
 import com.metrolist.music.viewmodels.LocalFilter
 import com.metrolist.music.viewmodels.LocalSearchViewModel
 import kotlinx.coroutines.flow.drop
+import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
+import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -191,7 +193,7 @@ fun LocalSearchScreen(
                                 isActive = item.id == mediaMetadata?.id,
                                 isPlaying = isPlaying,
                                 trailingContent = {
-                                    IconButton(
+                                    NuclearIconButton(
                                         onClick = {
                                             menuState.show {
                                                 SongMenu(
@@ -204,6 +206,8 @@ fun LocalSearchScreen(
                                                 )
                                             }
                                         },
+                                        variant = NuclearButtonVariant.Tertiary,
+                                        size = 40.dp,
                                     ) {
                                         Icon(
                                             painter = painterResource(R.drawable.more_vert),

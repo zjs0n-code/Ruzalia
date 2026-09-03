@@ -127,6 +127,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
+import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -580,7 +581,7 @@ fun AutoPlaylistScreen(
                                         onCheckedChange = onCheckedChange,
                                     )
                                 } else {
-                                    IconButton(
+                                    NuclearIconButton(
                                         onClick = {
                                             menuState.show {
                                                 SongMenu(
@@ -589,6 +590,8 @@ fun AutoPlaylistScreen(
                                                 )
                                             }
                                         },
+                                        variant = NuclearButtonVariant.Tertiary,
+                                        size = 40.dp,
                                     ) {
                                         Icon(
                                             painter = painterResource(R.drawable.more_vert),
@@ -803,7 +806,7 @@ fun AutoPlaylistScreen(
                             }
                         },
                     )
-                    IconButton(
+                    NuclearIconButton(
                         enabled = selection.isNotEmpty(),
                         onClick = {
                             menuState.show {
@@ -815,6 +818,8 @@ fun AutoPlaylistScreen(
                                 )
                             }
                         },
+                        variant = NuclearButtonVariant.Tertiary,
+                        size = 40.dp,
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.more_vert),

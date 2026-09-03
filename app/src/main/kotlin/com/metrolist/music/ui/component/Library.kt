@@ -25,6 +25,9 @@ import com.metrolist.music.ui.menu.ArtistMenu
 import com.metrolist.music.ui.menu.PlaylistMenu
 import com.metrolist.music.ui.menu.YouTubePlaylistMenu
 import kotlinx.coroutines.CoroutineScope
+import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
+import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun LibraryArtistListItem(
@@ -37,7 +40,7 @@ fun LibraryArtistListItem(
     ArtistListItem(
         artist = artist,
         trailingContent = {
-            androidx.compose.material3.IconButton(
+            NuclearIconButton(
                 onClick = {
                     menuState.show {
                         ArtistMenu(
@@ -46,7 +49,9 @@ fun LibraryArtistListItem(
                             onDismiss = menuState::dismiss
                         )
                     }
-                }
+                },
+                variant = NuclearButtonVariant.Tertiary,
+                size = 40.dp,
             ) {
                 Icon(
                     painter = painterResource(R.drawable.more_vert),
@@ -107,7 +112,7 @@ fun LibraryAlbumListItem(
     isActive = isActive,
     isPlaying = isPlaying,
     trailingContent = {
-        androidx.compose.material3.IconButton(
+        NuclearIconButton(
             onClick = {
                 menuState.show {
                     AlbumMenu(
@@ -115,7 +120,9 @@ fun LibraryAlbumListItem(
                         onDismiss = menuState::dismiss
                     )
                 }
-            }
+            },
+            variant = NuclearButtonVariant.Tertiary,
+            size = 40.dp,
         ) {
             Icon(
                 painter = painterResource(R.drawable.more_vert),
@@ -177,7 +184,7 @@ fun LibraryPlaylistListItem(
     PlaylistListItem(
     playlist = playlist,
     trailingContent = {
-        androidx.compose.material3.IconButton(
+        NuclearIconButton(
             onClick = {
                 menuState.show {
                     if (playlist.playlist.isEditable || playlist.songCount != 0) {
@@ -215,7 +222,9 @@ fun LibraryPlaylistListItem(
                         }
                     }
                 }
-            }
+            },
+            variant = NuclearButtonVariant.Tertiary,
+            size = 40.dp,
         ) {
             Icon(
                 painter = painterResource(R.drawable.more_vert),

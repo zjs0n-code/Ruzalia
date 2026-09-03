@@ -80,6 +80,8 @@ import com.metrolist.music.ui.menu.YouTubeSongMenu
 import com.metrolist.music.ui.utils.SnapLayoutInfoProvider
 import com.metrolist.music.ui.utils.backToMain
 import com.metrolist.music.viewmodels.ChartsViewModel
+import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
+import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -268,7 +270,7 @@ fun ChartsScreen(
                                             isPlaying = isPlaying,
                                             isSwipeable = false,
                                             trailingContent = {
-                                                IconButton(
+                                                NuclearIconButton(
                                                     onClick = {
                                                         menuState.show {
                                                             YouTubeSongMenu(
@@ -277,6 +279,8 @@ fun ChartsScreen(
                                                             )
                                                         }
                                                     },
+                                                    variant = NuclearButtonVariant.Tertiary,
+                                                    size = 40.dp,
                                                 ) {
                                                     Icon(
                                                         painter = painterResource(R.drawable.more_vert),

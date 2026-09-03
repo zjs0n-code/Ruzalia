@@ -111,6 +111,7 @@ import java.text.Collator
 import java.time.LocalDateTime
 import java.util.UUID
 import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
+import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -572,7 +573,7 @@ fun LibraryMixScreen(
                                 PlaylistListItem(
                                     playlist = item,
                                     trailingContent = {
-                                        IconButton(
+                                        NuclearIconButton(
                                             onClick = {
                                                 menuState.show {
                                                     PlaylistMenu(
@@ -582,6 +583,8 @@ fun LibraryMixScreen(
                                                     )
                                                 }
                                             },
+                                            variant = NuclearButtonVariant.Tertiary,
+                                            size = 40.dp,
                                         ) {
                                             Icon(
                                                 painter = painterResource(R.drawable.more_vert),
@@ -623,7 +626,7 @@ fun LibraryMixScreen(
                                     isActive = item.id == mediaMetadata?.id,
                                     isPlaying = isPlaying,
                                     trailingContent = {
-                                        IconButton(
+                                        NuclearIconButton(
                                             onClick = {
                                                 menuState.show {
                                                     SongMenu(
@@ -632,6 +635,8 @@ fun LibraryMixScreen(
                                                     )
                                                 }
                                             },
+                                            variant = NuclearButtonVariant.Tertiary,
+                                            size = 40.dp,
                                         ) {
                                             Icon(
                                                 painter = painterResource(R.drawable.more_vert),
@@ -675,7 +680,7 @@ fun LibraryMixScreen(
                                 ArtistListItem(
                                     artist = item,
                                     trailingContent = {
-                                        IconButton(
+                                        NuclearIconButton(
                                             onClick = {
                                                 menuState.show {
                                                     ArtistMenu(
@@ -685,6 +690,8 @@ fun LibraryMixScreen(
                                                     )
                                                 }
                                             },
+                                            variant = NuclearButtonVariant.Tertiary,
+                                            size = 40.dp,
                                         ) {
                                             Icon(
                                                 painter = painterResource(R.drawable.more_vert),
@@ -719,7 +726,7 @@ fun LibraryMixScreen(
                                     isActive = item.id == mediaMetadata?.album?.id,
                                     isPlaying = isPlaying,
                                     trailingContent = {
-                                        IconButton(
+                                        NuclearIconButton(
                                             onClick = {
                                                 menuState.show {
                                                     AlbumMenu(
@@ -728,6 +735,8 @@ fun LibraryMixScreen(
                                                     )
                                                 }
                                             },
+                                            variant = NuclearButtonVariant.Tertiary,
+                                            size = 40.dp,
                                         ) {
                                             Icon(
                                                 painter = painterResource(R.drawable.more_vert),

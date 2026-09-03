@@ -57,6 +57,8 @@ import com.metrolist.music.ui.utils.backToMain
 import com.metrolist.music.utils.rememberEnumPreference
 import com.metrolist.music.utils.rememberPreference
 import com.metrolist.music.viewmodels.ArtistSongsViewModel
+import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
+import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -135,7 +137,7 @@ fun ArtistSongsScreen(
                     isActive = song.id == mediaMetadata?.id,
                     isPlaying = isPlaying,
                     trailingContent = {
-                        IconButton(
+                        NuclearIconButton(
                             onClick = {
                                 menuState.show {
                                     SongMenu(
@@ -144,6 +146,8 @@ fun ArtistSongsScreen(
                                     )
                                 }
                             },
+                            variant = NuclearButtonVariant.Tertiary,
+                            size = 40.dp,
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.more_vert),

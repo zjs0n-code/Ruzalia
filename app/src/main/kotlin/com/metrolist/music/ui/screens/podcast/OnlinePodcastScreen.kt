@@ -85,6 +85,8 @@ import com.metrolist.music.ui.component.YouTubeListItem
 import com.metrolist.music.ui.menu.YouTubeSongMenu
 import com.metrolist.music.ui.utils.backToMain
 import com.metrolist.music.viewmodels.OnlinePodcastViewModel
+import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
+import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -220,11 +222,14 @@ fun OnlinePodcastScreen(
                                 )
                                 .animateItem(),
                             trailingContent = {
-                                IconButton(onClick = {
+                                NuclearIconButton(onClick = {
                                     menuState.show {
                                         YouTubeSongMenu(episode.asSongItem(), menuState::dismiss)
                                     }
-                                }) {
+                                },
+                                    variant = NuclearButtonVariant.Tertiary,
+                                    size = 40.dp,
+                                ) {
                                     Icon(painterResource(R.drawable.more_vert), null)
                                 }
                             }

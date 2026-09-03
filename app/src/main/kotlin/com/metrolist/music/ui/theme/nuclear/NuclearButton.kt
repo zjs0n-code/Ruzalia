@@ -149,6 +149,7 @@ fun NuclearIconButton(
     size: Dp = 40.dp,
     shape: Shape = MaterialTheme.shapes.medium,
     enabled: Boolean = true,
+    onLongClick: (() -> Unit)? = null,
     /** Overrides the variant's fill, for call sites that derive their own. */
     color: Color? = null,
     contentColor: Color? = null,
@@ -172,6 +173,7 @@ fun NuclearIconButton(
         shadow = colors.hasShadow,
         enabled = enabled,
         onClick = onClick,
+        onLongClick = onLongClick,
         contentAlignment = Alignment.Center,
         interactionSource = interactionSource,
     ) {

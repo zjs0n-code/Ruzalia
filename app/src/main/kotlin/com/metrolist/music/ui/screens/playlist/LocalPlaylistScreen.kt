@@ -156,6 +156,8 @@ import kotlinx.coroutines.withContext
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 import java.time.LocalDateTime
+import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
+import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
 
 @SuppressLint("RememberReturnType")
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
@@ -624,7 +626,7 @@ fun LocalPlaylistScreen(
                                         onCheckedChange = onCheckedChange,
                                     )
                                 } else {
-                                    IconButton(
+                                    NuclearIconButton(
                                         onClick = {
                                             menuState.show {
                                                 SongMenu(
@@ -635,6 +637,8 @@ fun LocalPlaylistScreen(
                                                 )
                                             }
                                         },
+                                        variant = NuclearButtonVariant.Tertiary,
+                                        size = 40.dp,
                                     ) {
                                         Icon(
                                             painter = painterResource(R.drawable.more_vert),
@@ -769,7 +773,10 @@ fun LocalPlaylistScreen(
             },
             navigationIcon = {
                 if (inSelectMode) {
-                    IconButton(onClick = onExitSelectionMode) {
+                    NuclearIconButton(onClick = onExitSelectionMode,
+                        variant = NuclearButtonVariant.Tertiary,
+                        size = 40.dp,
+                    ) {
                         Icon(
                             painter = painterResource(R.drawable.close),
                             contentDescription = null,
@@ -811,7 +818,7 @@ fun LocalPlaylistScreen(
                             }
                         },
                     )
-                    IconButton(
+                    NuclearIconButton(
                         enabled = selection.isNotEmpty(),
                         onClick = {
                             menuState.show {
@@ -829,6 +836,8 @@ fun LocalPlaylistScreen(
                                 )
                             }
                         },
+                        variant = NuclearButtonVariant.Tertiary,
+                        size = 40.dp,
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.more_vert),
@@ -837,8 +846,10 @@ fun LocalPlaylistScreen(
                     }
                 } else if (!isSearching) {
                     // Only search button remains in TopAppBar
-                    IconButton(
+                    NuclearIconButton(
                         onClick = { isSearching = true },
+                        variant = NuclearButtonVariant.Tertiary,
+                        size = 40.dp,
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.search),
@@ -1324,7 +1335,7 @@ fun LocalPlaylistHeader(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             // Shuffle Button - Smaller secondary button
-            Surface(
+            NuclearIconButton(
                 onClick = {
                     playerConnection.playQueue(
                         ListQueue(
@@ -1333,9 +1344,8 @@ fun LocalPlaylistHeader(
                         ),
                     )
                 },
-                shape = CircleShape,
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                modifier = Modifier.size(48.dp),
+                variant = NuclearButtonVariant.Tertiary,
+                size = 48.dp,
             ) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -1350,7 +1360,7 @@ fun LocalPlaylistHeader(
             }
 
             // Play Button - Larger primary circular button
-            Surface(
+            NuclearIconButton(
                 onClick = {
                     playerConnection.playQueue(
                         ListQueue(
@@ -1359,9 +1369,9 @@ fun LocalPlaylistHeader(
                         ),
                     )
                 },
-                color = MaterialTheme.colorScheme.primary,
-                shape = CircleShape,
-                modifier = Modifier.size(72.dp),
+                variant = NuclearButtonVariant.Primary,
+                size = 72.dp,
+                shape = MaterialTheme.shapes.large,
             ) {
                 Box(
                     contentAlignment = Alignment.Center,
@@ -1377,7 +1387,7 @@ fun LocalPlaylistHeader(
             }
 
             // Menu Button - Smaller secondary button
-            Surface(
+            NuclearIconButton(
                 onClick = {
                     menuState.show {
                         LocalPlaylistMenu(
@@ -1441,9 +1451,8 @@ fun LocalPlaylistHeader(
                         )
                     }
                 },
-                shape = CircleShape,
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                modifier = Modifier.size(48.dp),
+                variant = NuclearButtonVariant.Tertiary,
+                size = 48.dp,
             ) {
                 Box(
                     modifier = Modifier.fillMaxSize(),

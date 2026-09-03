@@ -83,6 +83,9 @@ import com.metrolist.music.utils.rememberPreference
 import com.metrolist.music.viewmodels.DateAgo
 import com.metrolist.music.viewmodels.HistoryViewModel
 import java.time.format.DateTimeFormatter
+import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
+import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
+import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -264,7 +267,7 @@ fun HistoryScreen(
                             isActive = song.id == mediaMetadata?.id,
                             isPlaying = isPlaying,
                             trailingContent = {
-                                IconButton(
+                                NuclearIconButton(
                                     onClick = {
                                         menuState.show {
                                             YouTubeSongMenu(
@@ -276,6 +279,8 @@ fun HistoryScreen(
                                             )
                                         }
                                     },
+                                    variant = NuclearButtonVariant.Tertiary,
+                                    size = 40.dp,
                                 ) {
                                     Icon(
                                         painter = painterResource(R.drawable.more_vert),
@@ -348,7 +353,7 @@ fun HistoryScreen(
                                         onCheckedChange = onCheckedChange,
                                     )
                                 } else {
-                                    IconButton(
+                                    NuclearIconButton(
                                         onClick = {
                                             menuState.show {
                                                 SongMenu(
@@ -358,6 +363,8 @@ fun HistoryScreen(
                                                 )
                                             }
                                         },
+                                        variant = NuclearButtonVariant.Tertiary,
+                                        size = 40.dp,
                                     ) {
                                         Icon(
                                             painter = painterResource(R.drawable.more_vert),
@@ -511,7 +518,7 @@ fun HistoryScreen(
                         }
                     },
                 )
-                IconButton(
+                NuclearIconButton(
                     enabled = selection.isNotEmpty(),
                     onClick = {
                         menuState.show {
@@ -530,6 +537,8 @@ fun HistoryScreen(
                             )
                         }
                     },
+                    variant = NuclearButtonVariant.Tertiary,
+                    size = 40.dp,
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.more_vert),

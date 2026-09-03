@@ -114,6 +114,8 @@ import com.metrolist.music.utils.rememberPreference
 import com.metrolist.music.viewmodels.OnlineSearchViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
+import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -291,8 +293,10 @@ fun OnlineSearchResult(
                 },
             isPlaying = isPlaying,
             trailingContent = {
-                IconButton(
+                NuclearIconButton(
                     onClick = longClick,
+                    variant = NuclearButtonVariant.Tertiary,
+                    size = 40.dp,
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.more_vert),

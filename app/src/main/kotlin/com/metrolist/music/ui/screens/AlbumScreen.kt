@@ -96,6 +96,8 @@ import com.metrolist.music.ui.utils.resize
 import com.metrolist.music.utils.makeTimeString
 import com.metrolist.music.utils.rememberPreference
 import com.metrolist.music.viewmodels.AlbumViewModel
+import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
+import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -295,15 +297,14 @@ fun AlbumScreen(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         // Like Button - Smaller secondary button
-                        Surface(
+                        NuclearIconButton(
                             onClick = {
                                 database.query {
                                     update(albumWithSongs.album.toggleLike())
                                 }
                             },
-                            shape = CircleShape,
-                            color = MaterialTheme.colorScheme.surfaceVariant,
-                            modifier = Modifier.size(48.dp),
+                            variant = NuclearButtonVariant.Tertiary,
+                            size = 48.dp,
                         ) {
                             Box(
                                 modifier = Modifier.fillMaxSize(),
@@ -333,7 +334,7 @@ fun AlbumScreen(
                         }
 
                         // Play Button - Larger primary circular button
-                        Surface(
+                        NuclearIconButton(
                             onClick = {
                                 if (!isListenTogetherGuest) {
                                     playerConnection.service.getAutomix(playlistId)
@@ -342,9 +343,9 @@ fun AlbumScreen(
                                     )
                                 }
                             },
-                            color = MaterialTheme.colorScheme.primary,
-                            shape = CircleShape,
-                            modifier = Modifier.size(72.dp),
+                            variant = NuclearButtonVariant.Primary,
+                            size = 72.dp,
+                            shape = MaterialTheme.shapes.large,
                         ) {
                             Box(
                                 contentAlignment = Alignment.Center,
@@ -353,14 +354,13 @@ fun AlbumScreen(
                                 Icon(
                                     painter = painterResource(R.drawable.play),
                                     contentDescription = stringResource(R.string.play),
-                                    tint = MaterialTheme.colorScheme.onPrimary,
                                     modifier = Modifier.size(32.dp),
                                 )
                             }
                         }
 
                         // Menu Button - Smaller secondary button
-                        Surface(
+                        NuclearIconButton(
                             onClick = {
                                 menuState.show {
                                     AlbumMenu(
@@ -373,9 +373,8 @@ fun AlbumScreen(
                                     )
                                 }
                             },
-                            shape = CircleShape,
-                            color = MaterialTheme.colorScheme.surfaceVariant,
-                            modifier = Modifier.size(48.dp),
+                            variant = NuclearButtonVariant.Tertiary,
+                            size = 48.dp,
                         ) {
                             Box(
                                 modifier = Modifier.fillMaxSize(),
@@ -418,7 +417,7 @@ fun AlbumScreen(
                                     onCheckedChange = onCheckedChange,
                                 )
                             } else {
-                                IconButton(
+                                NuclearIconButton(
                                     onClick = {
                                         menuState.show {
                                             SongMenu(
@@ -427,6 +426,8 @@ fun AlbumScreen(
                                             )
                                         }
                                     },
+                                    variant = NuclearButtonVariant.Tertiary,
+                                    size = 40.dp,
                                 ) {
                                     Icon(
                                         painter = painterResource(R.drawable.more_vert),
@@ -535,7 +536,10 @@ fun AlbumScreen(
         },
         navigationIcon = {
             if (inSelectMode) {
-                IconButton(onClick = onExitSelectionMode) {
+                NuclearIconButton(onClick = onExitSelectionMode,
+                    variant = NuclearButtonVariant.Tertiary,
+                    size = 40.dp,
+                ) {
                     Icon(
                         painter = painterResource(R.drawable.close),
                         contentDescription = null,
@@ -566,7 +570,7 @@ fun AlbumScreen(
                         }
                     },
                 )
-                IconButton(
+                NuclearIconButton(
                     enabled = selection.isNotEmpty(),
                     onClick = {
                         menuState.show {
@@ -580,6 +584,8 @@ fun AlbumScreen(
                             )
                         }
                     },
+                    variant = NuclearButtonVariant.Tertiary,
+                    size = 40.dp,
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.more_vert),

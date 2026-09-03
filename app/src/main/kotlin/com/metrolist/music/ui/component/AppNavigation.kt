@@ -35,6 +35,22 @@ import com.metrolist.music.ui.screens.Screens
 import com.metrolist.music.ui.theme.nuclear.NuclearTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.dp
+import com.metrolist.music.ui.theme.nuclear.NuclearSurface
 
 @Stable
 private fun isRouteSelected(currentRoute: String?, screenRoute: String, navigationItems: List<Screens>): Boolean {
@@ -147,15 +163,22 @@ fun AppNavigationBar(
     val borderColor = NuclearTheme.colors.border
     val borderWidth = NuclearTheme.metrics.borderWidth
 
-    NavigationBar(
-        // Drawn over the bar rather than behind it, so the container colour
-        // does not swallow the rule that separates it from the content.
-        modifier = modifier.drawWithContent {
-            drawContent()
-            drawRect(color = borderColor, size = Size(size.width, borderWidth.toPx()))
-        },
-        containerColor = containerColor,
-        contentColor = contentColor
+    // A Row rather than NavigationBar: the Material component brings a pill
+    // indicator and a ripple, and nuclear wants each destination to be a real
+    // button. The slim option only drops the label, so both variants are this
+    // one component.
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(containerColor)
+            .drawWithContent {
+                drawContent()
+                drawRect(color = borderColor, size = Size(size.width, borderWidth.toPx()))
+            }
+            .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
+            .padding(horizontal = 10.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         navigationItems.forEach { screen ->
             val isSelected = remember(currentRoute, screen.route) {
@@ -195,31 +218,44 @@ fun AppNavigationBar(
                 }
             }
 
-            NavigationBarItem(
-                selected = isSelected,
+            NuclearSurface(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
+                color = if (isSelected) {
+                    NuclearTheme.colors.primary
+                } else {
+                    NuclearTheme.colors.background
+                },
+                interactionSource = interactionSource,
                 onClick = {
+                    // The search item resolves its click through the interaction
+                    // source above so a long press can win instead.
                     if (!isSearchItem) {
                         onItemClick(screen, currentIsSelected)
                     }
-                    // For search item, click is handled via InteractionSource
                 },
-                interactionSource = interactionSource,
-                icon = {
+                contentAlignment = Alignment.Center,
+                contentPadding = PaddingValues(vertical = if (slimNav) 8.dp else 6.dp),
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                ) {
                     Icon(
                         painter = painterResource(id = iconRes),
-                        contentDescription = stringResource(screen.titleId)
+                        contentDescription = stringResource(screen.titleId),
                     )
-                },
-                label = if (!slimNav) {
-                    {
+                    if (!slimNav) {
                         Text(
                             text = stringResource(screen.titleId),
+                            style = MaterialTheme.typography.labelMedium,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            overflow = TextOverflow.Ellipsis,
                         )
                     }
-                } else null
-            )
+                }
+            }
         }
     }
 }

@@ -81,6 +81,8 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.drop
+import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
+import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class, FlowPreview::class)
 @Composable
@@ -162,7 +164,7 @@ fun OnlineSearchScreen(
                         },
                     isPlaying = isPlaying,
                     trailingContent = {
-                        IconButton(
+                        NuclearIconButton(
                             onClick = {
                                 menuState.show {
                                     when (item) {
@@ -230,6 +232,8 @@ fun OnlineSearchScreen(
                                     }
                                 }
                             },
+                            variant = NuclearButtonVariant.Tertiary,
+                            size = 40.dp,
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.more_vert),
@@ -435,7 +439,7 @@ fun OnlineSearchScreen(
                     },
                 isPlaying = isPlaying,
                 trailingContent = {
-                    IconButton(
+                    NuclearIconButton(
                         onClick = {
                             menuState.show {
                                 when (item) {
@@ -503,6 +507,8 @@ fun OnlineSearchScreen(
                                 }
                             }
                         },
+                        variant = NuclearButtonVariant.Tertiary,
+                        size = 40.dp,
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.more_vert),

@@ -94,6 +94,8 @@ import com.metrolist.music.utils.rememberPreference
 import com.metrolist.music.viewmodels.LibraryPodcastsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
+import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -409,7 +411,7 @@ fun LibraryPodcastsScreen(
                             showDownloadIcon = true,
                             subtitleOverride = subtitle.ifEmpty { null },
                             trailingContent = {
-                                IconButton(
+                                NuclearIconButton(
                                     onClick = {
                                         menuState.show {
                                             SongMenu(
@@ -418,6 +420,8 @@ fun LibraryPodcastsScreen(
                                             )
                                         }
                                     },
+                                    variant = NuclearButtonVariant.Tertiary,
+                                    size = 40.dp,
                                 ) {
                                 Icon(
                                     painter = painterResource(R.drawable.more_vert),
@@ -625,7 +629,10 @@ private fun PodcastEpisodePlaylistItem(
             }
         }
 
-        IconButton(onClick = onMenuClick) {
+        NuclearIconButton(onClick = onMenuClick,
+            variant = NuclearButtonVariant.Tertiary,
+            size = 40.dp,
+        ) {
             Icon(
                 painter = painterResource(R.drawable.more_vert),
                 contentDescription = stringResource(R.string.more_options),

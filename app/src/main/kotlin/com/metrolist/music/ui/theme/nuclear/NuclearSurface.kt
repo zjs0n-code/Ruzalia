@@ -9,7 +9,8 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
@@ -56,6 +57,7 @@ import androidx.compose.ui.unit.offset
  * and one given loose constraints produce a face that wraps its content -
  * without the call site needing to know how any of this is put together.
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NuclearSurface(
     modifier: Modifier = Modifier,
@@ -68,6 +70,7 @@ fun NuclearSurface(
     shadowColor: Color = NuclearTheme.colors.shadow,
     enabled: Boolean = true,
     onClick: (() -> Unit)? = null,
+    onLongClick: (() -> Unit)? = null,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     contentAlignment: Alignment = Alignment.TopStart,
     interactionSource: MutableInteractionSource? = null,
@@ -98,12 +101,13 @@ fun NuclearSurface(
         .border(borderWidth, borderColor, shape)
         .then(
             if (onClick != null) {
-                Modifier.clickable(
+                Modifier.combinedClickable(
                     interactionSource = source,
                     // nuclear has no ripple; the press *is* the feedback.
                     indication = null,
                     enabled = enabled,
                     role = Role.Button,
+                    onLongClick = onLongClick,
                     onClick = onClick,
                 )
             } else {

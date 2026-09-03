@@ -173,6 +173,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
+import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
 
 sealed class HomeSection(
     val id: String,
@@ -1822,7 +1824,7 @@ fun HomeScreen(
                                                 isPlaying = isPlaying,
                                                 isSwipeable = false,
                                                 trailingContent = {
-                                                    IconButton(
+                                                    NuclearIconButton(
                                                         onClick = {
                                                             menuState.show {
                                                                 SongMenu(
@@ -1831,6 +1833,8 @@ fun HomeScreen(
                                                                 )
                                                             }
                                                         },
+                                                        variant = NuclearButtonVariant.Tertiary,
+                                                        size = 40.dp,
                                                     ) {
                                                         Icon(
                                                             painter = painterResource(R.drawable.more_vert),
@@ -2144,7 +2148,7 @@ fun HomeScreen(
                                                 isPlaying = isPlaying,
                                                 isSwipeable = false,
                                                 trailingContent = {
-                                                    IconButton(
+                                                    NuclearIconButton(
                                                         onClick = {
                                                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                                             menuState.show {
@@ -2154,6 +2158,8 @@ fun HomeScreen(
                                                                 )
                                                             }
                                                         },
+                                                        variant = NuclearButtonVariant.Tertiary,
+                                                        size = 40.dp,
                                                     ) {
                                                         Icon(
                                                             painter = painterResource(R.drawable.more_vert),
@@ -2373,7 +2379,7 @@ fun HomeScreen(
                                                     isPlaying = isPlaying,
                                                     isSwipeable = false,
                                                     trailingContent = {
-                                                        IconButton(
+                                                        NuclearIconButton(
                                                             onClick = {
                                                                 menuState.show {
                                                                     YouTubeSongMenu(
@@ -2382,6 +2388,8 @@ fun HomeScreen(
                                                                     )
                                                                 }
                                                             },
+                                                            variant = NuclearButtonVariant.Tertiary,
+                                                            size = 40.dp,
                                                         ) {
                                                             Icon(
                                                                 painter = painterResource(R.drawable.more_vert),

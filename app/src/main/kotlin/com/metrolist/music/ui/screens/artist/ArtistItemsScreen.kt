@@ -64,6 +64,8 @@ import com.metrolist.music.ui.menu.YouTubeSongMenu
 import com.metrolist.music.ui.utils.backToMain
 import com.metrolist.music.utils.rememberEnumPreference
 import com.metrolist.music.viewmodels.ArtistItemsViewModel
+import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
+import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -132,7 +134,7 @@ fun ArtistItemsScreen(
                         },
                     isPlaying = isPlaying,
                     trailingContent = {
-                        IconButton(
+                        NuclearIconButton(
                             onClick = {
                                 menuState.show {
                                     when (item) {
@@ -182,6 +184,8 @@ fun ArtistItemsScreen(
                                     }
                                 }
                             },
+                            variant = NuclearButtonVariant.Tertiary,
+                            size = 40.dp,
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.more_vert),

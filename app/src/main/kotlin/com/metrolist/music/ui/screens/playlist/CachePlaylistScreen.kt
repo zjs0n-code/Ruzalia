@@ -97,6 +97,8 @@ import com.metrolist.music.utils.rememberEnumPreference
 import com.metrolist.music.utils.rememberPreference
 import com.metrolist.music.viewmodels.CachePlaylistViewModel
 import java.time.LocalDateTime
+import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
+import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -272,7 +274,7 @@ fun CachePlaylistScreen(
                                     onCheckedChange = onCheckedChange
                                 )
                             } else {
-                                IconButton(onClick = {
+                                NuclearIconButton(onClick = {
                                     menuState.show {
                                         SongMenu(
                                             originalSong = song,
@@ -280,7 +282,10 @@ fun CachePlaylistScreen(
                                             isFromCache = true,
                                         )
                                     }
-                                }) {
+                                },
+                                    variant = NuclearButtonVariant.Tertiary,
+                                    size = 40.dp,
+                                ) {
                                     Icon(
                                         painter = painterResource(R.drawable.more_vert),
                                         contentDescription = null
@@ -433,7 +438,7 @@ fun CachePlaylistScreen(
                             }
                         }
                     )
-                    IconButton(
+                    NuclearIconButton(
                         enabled = selection.isNotEmpty(),
                         onClick = {
                             menuState.show {
@@ -443,7 +448,9 @@ fun CachePlaylistScreen(
                                     clearAction = onExitSelectionMode
                                 )
                             }
-                        }
+                        },
+                        variant = NuclearButtonVariant.Tertiary,
+                        size = 40.dp,
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.more_vert),

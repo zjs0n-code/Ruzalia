@@ -392,23 +392,18 @@ fun ArtistScreen(
                                         // Radio Button
                                         if (!showLocal && !isGuest) {
                                             artistPage?.artist?.radioEndpoint?.let { radioEndpoint ->
-                                                OutlinedButton(
+                                                NuclearButton(
                                                     onClick = {
                                                         playerConnection.playQueue(YouTubeQueue(radioEndpoint))
                                                     },
-                                                    shape = RoundedCornerShape(50),
-                                                    modifier = Modifier.height(40.dp),
+                                                    variant = NuclearButtonVariant.Tertiary,
                                                 ) {
                                                     Icon(
                                                         painter = painterResource(R.drawable.radio),
                                                         contentDescription = null,
                                                         modifier = Modifier.size(20.dp),
                                                     )
-                                                    Spacer(modifier = Modifier.width(8.dp))
-                                                    Text(
-                                                        text = stringResource(R.string.radio),
-                                                        fontSize = 14.sp,
-                                                    )
+                                                    Text(text = stringResource(R.string.radio))
                                                 }
                                             }
                                         }
@@ -557,7 +552,7 @@ fun ArtistScreen(
                                 isActive = song.id == mediaMetadata?.id,
                                 isPlaying = isPlaying,
                                 trailingContent = {
-                                    IconButton(
+                                    NuclearIconButton(
                                         onClick = {
                                             menuState.show {
                                                 SongMenu(
@@ -566,6 +561,8 @@ fun ArtistScreen(
                                                 )
                                             }
                                         },
+                                        variant = NuclearButtonVariant.Tertiary,
+                                        size = 40.dp,
                                     ) {
                                         Icon(
                                             painter = painterResource(R.drawable.more_vert),
@@ -686,7 +683,7 @@ fun ArtistScreen(
                                     isActive = mediaMetadata?.id == song.id,
                                     isPlaying = isPlaying,
                                     trailingContent = {
-                                        IconButton(
+                                        NuclearIconButton(
                                             onClick = {
                                                 menuState.show {
                                                     YouTubeSongMenu(
@@ -695,6 +692,8 @@ fun ArtistScreen(
                                                     )
                                                 }
                                             },
+                                            variant = NuclearButtonVariant.Tertiary,
+                                            size = 40.dp,
                                         ) {
                                             Icon(
                                                 painter = painterResource(R.drawable.more_vert),
