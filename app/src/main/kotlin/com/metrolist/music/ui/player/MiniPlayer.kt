@@ -125,6 +125,8 @@ import kotlin.math.roundToInt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 
 /**
  * Stable wrapper for progress state - reads values only during draw phase
@@ -381,6 +383,15 @@ private fun NewMiniPlayer(
         // so it never bleeds over the navigation bar.
         val miniPlayerShape = RoundedCornerShape(12.dp)
         val shadowOffset = NuclearTheme.metrics.shadowOffset
+        // The mini player carries the shadow on its own modifier chain rather
+        // than through NuclearSurface, so it needs the press translation
+        // wiring up by hand to slide onto that shadow like every other chunk.
+        val miniPlayerPressed by interactionSource.collectIsPressedAsState()
+        val miniPlayerPress by animateDpAsState(
+            targetValue = if (miniPlayerPressed) shadowOffset else 0.dp,
+            animationSpec = spring(),
+            label = "miniPlayerPress",
+        )
         Box(
             modifier =
                 Modifier
@@ -389,12 +400,13 @@ private fun NewMiniPlayer(
                     .offset { IntOffset(offsetXAnimatable.value.roundToInt(), 0) }
                     .padding(end = shadowOffset, bottom = shadowOffset)
                     .nuclearHardShadow(miniPlayerShape, NuclearTheme.colors.shadow, shadowOffset)
+                    .offset(x = miniPlayerPress, y = miniPlayerPress)
                     .clip(miniPlayerShape)
                     .background(color = backgroundColor)
                     .border(NuclearTheme.metrics.borderWidth, outlineColor, miniPlayerShape)
                     .clickable(
                         interactionSource = interactionSource,
-                        indication = LocalIndication.current,
+                        indication = null,
                         onClick = onClick
                     ),
         ) {

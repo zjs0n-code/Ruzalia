@@ -12,6 +12,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -36,6 +38,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawOutline
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Constraints
@@ -79,20 +82,42 @@ fun NuclearSurface(
     val gap = if (shadow) NuclearTheme.metrics.shadowOffset else 0.dp
     val isClickable = onClick != null
 
-    // Only a clickable, shadowed surface can animate, and most surfaces are
-    // neither - GridItem alone backs dozens of lazy-grid call sites and should
-    // not pay for an Animatable and a flow collector that can never fire.
     val source = if (isClickable) interactionSource ?: remember { MutableInteractionSource() } else null
+    val ownPress = source?.collectIsPressedAsState()
+
+    // A surface can be pressable without owning the click: GridItem is wrapped
+    // in a clickable supplied by its caller, so the card carries the shadow
+    // while something above it handles the tap. Watching the pointer without
+    // consuming it lets those press too, and leaves the ancestor's click
+    // handling exactly as it was.
+    val observedPress = remember { mutableStateOf(false) }
+    val isPressed = ownPress?.value ?: observedPress.value
+
     val press: State<Dp> =
-        if (isClickable && shadow && source != null) {
-            val pressed = source.collectIsPressedAsState()
+        if (shadow) {
             animateDpAsState(
-                targetValue = if (pressed.value && enabled) gap else 0.dp,
+                targetValue = if (isPressed && enabled) gap else 0.dp,
                 animationSpec = spring(),
                 label = "nuclearPress",
             )
         } else {
             remember { mutableStateOf(0.dp) }
+        }
+
+    val pressObserver =
+        if (!isClickable && shadow) {
+            Modifier.pointerInput(Unit) {
+                awaitPointerEventScope {
+                    while (true) {
+                        awaitFirstDown(requireUnconsumed = false)
+                        observedPress.value = true
+                        waitForUpOrCancellation()
+                        observedPress.value = false
+                    }
+                }
+            }
+        } else {
+            Modifier
         }
 
     val faceModifier = Modifier
@@ -117,7 +142,9 @@ fun NuclearSurface(
         .padding(contentPadding)
 
     Layout(
-        modifier = modifier.alpha(if (isClickable && !enabled) 0.5f else 1f),
+        modifier = modifier
+            .alpha(if (isClickable && !enabled) 0.5f else 1f)
+            .then(pressObserver),
         content = {
             if (shadow) {
                 Box(Modifier.background(shadowColor, shape))
