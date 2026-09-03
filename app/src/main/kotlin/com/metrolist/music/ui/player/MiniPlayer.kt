@@ -11,7 +11,9 @@ import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.LocalIndication
@@ -389,7 +391,7 @@ private fun NewMiniPlayer(
         val miniPlayerPressed by interactionSource.collectIsPressedAsState()
         val miniPlayerPress by animateDpAsState(
             targetValue = if (miniPlayerPressed) shadowOffset else 0.dp,
-            animationSpec = spring(),
+            animationSpec = if (miniPlayerPressed) snap() else tween(durationMillis = 110),
             label = "miniPlayerPress",
         )
         Box(
