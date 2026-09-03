@@ -305,6 +305,12 @@ private fun NewMiniPlayer(
             miniPlayerBackground == MiniPlayerBackgroundStyle.GRADIENT)
 
     val primaryColor = if (forceLightColors) Color.White else MaterialTheme.colorScheme.primary
+    // `primary` is the derived *ink* - readable on the page, so right for the
+    // progress arc and the cast glyph, and wrong as a fill. The subscribe and
+    // like buttons paint with it, which is why they came out off-theme. The
+    // literal accent lives in `primaryContainer`, and that is also the role the
+    // album-art option reseeds, so this is what follows the artwork too.
+    val accentFill = if (forceLightColors) Color.White else MaterialTheme.colorScheme.primaryContainer
     val outlineColor = if (forceLightColors) Color.White else MaterialTheme.colorScheme.outline
     val onSurfaceColor = if (forceLightColors) Color.White else MaterialTheme.colorScheme.onSurface
     val errorColor = if (forceLightColors) Color(0xFFFF6B6B) else MaterialTheme.colorScheme.error
@@ -494,7 +500,7 @@ private fun NewMiniPlayer(
                     SubscribeButton(
                         artistId = artistId,
                         metadata = mediaMetadata!!,
-                        primaryColor = primaryColor,
+                        activeColor = accentFill,
                     )
                 }
 
@@ -503,7 +509,7 @@ private fun NewMiniPlayer(
 // Favorite button - isolated composable
                 mediaMetadata?.let { FavoriteButton(
                     songId = it.id,
-                    errorColor = errorColor,
+                    activeColor = accentFill,
                 )
                 }
             }
@@ -1052,7 +1058,7 @@ private fun LegacyMiniMediaInfo(
 private fun SubscribeButton(
     artistId: String,
     metadata: MediaMetadata,
-    primaryColor: Color,
+    activeColor: Color,
 ) {
     val database = LocalDatabase.current
     val libraryArtist by database.artist(artistId).collectAsStateWithLifecycle(initialValue = null)
@@ -1081,7 +1087,7 @@ private fun SubscribeButton(
 
         },
         size = 48.dp,
-        color = if (isSubscribed) primaryColor else NuclearTheme.colors.backgroundSecondary,
+        color = if (isSubscribed) activeColor else NuclearTheme.colors.backgroundSecondary,
     ) {
         Icon(
             painter = painterResource(if (isSubscribed) R.drawable.subscribed else R.drawable.subscribe),
@@ -1094,7 +1100,7 @@ private fun SubscribeButton(
 @Composable
 private fun FavoriteButton(
     songId: String,
-    errorColor: Color,
+    activeColor: Color,
 ) {
     val database = LocalDatabase.current
     val playerConnection = LocalPlayerConnection.current ?: return
@@ -1108,7 +1114,7 @@ private fun FavoriteButton(
             playerConnection.service.toggleLike() 
         },
         size = 48.dp,
-        color = if (isLiked) errorColor else NuclearTheme.colors.backgroundSecondary,
+        color = if (isLiked) activeColor else NuclearTheme.colors.backgroundSecondary,
     ) {
         Icon(
             painter = painterResource(if (isLiked) R.drawable.favorite else R.drawable.favorite_border),

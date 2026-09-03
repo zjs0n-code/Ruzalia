@@ -254,50 +254,55 @@ private fun ArtistLinksText(
     )
 }
 
+/**
+ * A row in any list in the app.
+ *
+ * Upstream painted a background only for the playing and the selected row and
+ * left every other one bare, which is why list view still looked like stock
+ * Material while grid view was fully reskinned - the grid's cards go through
+ * NuclearSurface and these did not. Now every row is a nuclear chunk: filled,
+ * outlined, sitting on its own hard shadow, and pressing into it.
+ *
+ * The surface takes the caller's modifier, so a row whose click comes from its
+ * caller still presses - NuclearSurface watches the pointer when it does not
+ * own the click.
+ *
+ * No longer inline: the content moved inside NuclearSurface's lambda, and an
+ * inline function cannot call its own lambda parameters from inside a
+ * non-inline one.
+ */
 @Composable
-inline fun ListItem(
+fun ListItem(
     modifier: Modifier = Modifier,
     title: String,
-    noinline subtitle: (@Composable RowScope.() -> Unit)? = null,
+    subtitle: (@Composable RowScope.() -> Unit)? = null,
     thumbnailContent: @Composable () -> Unit,
     trailingContent: @Composable RowScope.() -> Unit = {},
     isSelected: Boolean? = false,
     isActive: Boolean = false,
     isAvailable: Boolean = true,
 ) {
+    // Selection wins over playing: while you are picking rows, which ones you
+    // picked matters more than which one happens to be playing. The two need
+    // separate colours - both cannot be the accent - so selection borrows the
+    // palette's blue, which is one of nuclear's own accents and stays fixed
+    // across presets and album-art accent alike.
+    val fill = when {
+        isSelected == true -> NuclearTheme.colors.accents.blue
+        isActive -> MaterialTheme.colorScheme.secondaryContainer
+        else -> NuclearTheme.colors.backgroundSecondary
+    }
+
+    NuclearSurface(
+        modifier = modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+        shape = RoundedCornerShape(8.dp),
+        color = fill,
+    ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = if (isActive) {
-            modifier // playing highlight
-                .height(ListItemHeight)
-                .padding(horizontal = 8.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(
-                    color = // selected active
-                        if (isSelected == true) MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
-                        else MaterialTheme.colorScheme.secondaryContainer
-                )
-                .nuclearBorder(
-                    RoundedCornerShape(8.dp),
-                    NuclearTheme.colors.border,
-                    NuclearTheme.metrics.borderWidth,
-                )
-        } else if (isSelected == true) {
-            modifier // inactive selected
-                .height(ListItemHeight)
-                .padding(horizontal = 8.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(color = MaterialTheme.colorScheme.inversePrimary.copy(alpha = 0.4f))
-                .nuclearBorder(
-                    RoundedCornerShape(8.dp),
-                    NuclearTheme.colors.border,
-                    NuclearTheme.metrics.borderWidth,
-                )
-        } else {
-            modifier // default
-                .height(ListItemHeight)
-                .padding(horizontal = 8.dp)
-        }
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = ListItemHeight),
     ) {
         Box(
             modifier = Modifier.padding(6.dp),
@@ -347,6 +352,7 @@ inline fun ListItem(
         }
 
         trailingContent()
+    }
     }
 }
 

@@ -411,22 +411,15 @@ fun ArtistScreen(
                                         // Shuffle Button
                                         if (!showLocal && !isGuest) {
                                             artistPage?.artist?.shuffleEndpoint?.let { shuffleEndpoint ->
-                                                IconButton(
+                                                NuclearIconButton(
                                                     onClick = {
                                                         playerConnection.playQueue(YouTubeQueue(shuffleEndpoint))
                                                     },
-                                                    modifier =
-                                                        Modifier
-                                                            .size(48.dp)
-                                                            .background(
-                                                                MaterialTheme.colorScheme.primary,
-                                                                RoundedCornerShape(12.dp),
-                                                            ),
+                                                    size = 48.dp,
                                                 ) {
                                                     Icon(
                                                         painter = painterResource(R.drawable.shuffle),
                                                         contentDescription = "Shuffle",
-                                                        tint = MaterialTheme.colorScheme.onPrimary,
                                                         modifier = Modifier.size(20.dp),
                                                     )
                                                 }
@@ -1008,7 +1001,9 @@ fun ArtistScreen(
             }
         },
         actions = {
-            IconButton(
+            NuclearIconButton(
+                variant = NuclearButtonVariant.Tertiary,
+                size = 40.dp,
                 onClick = {
                     viewModel.artistPage?.artist?.shareLink?.let { link ->
                         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager

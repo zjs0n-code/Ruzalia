@@ -406,7 +406,13 @@ fun AlbumScreen(
 
                     SongListItem(
                         song = song,
-                        albumIndex = index + 1,
+                        // Upstream swaps the artwork for a track number here, on
+                        // the reasoning that every track shares one cover. Under
+                        // nuclear that leaves an outlined empty square with a
+                        // digit in it, and the row stops matching every other
+                        // song row in the app. TopPlaylistScreen still passes an
+                        // index, because there the number is a rank, not a
+                        // stand-in for missing art.
                         isActive = song.id == mediaMetadata?.id,
                         isPlaying = isPlaying,
                         showInLibraryIcon = true,
