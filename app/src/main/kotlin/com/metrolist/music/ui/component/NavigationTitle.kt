@@ -31,6 +31,7 @@ import com.metrolist.music.R
 import com.metrolist.music.ui.theme.nuclear.NuclearButton
 import com.metrolist.music.ui.theme.nuclear.NuclearButtonSize
 import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
+import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
 
 @Composable
 fun NavigationTitle(
@@ -92,11 +93,18 @@ fun NavigationTitle(
         }
 
         if (onClick != null) {
-            Icon(
-                painter = painterResource(R.drawable.arrow_forward),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
-            )
+            // The whole row stays tappable, but the arrow is the affordance
+            // people aim at, so it is a button in its own right.
+            NuclearIconButton(
+                onClick = onClick,
+                variant = NuclearButtonVariant.Tertiary,
+                size = 40.dp,
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.arrow_forward),
+                    contentDescription = null,
+                )
+            }
         }
     }
 }

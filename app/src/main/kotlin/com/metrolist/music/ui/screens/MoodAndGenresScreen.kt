@@ -43,6 +43,9 @@ import com.metrolist.music.ui.component.shimmer.ListItemPlaceHolder
 import com.metrolist.music.ui.component.shimmer.ShimmerHost
 import com.metrolist.music.ui.utils.backToMain
 import com.metrolist.music.viewmodels.MoodAndGenresViewModel
+import androidx.compose.foundation.layout.PaddingValues
+import com.metrolist.music.ui.theme.nuclear.NuclearSurface
+import com.metrolist.music.ui.theme.nuclear.NuclearTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -127,15 +130,14 @@ fun MoodAndGenresButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(
+    // Shared by the home page's mood/genre grid and the full screen, so both
+    // get the push button.
+    NuclearSurface(
+        modifier = modifier.height(MoodAndGenresButtonHeight),
+        color = NuclearTheme.colors.backgroundSecondary,
+        onClick = onClick,
+        contentPadding = PaddingValues(horizontal = 12.dp),
         contentAlignment = Alignment.CenterStart,
-        modifier =
-        modifier
-            .height(MoodAndGenresButtonHeight)
-            .clip(RoundedCornerShape(6.dp))
-            .background(MaterialTheme.colorScheme.surfaceContainer)
-            .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp),
     ) {
         Text(
             text = title,
