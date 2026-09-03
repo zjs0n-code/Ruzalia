@@ -99,7 +99,11 @@ private fun NewActionButton(
                 textAlign = TextAlign.Center,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.basicMarquee(),
+                // Upstream marqueed these because the Material button was too
+                // narrow for "Add to playlist". nuclear's is wide enough to wrap
+                // it over the two lines already allowed, and a label that holds
+                // still is easier to read than one that scrolls.
+                modifier = Modifier.fillMaxWidth(),
             )
         }
     }

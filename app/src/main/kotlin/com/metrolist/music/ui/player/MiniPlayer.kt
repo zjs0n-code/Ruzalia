@@ -129,6 +129,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.interaction.collectIsPressedAsState
+import com.metrolist.music.ui.theme.nuclear.nuclearOutlineOverlay
+import com.metrolist.music.ui.theme.nuclear.nuclearBorder
+import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
+import com.metrolist.music.ui.theme.nuclear.contentColorOn
 
 /**
  * Stable wrapper for progress state - reads values only during draw phase
@@ -295,25 +299,39 @@ private fun NewMiniPlayer(
     // Memoize colors
     val backgroundColor = when (miniPlayerBackground) {
         MiniPlayerBackgroundStyle.DEFAULT    -> MaterialTheme.colorScheme.surfaceContainer
-        MiniPlayerBackgroundStyle.TRANSPARENT -> Color.Black.copy(alpha = 0.25f)
+        // "Transparent" meant a 25% black wash, which under nuclear is a grey
+        // smear over a pink page. Actually transparent, with the outline left
+        // on, is both what the setting says and a shape nuclear already has.
+        MiniPlayerBackgroundStyle.TRANSPARENT -> Color.Transparent
         MiniPlayerBackgroundStyle.BLUR       -> MaterialTheme.colorScheme.surfaceContainer
         MiniPlayerBackgroundStyle.GRADIENT   -> MaterialTheme.colorScheme.surfaceContainer
         MiniPlayerBackgroundStyle.PURE_BLACK -> Color.Black
     }
+
+    // A transparent player has nothing to cast a shadow - the hard offset would
+    // show straight through the empty face - so that one style keeps the
+    // outline and drops the shadow.
+    val miniPlayerHasShadow = miniPlayerBackground != MiniPlayerBackgroundStyle.TRANSPARENT
+
+    // BLUR, GRADIENT and PURE_BLACK paint a dark panel whatever the app theme
+    // is, so plain type and glyphs on them switch to the palette's paper rather
+    // than to a hardcoded white.
     val forceLightColors = !useDarkTheme && (miniPlayerBackground == MiniPlayerBackgroundStyle.PURE_BLACK ||
             miniPlayerBackground == MiniPlayerBackgroundStyle.BLUR ||
             miniPlayerBackground == MiniPlayerBackgroundStyle.GRADIENT)
+    val paperOnDark = NuclearTheme.colors.contentColorOn(Color.Black)
 
-    val primaryColor = if (forceLightColors) Color.White else MaterialTheme.colorScheme.primary
-    // `primary` is the derived *ink* - readable on the page, so right for the
-    // progress arc and the cast glyph, and wrong as a fill. The subscribe and
-    // like buttons paint with it, which is why they came out off-theme. The
-    // literal accent lives in `primaryContainer`, and that is also the role the
-    // album-art option reseeds, so this is what follows the artwork too.
-    val accentFill = if (forceLightColors) Color.White else MaterialTheme.colorScheme.primaryContainer
-    val outlineColor = if (forceLightColors) Color.White else MaterialTheme.colorScheme.outline
-    val onSurfaceColor = if (forceLightColors) Color.White else MaterialTheme.colorScheme.onSurface
-    val errorColor = if (forceLightColors) Color(0xFFFF6B6B) else MaterialTheme.colorScheme.error
+    val primaryColor = if (forceLightColors) paperOnDark else MaterialTheme.colorScheme.primary
+    // The accent is the one colour that does *not* switch with the panel. A
+    // filled button reads on a dark background, and this is what carries the
+    // theme - and the album-art colour - into the mini player. `primary` is the
+    // derived ink: readable as type on the page, wrong as a fill, and forcing
+    // it to white on the dark panels was the other half of why the subscribe
+    // and like buttons ignored the theme.
+    val accentFill = MaterialTheme.colorScheme.primaryContainer
+    val outlineColor = if (forceLightColors) paperOnDark else MaterialTheme.colorScheme.outline
+    val onSurfaceColor = if (forceLightColors) paperOnDark else MaterialTheme.colorScheme.onSurface
+    val errorColor = NuclearTheme.colors.accents.red
 
     Box(
         modifier =
@@ -396,7 +414,7 @@ private fun NewMiniPlayer(
         // wiring up by hand to slide onto that shadow like every other chunk.
         val miniPlayerPressed by interactionSource.collectIsPressedAsState()
         val miniPlayerPress by animateDpAsState(
-            targetValue = if (miniPlayerPressed) shadowOffset else 0.dp,
+            targetValue = if (miniPlayerPressed && miniPlayerHasShadow) shadowOffset else 0.dp,
             animationSpec = if (miniPlayerPressed) snap() else tween(durationMillis = 110),
             label = "miniPlayerPress",
         )
@@ -407,8 +425,13 @@ private fun NewMiniPlayer(
                     .height(64.dp)
                     .offset { IntOffset(offsetXAnimatable.value.roundToInt(), 0) }
                     .padding(end = shadowOffset, bottom = shadowOffset)
-                    .nuclearHardShadow(miniPlayerShape, NuclearTheme.colors.shadow, shadowOffset)
-                    .offset(x = miniPlayerPress, y = miniPlayerPress)
+                    .then(
+                        if (miniPlayerHasShadow) {
+                            Modifier.nuclearHardShadow(miniPlayerShape, NuclearTheme.colors.shadow, shadowOffset)
+                        } else {
+                            Modifier
+                        },
+                    ).offset(x = miniPlayerPress, y = miniPlayerPress)
                     .clip(miniPlayerShape)
                     .background(color = backgroundColor)
                     .border(NuclearTheme.metrics.borderWidth, outlineColor, miniPlayerShape)
@@ -762,10 +785,21 @@ private fun LegacyMiniPlayer(
             (600 / (1f + kotlin.math.exp(-(-11.44748 * swipeSensitivity + 9.04945)))).roundToInt()
         }
 
-    val primaryColor = MaterialTheme.colorScheme.primary
-    val trackColor = MaterialTheme.colorScheme.surfaceVariant
+    // The progress fill is an accent, so it takes the accent role rather than
+    // `primary`, which in this scheme is the derived ink. The track was
+    // surfaceVariant - the same colour as the bar behind it, so the unplayed
+    // part was invisible - and becomes a faded outline instead.
+    val primaryColor = MaterialTheme.colorScheme.primaryContainer
+    val trackColor = NuclearTheme.colors.border.copy(alpha = 0.3f)
 
     val interactionSource = remember { MutableInteractionSource() }
+
+    // The legacy layout stays a full-width dock rather than becoming a floating
+    // chunk - that difference is the reason the setting exists - but it is a
+    // nuclear dock now: flat fill, hard outline, no ripple. It carries no drop
+    // shadow because it is welded to the bottom edge, so there is nowhere for
+    // the shadow to fall and nothing to press into.
+    val legacyShape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
 
     Box(
         modifier =
@@ -773,16 +807,20 @@ private fun LegacyMiniPlayer(
                 .then(if (isTabletLandscape) Modifier.width(500.dp) else Modifier.fillMaxWidth())
                 .height(MiniPlayerHeight)
                 .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
-                .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                .clip(legacyShape)
                 .background(
                     if (pureBlack && isSystemInDarkTheme()) {
                         Color.Black
                     } else {
                         MaterialTheme.colorScheme.surfaceContainer
                     },
+                ).nuclearOutlineOverlay(
+                    legacyShape,
+                    NuclearTheme.colors.border,
+                    NuclearTheme.metrics.borderWidth,
                 ).clickable(
                     interactionSource = interactionSource,
-                    indication = LocalIndication.current,
+                    indication = null,
                     onClick = onClick
                 ).let { baseModifier ->
                     if (swipeThumbnail) {
@@ -883,9 +921,11 @@ private fun LegacyMiniPlayer(
                 listenTogetherManager = listenTogetherManager,
             )
 
-            IconButton(
+            NuclearIconButton(
                 enabled = canSkipNext && !isListenTogetherGuest,
                 onClick = if (isListenTogetherGuest) ({}) else ({ playerConnection.seekToNext() }),
+                variant = NuclearButtonVariant.Tertiary,
+                size = 40.dp,
             ) {
                 Icon(painter = painterResource(R.drawable.skip_next), contentDescription = null)
             }
@@ -930,11 +970,11 @@ private fun LegacyPlayPauseButton(
     val isListenTogetherGuest = listenTogetherManager?.let { it.isInRoom && !it.isHost } ?: false
     val isMuted by playerConnection.isMuted.collectAsStateWithLifecycle()
 
-    IconButton(
+    NuclearIconButton(
         onClick = {
             if (isListenTogetherGuest) {
                 playerConnection.toggleMute()
-                return@IconButton
+                return@NuclearIconButton
             }
             if (isCasting) {
                 if (castIsPlaying) castHandler?.pause() else castHandler?.play()
@@ -945,6 +985,7 @@ private fun LegacyPlayPauseButton(
                 playerConnection.togglePlayPause()
             }
         },
+        size = 40.dp,
     ) {
         Icon(
             painter =
@@ -979,7 +1020,12 @@ private fun LegacyMiniMediaInfo(
                 Modifier
                     .padding(6.dp)
                     .size(48.dp)
-                    .clip(RoundedCornerShape(ThumbnailCornerRadius)),
+                    .clip(RoundedCornerShape(ThumbnailCornerRadius))
+                    .nuclearBorder(
+                        RoundedCornerShape(ThumbnailCornerRadius),
+                        NuclearTheme.colors.border,
+                        NuclearTheme.metrics.borderWidth,
+                    ),
         ) {
             Box(
                 modifier =

@@ -938,8 +938,11 @@ fun BottomSheetPlayer(
         },
     ) {
         val controlsContent: @Composable ColumnScope.(MediaMetadata) -> Unit = { mediaMetadata ->
+            // Upstream morphs this between 24dp and a 36dp near-circle. nuclear
+            // caps every radius at 12dp and draws no circles at all, so the
+            // morph survives at nuclear's scale rather than being dropped.
             val playPauseRoundness by animateDpAsState(
-                targetValue = if (isPlaying) 24.dp else 36.dp,
+                targetValue = if (isPlaying) 6.dp else 12.dp,
                 animationSpec = tween(durationMillis = 90, easing = LinearEasing),
                 label = "playPauseRoundness",
             )
@@ -1695,41 +1698,52 @@ fun BottomSheetPlayer(
                                     .padding(horizontal = PlayerHorizontalPadding),
                         ) {
                             Box(modifier = Modifier.weight(1f)) {
-                                ResizableIconButton(
-                                    icon =
-                                        when (repeatMode) {
-                                            Player.REPEAT_MODE_OFF, Player.REPEAT_MODE_ALL -> R.drawable.repeat
-                                            Player.REPEAT_MODE_ONE -> R.drawable.repeat_one
-                                            else -> throw IllegalStateException()
-                                        },
-                                    color = TextBackgroundColor,
-                                    modifier =
-                                        Modifier
-                                            .size(32.dp)
-                                            .padding(4.dp)
-                                            .align(Alignment.Center)
-                                            .alpha(
-                                                if (isListenTogetherGuest || repeatMode == Player.REPEAT_MODE_OFF) 0.5f else 1f,
-                                            ),
-                                    enabled = !isListenTogetherGuest,
+                                NuclearIconButton(
                                     onClick = {
                                         playerConnection.player.toggleRepeatMode()
                                     },
-                                )
+                                    enabled = !isListenTogetherGuest,
+                                    size = 44.dp,
+                                    color = textButtonColor,
+                                    contentColor = iconButtonColor,
+                                    // NuclearSurface already fades a disabled
+                                    // button, so only the repeat-off state is
+                                    // dimmed here.
+                                    modifier =
+                                        Modifier
+                                            .align(Alignment.Center)
+                                            .alpha(if (repeatMode == Player.REPEAT_MODE_OFF) 0.5f else 1f),
+                                ) {
+                                    Icon(
+                                        painter =
+                                            painterResource(
+                                                when (repeatMode) {
+                                                    Player.REPEAT_MODE_OFF, Player.REPEAT_MODE_ALL -> R.drawable.repeat
+                                                    Player.REPEAT_MODE_ONE -> R.drawable.repeat_one
+                                                    else -> throw IllegalStateException()
+                                                },
+                                            ),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(24.dp),
+                                    )
+                                }
                             }
 
                             Box(modifier = Modifier.weight(1f)) {
-                                ResizableIconButton(
-                                    icon = R.drawable.skip_previous,
-                                    enabled = canSkipPrevious && !isListenTogetherGuest,
-                                    color = TextBackgroundColor,
-                                    modifier =
-                                        Modifier
-                                            .size(32.dp)
-                                            .align(Alignment.Center)
-                                            .alpha(if (isListenTogetherGuest) 0.5f else 1f),
+                                NuclearIconButton(
                                     onClick = playerConnection::seekToPrevious,
-                                )
+                                    enabled = canSkipPrevious && !isListenTogetherGuest,
+                                    size = 44.dp,
+                                    color = textButtonColor,
+                                    contentColor = iconButtonColor,
+                                    modifier = Modifier.align(Alignment.Center),
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.skip_previous),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(24.dp),
+                                    )
+                                }
                             }
 
                             Spacer(Modifier.width(8.dp))
@@ -1786,33 +1800,45 @@ fun BottomSheetPlayer(
                             Spacer(Modifier.width(8.dp))
 
                             Box(modifier = Modifier.weight(1f)) {
-                                ResizableIconButton(
-                                    icon = R.drawable.skip_next,
-                                    enabled = canSkipNext && !isListenTogetherGuest,
-                                    color = TextBackgroundColor,
-                                    modifier =
-                                        Modifier
-                                            .size(32.dp)
-                                            .align(Alignment.Center)
-                                            .alpha(if (isListenTogetherGuest) 0.5f else 1f),
+                                NuclearIconButton(
                                     onClick = playerConnection::seekToNext,
-                                )
+                                    enabled = canSkipNext && !isListenTogetherGuest,
+                                    size = 44.dp,
+                                    color = textButtonColor,
+                                    contentColor = iconButtonColor,
+                                    modifier = Modifier.align(Alignment.Center),
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.skip_next),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(24.dp),
+                                    )
+                                }
                             }
 
                             Box(modifier = Modifier.weight(1f)) {
                                 // For episodes, show saved state (inLibrary); for songs, show liked state
                                 val isEpisode = currentSong?.song?.isEpisode == true
                                 val isFavorite = if (isEpisode) currentSong?.song?.inLibrary != null else currentSong?.song?.liked == true
-                                ResizableIconButton(
-                                    icon = if (isFavorite) R.drawable.favorite else R.drawable.favorite_border,
-                                    color = if (isFavorite) MaterialTheme.colorScheme.error else TextBackgroundColor,
-                                    modifier =
-                                        Modifier
-                                            .size(32.dp)
-                                            .padding(4.dp)
-                                            .align(Alignment.Center),
+                                NuclearIconButton(
                                     onClick = playerConnection::toggleLike,
-                                )
+                                    size = 44.dp,
+                                    // Filled with the accent once liked, the
+                                    // same signal the new design and the mini
+                                    // player use.
+                                    color = if (isFavorite) MaterialTheme.colorScheme.primaryContainer else textButtonColor,
+                                    contentColor = if (isFavorite) null else iconButtonColor,
+                                    modifier = Modifier.align(Alignment.Center),
+                                ) {
+                                    Icon(
+                                        painter =
+                                            painterResource(
+                                                if (isFavorite) R.drawable.favorite else R.drawable.favorite_border,
+                                            ),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(24.dp),
+                                    )
+                                }
                             }
                         }
                     }

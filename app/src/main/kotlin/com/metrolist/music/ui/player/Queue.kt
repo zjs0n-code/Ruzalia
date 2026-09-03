@@ -141,6 +141,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
+import com.metrolist.music.ui.theme.nuclear.NuclearButton
 
 
 @SuppressLint("UnrememberedMutableState")
@@ -421,14 +422,18 @@ fun Queue(
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 30.dp, vertical = 12.dp)
+                            // 30dp of side padding left "Sleep timer" no room
+                            // once these became bordered buttons rather than
+                            // bare text, and the label ellipsised.
+                            .padding(horizontal = 12.dp, vertical = 12.dp)
                             .windowInsetsPadding(
                                 WindowInsets.systemBars
                                     .only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal),
                             ),
                 ) {
-                    TextButton(
+                    NuclearButton(
                         onClick = { state.expandSoft() },
+                        variant = NuclearButtonVariant.Tertiary,
                         modifier = Modifier.weight(1f),
                     ) {
                         Row(
@@ -449,12 +454,11 @@ fun Queue(
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                                 textAlign = TextAlign.Center,
-                                modifier = Modifier.basicMarquee(),
                             )
                         }
                     }
 
-                    TextButton(
+                    NuclearButton(
                         enabled = !isListenTogetherGuest,
                         onClick = {
                             if (!isListenTogetherGuest) {
@@ -465,7 +469,8 @@ fun Queue(
                                 }
                             }
                         },
-                        modifier = Modifier.weight(1.2f),
+                        variant = NuclearButtonVariant.Tertiary,
+                        modifier = Modifier.weight(1.45f),
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -490,7 +495,6 @@ fun Queue(
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,
                                         textAlign = TextAlign.Center,
-                                        modifier = Modifier.basicMarquee(),
                                     )
                                 } else {
                                     Text(
@@ -499,17 +503,17 @@ fun Queue(
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,
                                         textAlign = TextAlign.Center,
-                                        modifier = Modifier.basicMarquee(),
                                     )
                                 }
                             }
                         }
                     }
 
-                    TextButton(
+                    NuclearButton(
                         onClick = {
                             onToggleLyrics()
                         },
+                        variant = NuclearButtonVariant.Tertiary,
                         modifier = Modifier.weight(1f),
                     ) {
                         Row(
@@ -530,7 +534,6 @@ fun Queue(
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                                 textAlign = TextAlign.Center,
-                                modifier = Modifier.basicMarquee(),
                             )
                         }
                     }
