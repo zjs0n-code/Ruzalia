@@ -178,8 +178,13 @@ fun AppNavigationBar(
                 drawContent()
                 drawRect(color = borderColor, size = Size(size.width, borderWidth.toPx()))
             }
-            .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
-            .padding(horizontal = 10.dp, vertical = 8.dp),
+            // The bar is laid out tall enough to cover the gesture inset so the
+            // page colour runs to the bottom of the screen, but the buttons have
+            // to sit above that inset - painted into it, their bottom edge and
+            // its shadow fell under the gesture bar and got clipped.
+            .windowInsetsPadding(
+                WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom),
+            ).padding(horizontal = 10.dp, vertical = 6.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -243,7 +248,7 @@ fun AppNavigationBar(
                     }
                 },
                 contentAlignment = Alignment.Center,
-                contentPadding = PaddingValues(vertical = if (slimNav) 8.dp else 6.dp),
+                contentPadding = PaddingValues(vertical = if (slimNav) 6.dp else 4.dp),
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,

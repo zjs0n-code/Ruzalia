@@ -302,7 +302,11 @@ fun ListItem(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = ListItemHeight),
+            .heightIn(min = ListItemHeight)
+            // The trailing control carries its own outline and shadow. Without
+            // this the two right-hand edges land on each other and read as one
+            // thick broken line.
+            .padding(end = 8.dp),
     ) {
         Box(
             modifier = Modifier.padding(6.dp),

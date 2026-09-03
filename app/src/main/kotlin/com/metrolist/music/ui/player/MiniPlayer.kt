@@ -133,6 +133,9 @@ import com.metrolist.music.ui.theme.nuclear.nuclearOutlineOverlay
 import com.metrolist.music.ui.theme.nuclear.nuclearBorder
 import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
 import com.metrolist.music.ui.theme.nuclear.contentColorOn
+import com.metrolist.music.ui.theme.nuclear.rememberNuclearPressState
+import com.metrolist.music.ui.theme.nuclear.nuclearPressOffset
+import com.metrolist.music.ui.theme.nuclear.nuclearPressObserver
 
 /**
  * Stable wrapper for progress state - reads values only during draw phase
@@ -412,11 +415,11 @@ private fun NewMiniPlayer(
         // The mini player carries the shadow on its own modifier chain rather
         // than through NuclearSurface, so it needs the press translation
         // wiring up by hand to slide onto that shadow like every other chunk.
-        val miniPlayerPressed by interactionSource.collectIsPressedAsState()
-        val miniPlayerPress by animateDpAsState(
-            targetValue = if (miniPlayerPressed && miniPlayerHasShadow) shadowOffset else 0.dp,
-            animationSpec = if (miniPlayerPressed) snap() else tween(durationMillis = 110),
-            label = "miniPlayerPress",
+        val miniPlayerPressState = rememberNuclearPressState()
+        val miniPlayerPress by nuclearPressOffset(
+            pressed = miniPlayerPressState.pressed,
+            gap = shadowOffset,
+            shadow = miniPlayerHasShadow,
         )
         Box(
             modifier =
@@ -432,6 +435,7 @@ private fun NewMiniPlayer(
                             Modifier
                         },
                     ).offset(x = miniPlayerPress, y = miniPlayerPress)
+                    .nuclearPressObserver(miniPlayerPressState, enabled = miniPlayerHasShadow)
                     .clip(miniPlayerShape)
                     .background(color = backgroundColor)
                     .border(NuclearTheme.metrics.borderWidth, outlineColor, miniPlayerShape)
