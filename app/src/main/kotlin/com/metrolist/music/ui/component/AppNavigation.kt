@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Text
@@ -229,7 +228,11 @@ fun AppNavigationBar(
                 color = if (isSelected) {
                     NuclearTheme.colors.primary
                 } else {
-                    NuclearTheme.colors.background
+                    // Was the page colour, which worked while the bar behind it
+                    // was a white card. The bar takes the page colour now, so an
+                    // unselected item painted the same lost its fill against it -
+                    // it becomes the card colour, matching the top bar's buttons.
+                    NuclearTheme.colors.backgroundSecondary
                 },
                 interactionSource = interactionSource,
                 onClick = {

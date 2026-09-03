@@ -55,6 +55,9 @@ import androidx.compose.ui.unit.dp
 import com.metrolist.music.R
 import com.metrolist.music.ui.screens.OptionStats
 import com.metrolist.music.ui.theme.nuclear.NuclearTheme
+import com.metrolist.music.ui.theme.nuclear.NuclearButton
+import com.metrolist.music.ui.theme.nuclear.NuclearButtonSize
+import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
 
 @Composable
 fun <E> ChipsRow(
@@ -74,16 +77,21 @@ fun <E> ChipsRow(
         Spacer(Modifier.width(12.dp))
 
         chips.forEach { (value, label) ->
-            FilterChip(
-                label = { Text(label) },
-                selected = currentValue == value,
-                colors = FilterChipDefaults.filterChipColors(
-                    containerColor = containerColor,
-                ),
+            // These are the mood chips at the top of home. They had picked up
+            // nuclear's outline but were still Material FilterChips underneath -
+            // no shadow, so nothing to press into, while the moods *grid*
+            // further down the page was already a push button.
+            NuclearButton(
                 onClick = { onValueUpdate(value) },
-                shape = MaterialTheme.shapes.medium,
-                border = BorderStroke(NuclearTheme.metrics.borderWidth, NuclearTheme.colors.border),
-            )
+                variant = if (currentValue == value) {
+                    NuclearButtonVariant.Primary
+                } else {
+                    NuclearButtonVariant.Tertiary
+                },
+                size = NuclearButtonSize.Small,
+            ) {
+                Text(label)
+            }
 
             Spacer(Modifier.width(8.dp))
         }
