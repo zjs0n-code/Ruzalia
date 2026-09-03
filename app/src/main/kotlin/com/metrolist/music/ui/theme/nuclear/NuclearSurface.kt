@@ -33,6 +33,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -235,4 +236,24 @@ fun Modifier.nuclearOutlineOverlay(
     translate(inset, inset) {
         drawOutline(outline, color = color, style = Stroke(stroke))
     }
+}
+
+/**
+ * A hard rule along the bottom edge, drawn *over* the element's own background.
+ *
+ * The app bar and the navigation bar sit at the page colour rather than on a
+ * card, so the only thing separating them from the content is this line -
+ * nuclear divides a header from its body with a rule, not with a fill.
+ */
+fun Modifier.bottomRule(
+    color: Color,
+    width: Dp,
+) = drawWithContent {
+    drawContent()
+    val stroke = width.toPx()
+    drawRect(
+        color = color,
+        topLeft = Offset(0f, size.height - stroke),
+        size = Size(size.width, stroke),
+    )
 }

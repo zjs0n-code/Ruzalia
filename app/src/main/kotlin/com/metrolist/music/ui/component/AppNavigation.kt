@@ -75,7 +75,9 @@ fun AppNavigationRail(
     pureBlack: Boolean = false,
     onSearchLongClick: (() -> Unit)? = null
 ) {
-    val containerColor = if (pureBlack) Color.Black else MaterialTheme.colorScheme.surfaceContainer
+    // The page colour, not a card colour - see the app bar. The hard rule
+    // along the content edge is what separates this from the page.
+    val containerColor = if (pureBlack) Color.Black else MaterialTheme.colorScheme.background
     val haptics = LocalHapticFeedback.current
     val viewConfiguration = LocalViewConfiguration.current
 
@@ -155,7 +157,9 @@ fun AppNavigationBar(
     slimNav: Boolean = false,
     onSearchLongClick: (() -> Unit)? = null
 ) {
-    val containerColor = if (pureBlack) Color.Black else MaterialTheme.colorScheme.surfaceContainer
+    // The page colour, not a card colour - see the app bar. The hard rule
+    // along the content edge is what separates this from the page.
+    val containerColor = if (pureBlack) Color.Black else MaterialTheme.colorScheme.background
     val contentColor = if (pureBlack) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
     val haptics = LocalHapticFeedback.current
     val viewConfiguration = LocalViewConfiguration.current

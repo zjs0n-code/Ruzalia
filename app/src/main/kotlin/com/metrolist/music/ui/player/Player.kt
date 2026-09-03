@@ -198,6 +198,11 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LocalContentColor
+import androidx.media3.exoplayer.offline.Download
+import androidx.media3.exoplayer.offline.DownloadService
+import com.metrolist.music.playback.ExoDownloadService
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -585,7 +590,8 @@ fun BottomSheetPlayer(
             }
         }
 
-    val download by LocalDownloadUtil.current
+    val downloadUtil = LocalDownloadUtil.current
+    val download by downloadUtil
         .getDownload(mediaMetadata?.id ?: "")
         .collectAsStateWithLifecycle(initialValue = null)
 
@@ -1192,6 +1198,53 @@ fun BottomSheetPlayer(
                                         modifier = Modifier.size(24.dp),
                                     )
                                 }
+                            }
+                        }
+
+                        // Squeezed between the two: square sides facing each
+                        // neighbour's flat inner edge, so the trio still reads as
+                        // one joined control with curved outer ends. middleShape
+                        // was already declared for a button that was never added.
+                        val isDownloaded = download?.state == Download.STATE_COMPLETED
+                        val isDownloading =
+                            download?.state == Download.STATE_QUEUED ||
+                                download?.state == Download.STATE_DOWNLOADING
+                        NuclearIconButton(
+                            onClick = {
+                                if (isDownloaded || isDownloading) {
+                                    DownloadService.sendRemoveDownload(
+                                        context,
+                                        ExoDownloadService::class.java,
+                                        mediaMetadata.id,
+                                        false,
+                                    )
+                                } else {
+                                    downloadUtil.download(mediaMetadata)
+                                }
+                            },
+                            shape = middleShape,
+                            size = 42.dp,
+                            // State shows in the glyph, not the fill - the like
+                            // button beside it works the same way, and the fill
+                            // has to keep tracking "Player button colors".
+                            color = textButtonColor,
+                            contentColor = iconButtonColor,
+                        ) {
+                            if (isDownloading) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(20.dp),
+                                    strokeWidth = 2.dp,
+                                    color = LocalContentColor.current,
+                                )
+                            } else {
+                                Icon(
+                                    painter =
+                                        painterResource(
+                                            if (isDownloaded) R.drawable.offline else R.drawable.download,
+                                        ),
+                                    contentDescription = stringResource(R.string.action_download),
+                                    modifier = Modifier.size(24.dp),
+                                )
                             }
                         }
 

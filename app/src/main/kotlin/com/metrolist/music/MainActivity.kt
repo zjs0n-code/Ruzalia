@@ -226,6 +226,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import com.metrolist.music.ui.theme.nuclear.NuclearTheme
+import com.metrolist.music.ui.theme.nuclear.bottomRule
 
 @Suppress("DEPRECATION", "ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
 @AndroidEntryPoint
@@ -1107,15 +1109,23 @@ class MainActivity : FragmentActivity() {
                                         },
                                         scrollBehavior = topAppBarScrollBehavior,
                                         colors =
+                                            // The bar took surfaceContainer, which is the colour of a
+                                            // *card* - a white slab across the top of a tinted page,
+                                            // with nothing on it but outlined buttons. It takes the
+                                            // page colour now and is separated by a hard rule instead,
+                                            // which is how nuclear divides a header from its content.
                                             TopAppBarDefaults.topAppBarColors(
-                                                containerColor = if (pureBlack) Color.Black else MaterialTheme.colorScheme.surfaceContainer,
-                                                scrolledContainerColor = if (pureBlack) Color.Black else MaterialTheme.colorScheme.surfaceContainer,
+                                                containerColor = if (pureBlack) Color.Black else MaterialTheme.colorScheme.background,
+                                                scrolledContainerColor = if (pureBlack) Color.Black else MaterialTheme.colorScheme.background,
                                                 titleContentColor = MaterialTheme.colorScheme.onSurface,
                                                 actionIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                                                 navigationIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                                             ),
                                         modifier =
-                                            Modifier.windowInsetsPadding(
+                                            Modifier.bottomRule(
+                                                NuclearTheme.colors.border,
+                                                NuclearTheme.metrics.borderWidth,
+                                            ).windowInsetsPadding(
                                                 if (showRail) {
                                                     WindowInsets(left = NavigationBarHeight)
                                                         .add(cutoutInsets.only(WindowInsetsSides.Start))
