@@ -71,6 +71,11 @@ fun <E> ChipsRow(
         modifier =
         modifier
             .fillMaxWidth()
+            // Every one of these rows sits directly beneath an app bar, and the
+            // bar now ends in a hard rule rather than fading out. Without a gap
+            // the chips' own outlines land on that rule and read as one smudged
+            // line.
+            .padding(top = 10.dp, bottom = 6.dp)
             .horizontalScroll(rememberScrollState())
             .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal)),
     ) {
