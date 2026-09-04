@@ -23,6 +23,12 @@ val debugKeyPassword = System.getenv("METROLIST_DEBUG_KEY_PASSWORD")?.takeIf { i
 val persistentDebugKeystoreFile = file("persistent-debug.keystore")
 val workflowDebugKeystoreFile = debugKeystorePathOverride?.let(::file)
 
+// Ruzalia: `-PlocalReleaseSigning=true` signs a release build with the same
+// throwaway key the debug build uses, so an optimised build can be installed
+// over the debug one for testing without wiping its library. It has to be asked
+// for by hand - a release must never fall back to this key on its own.
+val localReleaseSigning = (providers.gradleProperty("localReleaseSigning").orNull ?: "false").toBoolean()
+
 plugins {
     id("com.android.application")
     alias(libs.plugins.hilt)
@@ -126,6 +132,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            if (localReleaseSigning && persistentDebugKeystoreFile.exists()) {
+                signingConfig = signingConfigs.getByName("persistentDebug")
+            }
         }
         debug {
             if (applicationIdOverride == null) {
