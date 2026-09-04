@@ -30,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -129,7 +130,10 @@ fun NuclearSurface(
             }
             Box(modifier = faceModifier, contentAlignment = contentAlignment) {
                 val scope = this
-                CompositionLocalProvider(LocalContentColor provides contentColor) {
+                CompositionLocalProvider(
+                    LocalContentColor provides contentColor,
+                    LocalNuclearPressParent provides pressState,
+                ) {
                     with(scope) { content() }
                 }
             }
@@ -169,14 +173,48 @@ private const val MinPressMillis = 90L
 /** How long the face takes to slide back off its shadow. */
 private const val PressReleaseMillis = 110
 
-/** The pressed state of one nuclear surface. */
+/**
+ * The nearest enclosing surface, so a nested one can take a press off it.
+ *
+ * A row and the overflow button sitting on it are both push surfaces, and both
+ * are under the finger. Without this they would both move, and a tap on the
+ * button would read as a tap on the row behind it.
+ */
+internal val LocalNuclearPressParent = staticCompositionLocalOf<NuclearPressState?> { null }
+
+/**
+ * The pressed state of one nuclear surface.
+ *
+ * Claiming walks up the enclosing surfaces and releases each one. Ancestors are
+ * dispatched the pointer before their descendants, so by the time the innermost
+ * surface claims, every ancestor has already pressed - but all of it happens
+ * inside a single event dispatch, before anything is composed or drawn, so no
+ * frame ever shows more than one surface down.
+ */
 @Stable
-internal class NuclearPressState {
+internal class NuclearPressState(private val parent: NuclearPressState?) {
     var pressed by mutableStateOf(false)
+        private set
+
+    fun claim() {
+        var ancestor = parent
+        while (ancestor != null) {
+            ancestor.pressed = false
+            ancestor = ancestor.parent
+        }
+        pressed = true
+    }
+
+    fun release() {
+        pressed = false
+    }
 }
 
 @Composable
-internal fun rememberNuclearPressState() = remember { NuclearPressState() }
+internal fun rememberNuclearPressState(): NuclearPressState {
+    val parent = LocalNuclearPressParent.current
+    return remember(parent) { NuclearPressState(parent) }
+}
 
 /**
  * Drives [state] from the pointer rather than from an interaction source.
@@ -203,7 +241,7 @@ internal fun Modifier.nuclearPressObserver(
             var completed = false
             awaitPointerEventScope {
                 val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
-                state.pressed = true
+                state.claim()
                 while (true) {
                     val event = awaitPointerEvent(PointerEventPass.Initial)
                     val change = event.changes.firstOrNull { it.id == down.id } ?: break
@@ -215,7 +253,7 @@ internal fun Modifier.nuclearPressObserver(
                 }
             }
             if (completed) delay(MinPressMillis)
-            state.pressed = false
+            state.release()
         }
     }
 }

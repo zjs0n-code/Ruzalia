@@ -48,6 +48,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableLongState
 import androidx.compose.runtime.Stable
@@ -133,6 +134,7 @@ import com.metrolist.music.ui.theme.nuclear.nuclearOutlineOverlay
 import com.metrolist.music.ui.theme.nuclear.nuclearBorder
 import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
 import com.metrolist.music.ui.theme.nuclear.contentColorOn
+import com.metrolist.music.ui.theme.nuclear.LocalNuclearPressParent
 import com.metrolist.music.ui.theme.nuclear.rememberNuclearPressState
 import com.metrolist.music.ui.theme.nuclear.nuclearPressOffset
 import com.metrolist.music.ui.theme.nuclear.nuclearPressObserver
@@ -482,62 +484,67 @@ private fun NewMiniPlayer(
                 }
                 else -> {}
             }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp, vertical = 8.dp),
-            ) {
-                // Play button with progress - isolated composable
-                NewMiniPlayerPlayButton(
-                    progressState = progressState,
-                    playbackState = playbackState,
-                    isCasting = isCasting,
-                    castHandler = castHandler,
-                    playerConnection = playerConnection,
-                    mediaMetadata = mediaMetadata,
-                    primaryColor = primaryColor,
-                    outlineColor = outlineColor,
-                    listenTogetherManager = listenTogetherManager,
-                )
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                // Song info - isolated composable
-                NewMiniPlayerSongInfo(
-                    mediaMetadata = mediaMetadata,
-                    onSurfaceColor = onSurfaceColor,
-                    errorColor = errorColor,
-                    modifier = Modifier.weight(1f),
-                )
-
-                Spacer(modifier = Modifier.width(12.dp))
-
-                // Cast indicator
-                if (isCasting) {
-                    Icon(
-                        painter = painterResource(R.drawable.cast_connected),
-                        contentDescription = "Casting",
-                        tint = primaryColor,
-                        modifier = Modifier.size(20.dp),
+            // The follow and like buttons are push surfaces sitting on another
+            // push surface. Handing them the dock's state lets them take the
+            // press off it, so only the button they are on moves.
+            CompositionLocalProvider(LocalNuclearPressParent provides miniPlayerPressState) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp, vertical = 8.dp),
+                ) {
+                    // Play button with progress - isolated composable
+                    NewMiniPlayerPlayButton(
+                        progressState = progressState,
+                        playbackState = playbackState,
+                        isCasting = isCasting,
+                        castHandler = castHandler,
+                        playerConnection = playerConnection,
+                        mediaMetadata = mediaMetadata,
+                        primaryColor = primaryColor,
+                        outlineColor = outlineColor,
+                        listenTogetherManager = listenTogetherManager,
                     )
-                    Spacer(modifier = Modifier.width(12.dp))
-                }
 
-// Subscribe button - isolated composable
-                mediaMetadata?.artists?.firstOrNull()?.id?.let { artistId ->
-                    SubscribeButton(
-                        artistId = artistId,
-                        metadata = mediaMetadata!!,
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    // Song info - isolated composable
+                    NewMiniPlayerSongInfo(
+                        mediaMetadata = mediaMetadata,
+                        onSurfaceColor = onSurfaceColor,
+                        errorColor = errorColor,
+                        modifier = Modifier.weight(1f),
+                    )
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    // Cast indicator
+                    if (isCasting) {
+                        Icon(
+                            painter = painterResource(R.drawable.cast_connected),
+                            contentDescription = "Casting",
+                            tint = primaryColor,
+                            modifier = Modifier.size(20.dp),
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                    }
+
+    // Subscribe button - isolated composable
+                    mediaMetadata?.artists?.firstOrNull()?.id?.let { artistId ->
+                        SubscribeButton(
+                            artistId = artistId,
+                            metadata = mediaMetadata!!,
+                            activeColor = accentFill,
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+    // Favorite button - isolated composable
+                    mediaMetadata?.let { FavoriteButton(
+                        songId = it.id,
                         activeColor = accentFill,
                     )
-                }
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-// Favorite button - isolated composable
-                mediaMetadata?.let { FavoriteButton(
-                    songId = it.id,
-                    activeColor = accentFill,
-                )
+                    }
                 }
             }
         }
