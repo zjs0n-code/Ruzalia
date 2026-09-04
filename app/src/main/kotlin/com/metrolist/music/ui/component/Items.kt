@@ -1344,6 +1344,10 @@ fun YouTubeGridItem(
             isActive = isActive,
             isPlaying = isPlaying,
             shape = if (item is ArtistItem) CircleShape else RoundedCornerShape(ThumbnailCornerRadius),
+            // Without this the thumbnail forces itself square inside a card
+            // sized 16:9 for a song, overflows the box it was given, and paints
+            // over the title underneath it.
+            thumbnailRatio = thumbnailRatio,
         )
 
         if (item is SongItem && !isActive) {
