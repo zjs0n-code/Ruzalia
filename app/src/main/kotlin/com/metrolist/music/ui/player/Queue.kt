@@ -46,14 +46,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -62,7 +58,6 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -100,6 +95,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.Player
 import androidx.media3.common.Timeline
 import androidx.media3.exoplayer.source.ShuffleOrder.DefaultShuffleOrder
+import com.metrolist.music.ui.theme.nuclear.Checkbox
+import com.metrolist.music.ui.theme.nuclear.OutlinedButton
+import com.metrolist.music.ui.theme.nuclear.Button
+import com.metrolist.music.ui.theme.nuclear.TextButton
+import com.metrolist.music.ui.theme.nuclear.IconButton
 import com.metrolist.music.LocalListenTogetherManager
 import com.metrolist.music.LocalNavController
 import com.metrolist.music.LocalPlayerConnection
@@ -874,7 +874,7 @@ fun Queue(
                                                 }
                                             }
                                             if (!locked && !isListenTogetherGuest) {
-                                                IconButton(
+                                                androidx.compose.material3.IconButton(
                                                     onClick = { },
                                                     modifier = Modifier.draggableHandle(),
                                                 ) {

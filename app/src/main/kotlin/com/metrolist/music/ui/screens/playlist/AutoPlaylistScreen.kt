@@ -34,16 +34,13 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
@@ -90,6 +87,9 @@ import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadService
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
+import com.metrolist.music.ui.theme.nuclear.Checkbox
+import com.metrolist.music.ui.theme.nuclear.TextButton
+import com.metrolist.music.ui.theme.nuclear.IconButton
 import com.metrolist.innertube.YouTube
 import com.metrolist.music.LocalDownloadUtil
 import com.metrolist.music.LocalPlayerAwareWindowInsets
@@ -126,6 +126,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.metrolist.music.ui.theme.nuclear.NuclearArtwork
 import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
 import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
 
@@ -866,17 +867,7 @@ private fun AutoPlaylistHeader(
         Box(
             modifier = Modifier.padding(top = 8.dp, bottom = 20.dp),
         ) {
-            androidx.compose.material3.Surface(
-                modifier =
-                    Modifier
-                        .size(240.dp)
-                        .shadow(
-                            elevation = 24.dp,
-                            shape = RoundedCornerShape(3.dp),
-                            spotColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
-                        ),
-                shape = RoundedCornerShape(3.dp),
-            ) {
+            NuclearArtwork {
                 AsyncImage(
                     model = songs[0].song.thumbnailUrl,
                     contentDescription = null,
@@ -925,7 +916,7 @@ private fun AutoPlaylistHeader(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             // Shuffle Button - Smaller secondary button
-            androidx.compose.material3.Surface(
+            NuclearIconButton(
                 onClick = {
                     playerConnection.playQueue(
                         ListQueue(
@@ -934,9 +925,8 @@ private fun AutoPlaylistHeader(
                         ),
                     )
                 },
-                shape = androidx.compose.foundation.shape.CircleShape,
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                modifier = Modifier.size(48.dp),
+                variant = NuclearButtonVariant.Tertiary,
+                size = 48.dp,
             ) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -951,7 +941,7 @@ private fun AutoPlaylistHeader(
             }
 
             // Play Button - Larger primary circular button
-            Surface(
+            NuclearIconButton(
                 onClick = {
                     playerConnection.playQueue(
                         ListQueue(
@@ -960,9 +950,9 @@ private fun AutoPlaylistHeader(
                         ),
                     )
                 },
-                color = MaterialTheme.colorScheme.primary,
-                shape = androidx.compose.foundation.shape.CircleShape,
-                modifier = Modifier.size(72.dp),
+                variant = NuclearButtonVariant.Primary,
+                size = 72.dp,
+                shape = MaterialTheme.shapes.large,
             ) {
                 Box(
                     contentAlignment = Alignment.Center,
@@ -978,7 +968,7 @@ private fun AutoPlaylistHeader(
             }
 
             // Menu Button - Smaller secondary button
-            Surface(
+            NuclearIconButton(
                 onClick = {
                     menuState.show {
                         AutoPlaylistMenu(
@@ -1016,9 +1006,8 @@ private fun AutoPlaylistHeader(
                         )
                     }
                 },
-                shape = androidx.compose.foundation.shape.CircleShape,
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                modifier = Modifier.size(48.dp),
+                variant = NuclearButtonVariant.Tertiary,
+                size = 48.dp,
             ) {
                 Box(
                     modifier = Modifier.fillMaxSize(),

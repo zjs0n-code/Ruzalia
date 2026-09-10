@@ -17,9 +17,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
@@ -31,6 +29,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.metrolist.music.ui.theme.nuclear.ElevatedCard
+import com.metrolist.music.ui.theme.nuclear.RadioButton
+import com.metrolist.music.ui.theme.nuclear.FilledTonalButton
+import com.metrolist.music.ui.theme.nuclear.Button
+import com.metrolist.music.ui.theme.nuclear.TextButton
 import com.metrolist.music.ui.theme.nuclear.Switch
 import com.metrolist.music.R
 import java.time.LocalTime
@@ -39,9 +42,6 @@ import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.Button
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -550,12 +550,10 @@ fun SleepTimerDialog(
             ) {
                 TextButton(
                     onClick = onDismiss,
-                    shapes = ButtonDefaults.shapes(),
                 ) {
                     Text(stringResource(android.R.string.cancel))
                 }
-                androidx.compose.material3.Button(
-                    shapes = ButtonDefaults.shapes(),
+                Button(
                     onClick = {
                             val (finalRepeat, finalDayTimes) =
                                 when (selectedRepeat) {

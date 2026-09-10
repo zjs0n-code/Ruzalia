@@ -55,11 +55,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BasicAlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -114,6 +111,10 @@ import coil3.ImageLoader
 import coil3.request.ImageRequest
 import coil3.request.allowHardware
 import coil3.toBitmap
+import com.metrolist.music.ui.theme.nuclear.FilterChip
+import com.metrolist.music.ui.theme.nuclear.Card
+import com.metrolist.music.ui.theme.nuclear.FilledTonalButton
+import com.metrolist.music.ui.theme.nuclear.Button
 import com.metrolist.music.LocalDatabase
 import com.metrolist.music.LocalListenTogetherManager
 import com.metrolist.music.LocalPlayerConnection
@@ -2034,7 +2035,7 @@ fun OriginalLyrics(
                                     }
                                 val selected = previewBackgroundStyle == style
 
-                                androidx.compose.material3.FilterChip(
+                                FilterChip(
                                     selected = selected,
                                     onClick = { previewBackgroundStyle = style },
                                     label = { Text(label) },

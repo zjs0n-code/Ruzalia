@@ -27,10 +27,8 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -72,6 +70,8 @@ import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadService
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
+import com.metrolist.music.ui.theme.nuclear.Checkbox
+import com.metrolist.music.ui.theme.nuclear.IconButton
 import com.metrolist.music.LocalDownloadUtil
 import com.metrolist.music.LocalPlayerAwareWindowInsets
 import com.metrolist.music.LocalPlayerConnection
@@ -97,6 +97,7 @@ import com.metrolist.music.utils.rememberEnumPreference
 import com.metrolist.music.utils.rememberPreference
 import com.metrolist.music.viewmodels.CachePlaylistViewModel
 import java.time.LocalDateTime
+import com.metrolist.music.ui.theme.nuclear.NuclearArtwork
 import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
 import com.metrolist.music.ui.theme.nuclear.NuclearIconButton
 
@@ -490,16 +491,7 @@ private fun CachePlaylistHeader(
         Box(
             modifier = Modifier.padding(top = 8.dp, bottom = 20.dp)
         ) {
-            androidx.compose.material3.Surface(
-                modifier = Modifier
-                    .size(240.dp)
-                    .shadow(
-                        elevation = 24.dp,
-                        shape = RoundedCornerShape(3.dp),
-                        spotColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
-                    ),
-                shape = RoundedCornerShape(3.dp)
-            ) {
+            NuclearArtwork {
                 AsyncImage(
                     model = songs.first().thumbnailUrl,
                     contentDescription = null,
@@ -540,7 +532,7 @@ private fun CachePlaylistHeader(
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Shuffle Button - Smaller secondary button
-            androidx.compose.material3.Surface(
+            NuclearIconButton(
                 onClick = {
                     playerConnection.playQueue(
                         ListQueue(
@@ -549,9 +541,8 @@ private fun CachePlaylistHeader(
                         )
                     )
                 },
-                shape = androidx.compose.foundation.shape.CircleShape,
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                modifier = Modifier.size(48.dp)
+                variant = NuclearButtonVariant.Tertiary,
+                size = 48.dp,
             ) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -566,7 +557,7 @@ private fun CachePlaylistHeader(
             }
 
             // Play Button - Larger primary circular button
-            Surface(
+            NuclearIconButton(
                 onClick = {
                     playerConnection.playQueue(
                         ListQueue(
@@ -575,9 +566,9 @@ private fun CachePlaylistHeader(
                         )
                     )
                 },
-                color = MaterialTheme.colorScheme.primary,
-                shape = androidx.compose.foundation.shape.CircleShape,
-                modifier = Modifier.size(72.dp)
+                variant = NuclearButtonVariant.Primary,
+                size = 72.dp,
+                shape = MaterialTheme.shapes.large,
             ) {
                 Box(
                     contentAlignment = Alignment.Center,
@@ -593,7 +584,7 @@ private fun CachePlaylistHeader(
             }
 
             // Menu Button - Smaller secondary button
-            Surface(
+            NuclearIconButton(
                 onClick = {
                     menuState.show {
                         CachePlaylistMenu(
@@ -611,9 +602,8 @@ private fun CachePlaylistHeader(
                         )
                     }
                 },
-                shape = androidx.compose.foundation.shape.CircleShape,
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                modifier = Modifier.size(48.dp)
+                variant = NuclearButtonVariant.Tertiary,
+                size = 48.dp,
             ) {
                 Box(
                     modifier = Modifier.fillMaxSize(),

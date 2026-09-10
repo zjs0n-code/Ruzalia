@@ -97,11 +97,16 @@ fun NuclearButton(
     size: NuclearButtonSize = NuclearButtonSize.Default,
     shape: Shape = MaterialTheme.shapes.medium,
     enabled: Boolean = true,
+    /** Overrides the variant's fill, for call sites that derive their own. */
+    color: Color? = null,
+    contentColor: Color? = null,
     interactionSource: MutableInteractionSource? = null,
     content: @Composable RowScope.() -> Unit,
 ) {
     val colors = nuclearButtonColors(variant)
     val metrics = NuclearTheme.metrics
+    val fill = color ?: colors.fill
+    val ink = contentColor ?: color?.let { NuclearTheme.colors.contentColorOn(it) } ?: colors.content
 
     // The face should be the height nuclear specifies; the shadow lives outside
     // it, so the box we ask for has to be that much taller.
@@ -111,8 +116,8 @@ fun NuclearButton(
         modifier = modifier
             .defaultMinSize(minHeight = boxHeight),
         shape = shape,
-        color = colors.fill,
-        contentColor = colors.content,
+        color = fill,
+        contentColor = ink,
         borderColor = colors.outline,
         borderWidth = if (variant == NuclearButtonVariant.Text) 0.dp else metrics.borderWidth,
         shadow = colors.hasShadow,
