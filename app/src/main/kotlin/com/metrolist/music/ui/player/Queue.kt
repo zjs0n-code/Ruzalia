@@ -1317,13 +1317,19 @@ private fun PlayerQueueButton(
     // They take the same fill as play, share, download and like, so the whole
     // player follows the artwork together rather than leaving this row in the
     // theme's page colour while everything above it turned the colour of the
-    // cover. On is the icon at full strength against that shared fill; off
-    // fades the icon back.
+    // cover.
+    //
+    // On inverts that fill instead of dimming the icon: every glyph here stays
+    // the same weight as the play and share icons above, and the one that is on
+    // is the one that swaps light for dark.
+    val fill = if (isActive) iconButtonColor else textButtonColor
+    val ink = if (isActive) textButtonColor else iconButtonColor
+
     NuclearSurface(
         modifier = modifier.alpha(alphaFactor),
         shape = shape,
-        color = textButtonColor,
-        contentColor = iconButtonColor,
+        color = fill,
+        contentColor = ink,
         borderColor = NuclearTheme.colors.border,
         enabled = enabled,
         onClick = onClick,
@@ -1332,7 +1338,7 @@ private fun PlayerQueueButton(
         if (text != null) {
             Text(
                 text = text,
-                color = iconButtonColor.copy(alpha = if (enabled) 1f else 0.6f),
+                color = ink.copy(alpha = if (enabled) 1f else 0.6f),
                 fontSize = 10.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -1343,7 +1349,7 @@ private fun PlayerQueueButton(
                         .basicMarquee(),
             )
         } else {
-            val finalTint = iconButtonColor.copy(alpha = if (isActive) 1f else 0.45f)
+            val finalTint = ink
             Icon(
                 painter = painterResource(id = icon),
                 contentDescription = null,
