@@ -23,7 +23,7 @@ Nothing under the surface changed. Every feature is Metrolist's.
 <img src="assets/screenshots/01-home-light.png" width="24%" />
 <img src="assets/screenshots/02-home-dark.png" width="24%" />
 <img src="assets/screenshots/03-player.png" width="24%" />
-<img src="assets/screenshots/06-song-menu.png" width="24%" />
+<img src="assets/screenshots/05-playlist.png" width="24%" />
 </div>
 
 ---
@@ -59,11 +59,16 @@ The colours are ports of nuclear's own OKLCH values, converted to sRGB. The five
 **Default**, **Aurora**, **Ember**, **Lagoon** and **Arctic Moss** — are the same structure at
 five hues, exactly as nuclear builds them.
 
+<div align="center">
+<img src="assets/screenshots/04-library.png" width="32%" />
+<img src="assets/screenshots/06-song-menu.png" width="32%" />
+</div>
+
 ### Themes
 
 <div align="center">
-<img src="assets/screenshots/04-custom-theme.png" width="32%" />
-<img src="assets/screenshots/05-advanced-theme.png" width="32%" />
+<img src="assets/screenshots/07-theme.png" width="32%" />
+<img src="assets/screenshots/08-advanced-theme.png" width="32%" />
 </div>
 
 Beyond the five presets:

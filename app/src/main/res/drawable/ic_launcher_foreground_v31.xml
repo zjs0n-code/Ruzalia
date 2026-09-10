@@ -1,15 +1,20 @@
 <!--
-  Ruzalia mark: a bold R knocked into nuclear's field, the inverse of
-  nuclear's own black-field-with-glyph construction. 108x108 adaptive canvas;
-  the glyph sits inside the 72dp safe zone.
+  Ruzália's mark: a geometric R wearing the same construction as every control
+  in the app - a flat face with a hard, zero-blur shadow offset down and to the
+  right. 108x108 adaptive canvas; the glyph and its shadow both sit inside the
+  72dp safe zone, so no launcher mask can clip either.
 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+    <!-- The shadow is a solid silhouette: nuclear's shadow is the shape, not a blur. -->
     <path
         android:fillColor="#FF000000"
+        android:pathData="M37,32L64,32L78,41L78,51L64,60L79,80L64,80L50,60L50,80L37,80Z" />
+    <path
+        android:fillColor="#FFFFFFFF"
         android:fillType="evenOdd"
-        android:pathData="M32,28h26c11.6,0 18,6.2 18,14c0,7.8 -6.4,14 -18,14l18,24l-17,0l-14,-19l0,19l-13,0z M45,38h12c3.9,0 6,1.8 6,4c0,2.2 -2.1,4 -6,4l-12,0z" />
+        android:pathData="M32,27L59,27L73,36L73,46L59,55L74,75L59,75L45,55L45,75L32,75Z M45,35L59,35L62,41L59,47L45,47Z" />
 </vector>

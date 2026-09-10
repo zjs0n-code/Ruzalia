@@ -1,7 +1,6 @@
 <!--
-  Ruzalia mark: a bold R knocked into nuclear's field, the inverse of
-  nuclear's own black-field-with-glyph construction. 108x108 adaptive canvas;
-  the glyph sits inside the 72dp safe zone.
+  Ruzália's mark as a themed icon. A single tint, so the hard shadow is
+  dropped - the silhouette carries it alone.
 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
@@ -11,5 +10,5 @@
     <path
         android:fillColor="#FFFFFFFF"
         android:fillType="evenOdd"
-        android:pathData="M32,28h26c11.6,0 18,6.2 18,14c0,7.8 -6.4,14 -18,14l18,24l-17,0l-14,-19l0,19l-13,0z M45,38h12c3.9,0 6,1.8 6,4c0,2.2 -2.1,4 -6,4l-12,0z" />
+        android:pathData="M32,27L59,27L73,36L73,46L59,55L74,75L59,75L45,55L45,75L32,75Z M45,35L59,35L62,41L59,47L45,47Z" />
 </vector>
