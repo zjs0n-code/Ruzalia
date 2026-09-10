@@ -60,6 +60,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.metrolist.music.ui.theme.nuclear.IconButton
 import com.metrolist.music.ui.theme.nuclear.Checkbox
 import com.metrolist.innertube.models.Artist
 import com.metrolist.innertube.models.WatchEndpoint
@@ -706,7 +707,7 @@ fun StatsScreen(
                     )
 
                     if (sArtists.isNotEmpty()) {
-                        androidx.compose.material3.IconButton(onClick = clearArtistSelection) {
+                        IconButton(onClick = clearArtistSelection) {
                             Icon(
                                 painter = painterResource(R.drawable.close),
                                 contentDescription = "Clear Artists",
@@ -721,7 +722,7 @@ fun StatsScreen(
         },
         navigationIcon = {
             if (inSelectMode) {
-                androidx.compose.material3.IconButton(onClick = onExitSelectionMode) {
+                IconButton(onClick = onExitSelectionMode) {
                     Icon(
                         painter = painterResource(R.drawable.close),
                         contentDescription = "Select Button",
@@ -770,7 +771,7 @@ fun StatsScreen(
                     )
                 }
             } else if (!isSearching) {
-                androidx.compose.material3.IconButton(
+                IconButton(
                     onClick = { isSearching = true },
                 ) {
                     Icon(
