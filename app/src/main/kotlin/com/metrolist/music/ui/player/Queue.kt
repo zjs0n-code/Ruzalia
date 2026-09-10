@@ -307,8 +307,6 @@ fun Queue(
                         textButtonColor = textButtonColor,
                         iconButtonColor = iconButtonColor,
                         iconSize = iconSize,
-                        textBackgroundColor = TextBackgroundColor,
-                        playerBackground = playerBackground,
                     )
 
                     PlayerQueueButton(
@@ -328,8 +326,6 @@ fun Queue(
                         iconButtonColor = iconButtonColor,
                         text = if (sleepTimerEnabled) makeTimeString(sleepTimerTimeLeft) else null,
                         iconSize = iconSize,
-                        textBackgroundColor = TextBackgroundColor,
-                        playerBackground = playerBackground,
                     )
 
                     val shuffleModeEnabled by playerConnection.shuffleModeEnabled.collectAsStateWithLifecycle()
@@ -345,8 +341,6 @@ fun Queue(
                         textButtonColor = textButtonColor,
                         iconButtonColor = iconButtonColor,
                         iconSize = iconSize,
-                        textBackgroundColor = TextBackgroundColor,
-                        playerBackground = playerBackground,
                     )
 
                     PlayerQueueButton(
@@ -358,8 +352,6 @@ fun Queue(
                         textButtonColor = textButtonColor,
                         iconButtonColor = iconButtonColor,
                         iconSize = iconSize,
-                        textBackgroundColor = TextBackgroundColor,
-                        playerBackground = playerBackground,
                     )
 
                     PlayerQueueButton(
@@ -379,8 +371,6 @@ fun Queue(
                         textButtonColor = textButtonColor,
                         iconButtonColor = iconButtonColor,
                         iconSize = iconSize,
-                        textBackgroundColor = TextBackgroundColor,
-                        playerBackground = playerBackground,
                     )
 
                     Spacer(modifier = Modifier.weight(1f))
@@ -434,6 +424,10 @@ fun Queue(
                     NuclearButton(
                         onClick = { state.expandSoft() },
                         variant = NuclearButtonVariant.Tertiary,
+                        // The old design keeps the same rule as the new one: the
+                        // controls under the player follow the artwork too.
+                        color = textButtonColor,
+                        contentColor = iconButtonColor,
                         modifier = Modifier.weight(1f),
                     ) {
                         Row(
@@ -445,12 +439,12 @@ fun Queue(
                                 painter = painterResource(id = R.drawable.queue_music),
                                 contentDescription = null,
                                 modifier = Modifier.size(20.dp),
-                                tint = TextBackgroundColor,
+                                tint = iconButtonColor,
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
                                 text = stringResource(id = R.string.queue),
-                                color = TextBackgroundColor,
+                                color = iconButtonColor,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                                 textAlign = TextAlign.Center,
@@ -470,6 +464,10 @@ fun Queue(
                             }
                         },
                         variant = NuclearButtonVariant.Tertiary,
+                        // The old design keeps the same rule as the new one: the
+                        // controls under the player follow the artwork too.
+                        color = textButtonColor,
+                        contentColor = iconButtonColor,
                         modifier = Modifier.weight(1.45f),
                     ) {
                         Row(
@@ -481,7 +479,7 @@ fun Queue(
                                 painter = painterResource(id = R.drawable.bedtime),
                                 contentDescription = null,
                                 modifier = Modifier.size(20.dp),
-                                tint = TextBackgroundColor,
+                                tint = iconButtonColor,
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             AnimatedContent(
@@ -491,7 +489,7 @@ fun Queue(
                                 if (enabled) {
                                     Text(
                                         text = makeTimeString(sleepTimerTimeLeft),
-                                        color = TextBackgroundColor,
+                                        color = iconButtonColor,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,
                                         textAlign = TextAlign.Center,
@@ -499,7 +497,7 @@ fun Queue(
                                 } else {
                                     Text(
                                         text = stringResource(id = R.string.sleep_timer),
-                                        color = TextBackgroundColor,
+                                        color = iconButtonColor,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,
                                         textAlign = TextAlign.Center,
@@ -514,6 +512,10 @@ fun Queue(
                             onToggleLyrics()
                         },
                         variant = NuclearButtonVariant.Tertiary,
+                        // The old design keeps the same rule as the new one: the
+                        // controls under the player follow the artwork too.
+                        color = textButtonColor,
+                        contentColor = iconButtonColor,
                         modifier = Modifier.weight(1f),
                     ) {
                         Row(
@@ -525,12 +527,12 @@ fun Queue(
                                 painter = painterResource(id = R.drawable.lyrics),
                                 contentDescription = null,
                                 modifier = Modifier.size(20.dp),
-                                tint = TextBackgroundColor,
+                                tint = iconButtonColor,
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
                                 text = stringResource(R.string.lyrics),
-                                color = TextBackgroundColor,
+                                color = iconButtonColor,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                                 textAlign = TextAlign.Center,
@@ -1305,19 +1307,23 @@ private fun PlayerQueueButton(
     textButtonColor: Color,
     iconButtonColor: Color,
     iconSize: androidx.compose.ui.unit.Dp,
-    textBackgroundColor: Color,
-    playerBackground: PlayerBackgroundStyle,
 ) {
     val alphaFactor = if (enabled) 1f else 0.35f
 
     // These five get pressed constantly, so they are real nuclear buttons -
     // filled, outlined, and sliding onto their own shadow - rather than icons
-    // in an outlined box. Inactive ones use the page colour so the active one
-    // still reads as the one that is on.
+    // in an outlined box.
+    //
+    // They take the same fill as play, share, download and like, so the whole
+    // player follows the artwork together rather than leaving this row in the
+    // theme's page colour while everything above it turned the colour of the
+    // cover. On is the icon at full strength against that shared fill; off
+    // fades the icon back.
     NuclearSurface(
         modifier = modifier.alpha(alphaFactor),
         shape = shape,
-        color = if (isActive) textButtonColor else NuclearTheme.colors.background,
+        color = textButtonColor,
+        contentColor = iconButtonColor,
         borderColor = NuclearTheme.colors.border,
         enabled = enabled,
         onClick = onClick,
@@ -1337,21 +1343,7 @@ private fun PlayerQueueButton(
                         .basicMarquee(),
             )
         } else {
-            val baseTint =
-                if (isActive) {
-                    iconButtonColor
-                } else {
-                    when (playerBackground) {
-                        PlayerBackgroundStyle.BLUR, PlayerBackgroundStyle.GRADIENT -> {
-                            Color.White
-                        }
-
-                        PlayerBackgroundStyle.DEFAULT -> {
-                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                        }
-                    }
-                }
-            val finalTint = if (enabled) baseTint else baseTint.copy(alpha = 0.5f)
+            val finalTint = iconButtonColor.copy(alpha = if (isActive) 1f else 0.45f)
             Icon(
                 painter = painterResource(id = icon),
                 contentDescription = null,
