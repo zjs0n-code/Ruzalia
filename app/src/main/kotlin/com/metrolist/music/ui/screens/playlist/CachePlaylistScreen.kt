@@ -442,11 +442,15 @@ fun CachePlaylistScreen(
                     NuclearIconButton(
                         enabled = selection.isNotEmpty(),
                         onClick = {
+                            val selectedSongs = filteredSongs.filter { it.id in selection }
                             menuState.show {
                                 SelectionSongMenu(
-                                    songSelection = filteredSongs.filter { it.id in selection },
+                                    songSelection = selectedSongs,
                                     onDismiss = menuState::dismiss,
-                                    clearAction = onExitSelectionMode
+                                    clearAction = onExitSelectionMode,
+                                    onRemoveFromCache = {
+                                        viewModel.removeSongsFromCache(selectedSongs.map { it.id })
+                                    },
                                 )
                             }
                         },
