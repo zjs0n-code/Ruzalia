@@ -1,18 +1,18 @@
 <div align="center">
 
-# Ruzalia
+# Ruzália
 
 ### Metrolist, wearing nuclear's skin
 
 </div>
 
 > [!IMPORTANT]
-> **Unofficial.** Ruzalia is a personal fork of [Metrolist](https://github.com/MetrolistGroup/Metrolist)
+> **Unofficial.** Ruzália is a personal fork of [Metrolist](https://github.com/MetrolistGroup/Metrolist)
 > and is **not affiliated with, endorsed by, or supported by** the Metrolist project or by
-> [nuclear](https://github.com/nukeop/nuclear). Please do not raise Ruzalia issues with either of them.
+> [nuclear](https://github.com/nukeop/nuclear). Please do not raise Ruzália issues with either of them.
 > It installs alongside Metrolist as a separate app (`com.ruzalia.music`), so you can keep both.
 
-Ruzalia is Metrolist — the same YouTube Music client, with the same streaming, downloads,
+Ruzália is Metrolist — the same YouTube Music client, with the same streaming, downloads,
 synced lyrics and equaliser — rebuilt to look like [nuclear](https://github.com/nukeop/nuclear),
 the desktop player: chunky black outlines, hard zero-blur shadows, Bricolage Grotesque over
 DM Sans, and a candy palette that starts at pink.
@@ -28,10 +28,23 @@ Nothing under the surface changed. Every feature is Metrolist's.
 
 ---
 
+## Installing
+
+Grab the APK from [Releases](https://github.com/zjs0n-code/Ruzalia/releases) and install it.
+Android will warn you about installing outside the Play Store; that is expected for any APK.
+
+Ruzália installs **alongside** Metrolist rather than over it — different application id, so
+both can sit on the same phone and neither touches the other's library.
+
+The app checks this repository for its own updates. It will never offer you a Metrolist build:
+those are signed with a different key and would not install over Ruzália anyway.
+
+---
+
 ## The design
 
 nuclear's look is neobrutalism, and all of it lives in CSS custom properties in
-`packages/tailwind-config/global.css` plus five preset files. Ruzalia ports the values
+`packages/tailwind-config/global.css` plus five preset files. Ruzália ports the values
 rather than approximating them:
 
 | | |
@@ -84,7 +97,7 @@ out of date — there are no git submodules any more, and the Gradle protobuf pl
 `protoc` itself, so no local protobuf-compiler is needed.
 
 ```bash
-git clone <your fork> ruzalia && cd ruzalia
+git clone https://github.com/zjs0n-code/Ruzalia.git ruzalia && cd ruzalia
 
 # compileSdk is 37
 sdkmanager "platforms;android-37" "build-tools;37.0.0"
@@ -105,21 +118,30 @@ The APK lands at `app/build/outputs/apk/foss/debug/app-foss-debug.apk`.
 
 > [!NOTE]
 > A **debug** build is noticeably slower than a release build — Compose especially. If you are
-> comparing against a released copy of Metrolist and Ruzalia feels heavy, that is the build
+> comparing against a released copy of Metrolist and Ruzália feels heavy, that is the build
 > type, not the skin. Build the release variant to compare fairly.
 
 Tests: `./gradlew :app:testFossDebugUnitTest`
 
-## Staying current with upstream
+## Staying current with Metrolist
 
-The Kotlin namespace is still `com.metrolist.music` — only the `applicationId` changed. That
-keeps the diff to the theme package plus a couple of dozen UI files, so merging upstream stays
-tractable:
+Ruzália is a fork, not a re-implementation, so new Metrolist features arrive by merging
+upstream in and rebuilding — they do not appear on their own. What you get from a Ruzália
+release is *Metrolist at whatever version it was merged from, wearing this skin*.
+
+The Kotlin namespace is deliberately still `com.metrolist.music`; only the `applicationId`
+changed. That keeps the diff down to the theme package plus a couple of dozen UI files, which
+is what makes merging upstream tractable rather than a rewrite each time:
 
 ```bash
 git remote add upstream https://github.com/MetrolistGroup/Metrolist.git
-git fetch upstream && git merge upstream/main
+git fetch upstream --tags
+git merge v13.7.0        # whichever release you are moving to
 ```
+
+Conflicts land almost entirely in the reskinned UI files, and the rule for resolving them is
+usually "take upstream's logic, keep Ruzália's appearance". Rebuild and check the screens the
+merge touched before releasing.
 
 ## Credits and licence
 
@@ -127,10 +149,10 @@ git fetch upstream && git merge upstream/main
   this app actually does. GPL-3.0.
 - **[nuclear](https://github.com/nukeop/nuclear)** by nukeop — the design language this app
   wears. AGPL-3.0. Only the visual design is reproduced here, reimplemented in Kotlin; no
-  nuclear code is included, and the Ruzalia mark is its own, not nuclear's.
+  nuclear code is included, and the Ruzália mark is its own, not nuclear's.
 - **Fonts** — [Bricolage Grotesque](https://github.com/ateliertriay/bricolage),
   [DM Sans](https://github.com/googlefonts/dm-fonts) and
   [Space Mono](https://github.com/googlefonts/spacemono), all under the SIL Open Font License.
   Licence texts ship in `app/src/main/assets/licenses/`.
 
-Ruzalia is **GPL-3.0**, like its upstream. See [LICENSE](LICENSE).
+Ruzália is **GPL-3.0**, like its upstream. See [LICENSE](LICENSE).

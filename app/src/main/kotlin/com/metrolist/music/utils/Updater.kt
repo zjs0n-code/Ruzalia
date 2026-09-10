@@ -39,8 +39,11 @@ object Updater {
     private var cachedAllReleases: List<ReleaseInfo> = emptyList()
     
     private const val CHECK_INTERVAL_MILLIS = 2 * 60 * 60 * 1000L // 2 hours
-    private const val GITHUB_API_BASE = "https://api.github.com/repos/MetrolistGroup/Metrolist"
-    private const val KMP_RELEASES_URL = "https://api.github.com/repos/MetrolistGroup/Metrolist-KMP/releases?per_page=30"
+    // Ruzalia's own releases. Pointed at upstream this would offer every user
+    // the real Metrolist APK, which has a different application id and a
+    // different signing key - it would install as a second, unskinned app or
+    // fail outright.
+    private const val GITHUB_API_BASE = "https://api.github.com/repos/zjs0n-code/Ruzalia"
     const val KMP_APK_NAME = "Metrolist.apk"
 
     /**
@@ -195,9 +198,16 @@ object Updater {
      * Returns the newest KMP release that provides the migration APK.
      */
     suspend fun getLatestKmpRelease(): Result<ReleaseInfo?> =
+        // Upstream uses this to offer a migration to Metrolist-KMP. Ruzalia has
+        // no such build, and handing someone a different app is not an update,
+        // so the prompt never appears here.
+        Result.success(null)
+
+    @Suppress("unused")
+    private suspend fun getLatestKmpReleaseUpstream(): Result<ReleaseInfo?> =
         withContext(Dispatchers.IO) {
             runCatching {
-                val releases = JSONArray(client.get(KMP_RELEASES_URL).bodyAsText())
+                val releases = JSONArray(client.get("").bodyAsText())
 
                 for (i in 0 until releases.length()) {
                     val release = releases.getJSONObject(i)

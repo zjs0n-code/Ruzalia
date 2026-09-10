@@ -51,7 +51,7 @@ android {
         val baseVersionName = requireNotNull(versionName)
         buildConfigField("String", "BASE_VERSION_NAME", "\"$baseVersionName\"")
         buildCommit?.let { versionName = "$baseVersionName+$it" }
-        resValue("string", "app_name", appNameOverride ?: "Ruzalia")
+        resValue("string", "app_name", appNameOverride ?: "Ruzália")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
@@ -142,7 +142,7 @@ android {
             }
             isDebuggable = true
             if (appNameOverride == null) {
-                resValue("string", "app_name", "Ruzalia Debug")
+                resValue("string", "app_name", "Ruzália Debug")
             }
             signingConfig =
                 if (workflowDebugKeystoreFile != null) {
