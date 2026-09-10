@@ -101,6 +101,13 @@ object Updater {
             
             // Parse architecture and variant from filename
             val (arch, variant) = when {
+                // Ruzalia names its own downloads after itself. Without this the
+                // updater finds the release but no asset inside it, and offers an
+                // update it cannot download.
+                name.startsWith("Ruzalia-") && name.endsWith("-with-Google-Cast.apk") ->
+                    "universal" to "gms"
+                name.startsWith("Ruzalia-") -> "universal" to "foss"
+
                 name == "Metrolist.apk" -> "universal" to "foss"
                 name == "Metrolist-with-Google-Cast.apk" -> "universal" to "gms"
                 name.startsWith("app-") && name.endsWith("-release.apk") -> {
