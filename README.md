@@ -92,9 +92,9 @@ Missing tokens fall back to the default preset, so a partial file still loads.
 
 ## Building
 
-Prerequisites: **JDK 21** and the Android SDK. The checked-in `development_guide.md` is
-out of date — there are no git submodules any more, and the Gradle protobuf plugin fetches
-`protoc` itself, so no local protobuf-compiler is needed.
+Prerequisites: **JDK 21** and the Android SDK. There are no git submodules, and the Gradle
+protobuf plugin fetches `protoc` itself, so no local protobuf-compiler is needed — ignore any
+older Metrolist guide that says otherwise.
 
 ```bash
 git clone https://github.com/zjs0n-code/Ruzalia.git ruzalia && cd ruzalia

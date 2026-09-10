@@ -850,6 +850,12 @@
     <string name="credits_lead_developer">Lead developer</string>
     <string name="credits_collaborator">Collaborator</string>
     <string name="credits_collaborators_section">Collaborators</string>
+    <string name="credits_ruzalia_author">Ruzália — fork and reskin</string>
+    <string name="credits_upstream_section">Built on Metrolist</string>
+    <string name="credits_upstream_note">Every feature in this app comes from Metrolist. Ruzália only changes how it looks.</string>
+    <string name="credits_design_section">Design</string>
+    <string name="credits_nuclear_role">nuclear — the design language</string>
+    <string name="credits_nuclear_note">The look is a port of the nuclear neobrutalist design language, reimplemented in Kotlin. No nuclear code is included.</string>
     <string name="credits_license_name">GNU General Public License v3.0</string>
     <string name="credits_license_desc">Free, open-source software. You may use, study, share, and improve it</string>
     <string name="credits_discord">Discord server</string>

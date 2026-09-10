@@ -101,6 +101,22 @@ private data class CommunityLink(
     val url: String
 )
 
+/** Ruzalia's own author. The hero card is this fork's, not upstream's. */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+private val ruzaliaAuthor = Contributor(
+    name = "zjs0n-code",
+    roleRes = R.string.credits_ruzalia_author,
+    githubHandle = "zjs0n-code",
+    polygon = MaterialShapes.Cookie7Sided,
+)
+
+/** nuclear is credited as the design's author even though none of its code is here. */
+private val designAuthor = Contributor(
+    name = "nukeop",
+    roleRes = R.string.credits_nuclear_role,
+    githubHandle = "nukeop",
+)
+
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 private val leadDeveloper = Contributor(
     name = "Mo Agamy",
@@ -342,17 +358,17 @@ fun AboutScreen(
                     horizontalArrangement = Arrangement.spacedBy(20.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    var leadClickCount by remember(leadDeveloper.name) { mutableIntStateOf(0) }
+                    var leadClickCount by remember(ruzaliaAuthor.name) { mutableIntStateOf(0) }
             
                     ContributorAvatar(
-                        avatarUrl = leadDeveloper.avatarUrl,
+                        avatarUrl = ruzaliaAuthor.avatarUrl,
                         sizeDp = 110,
-                        shape = leadDeveloper.polygon?.toShape() ?: CircleShape,
-                        contentDescription = leadDeveloper.name,
+                        shape = ruzaliaAuthor.polygon?.toShape() ?: CircleShape,
+                        contentDescription = ruzaliaAuthor.name,
                         onClick = {
                             handleEasterEggClick(
                                 clickCount = leadClickCount,
-                                favoriteSongVideoId = leadDeveloper.favoriteSongVideoId,
+                                favoriteSongVideoId = ruzaliaAuthor.favoriteSongVideoId,
                                 coroutineScope = coroutineScope,
                                 snackbarHostState = snackbarHostState,
                                 playerConnection = playerConnection,
@@ -367,7 +383,7 @@ fun AboutScreen(
                         verticalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = leadDeveloper.name,
+                            text = ruzaliaAuthor.name,
                             style = MaterialTheme.typography.headlineLarge,
                             fontWeight = FontWeight.Black,
                             color = MaterialTheme.colorScheme.onSurface,
@@ -375,7 +391,7 @@ fun AboutScreen(
                             letterSpacing = (-0.5).sp
                         )
                         Text(
-                            text = stringResource(R.string.credits_lead_developer),
+                            text = stringResource(R.string.credits_ruzalia_author),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.SemiBold
@@ -384,33 +400,25 @@ fun AboutScreen(
                 }
                 
                 Spacer(Modifier.height(24.dp))
-                
-                DeveloperSocials(uriHandler)
-                
-                Spacer(Modifier.height(16.dp))
-                
+
                 Button(
-                    onClick = { uriHandler.openUri("https://buymeacoffee.com/mostafaalagamy") },
+                    onClick = { uriHandler.openUri(ruzaliaAuthor.githubUrl) },
                     modifier = Modifier.fillMaxWidth(),
-                    shape = CircleShape,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    )
                 ) {
-                    Icon(painterResource(R.drawable.buymeacoffee), contentDescription = null, modifier = Modifier.size(20.dp))
+                    Icon(painterResource(R.drawable.github), contentDescription = null, modifier = Modifier.size(20.dp))
                     Spacer(Modifier.width(12.dp))
-                    Text(stringResource(R.string.buy_mo_a_coffee), fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
+                    Text(ruzaliaAuthor.name, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
                 }
             }
         }
 
         Spacer(Modifier.height(32.dp))
-        
-        // Collaborators section - back to Material3SettingsGroup
+
+        // Upstream's people, with its lead developer at the head of the list.
+        // Ruzalia is a reskin - none of what the app does is its work.
         Material3SettingsGroup(
-            title = stringResource(R.string.credits_collaborators_section),
-            items = collaborators.map { contributor ->
+            title = stringResource(R.string.credits_upstream_section),
+            items = (listOf(leadDeveloper) + collaborators).map { contributor ->
                 Material3SettingsItem(
                     leadingContent = {
                         var clickCount by remember(contributor.name) { mutableIntStateOf(0) }
@@ -468,6 +476,70 @@ fun AboutScreen(
                     onClick = { uriHandler.openUri(contributor.githubUrl) }
                 )
             }
+        )
+
+        Spacer(Modifier.height(12.dp))
+
+        Text(
+            text = stringResource(R.string.credits_upstream_note),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 4.dp),
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        DeveloperSocials(uriHandler)
+
+        Spacer(Modifier.height(12.dp))
+
+        Button(
+            onClick = { uriHandler.openUri("https://buymeacoffee.com/mostafaalagamy") },
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Icon(painterResource(R.drawable.buymeacoffee), contentDescription = null, modifier = Modifier.size(20.dp))
+            Spacer(Modifier.width(12.dp))
+            Text(stringResource(R.string.buy_mo_a_coffee), fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
+        }
+
+        Spacer(Modifier.height(32.dp))
+
+        // The look is nuclear's, so nuclear gets its own credit.
+        Material3SettingsGroup(
+            title = stringResource(R.string.credits_design_section),
+            items = listOf(
+                Material3SettingsItem(
+                    leadingContent = {
+                        ContributorAvatar(
+                            avatarUrl = designAuthor.avatarUrl,
+                            sizeDp = 48,
+                            shape = CircleShape,
+                            contentDescription = designAuthor.name,
+                            onClick = { uriHandler.openUri("https://github.com/nukeop/nuclear") },
+                        )
+                    },
+                    title = { Text(text = designAuthor.name, fontWeight = FontWeight.SemiBold) },
+                    description = { Text(stringResource(designAuthor.roleRes)) },
+                    trailingContent = {
+                        Icon(
+                            painter = painterResource(R.drawable.github),
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    },
+                    onClick = { uriHandler.openUri("https://github.com/nukeop/nuclear") },
+                ),
+            ),
+        )
+
+        Spacer(Modifier.height(12.dp))
+
+        Text(
+            text = stringResource(R.string.credits_nuclear_note),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 4.dp),
         )
 
         Spacer(Modifier.height(32.dp))
