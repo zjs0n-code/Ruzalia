@@ -28,6 +28,7 @@ val workflowDebugKeystoreFile = debugKeystorePathOverride?.let(::file)
 // over the debug one for testing without wiping its library. It has to be asked
 // for by hand - a release must never fall back to this key on its own.
 val localReleaseSigning = (providers.gradleProperty("localReleaseSigning").orNull ?: "false").toBoolean()
+val releaseKeystoreFile = file("keystore/release.keystore")
 
 plugins {
     id("com.android.application")
@@ -132,8 +133,19 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
-            if (localReleaseSigning && persistentDebugKeystoreFile.exists()) {
-                signingConfig = signingConfigs.getByName("persistentDebug")
+            // `-PlocalReleaseSigning=true` wins on purpose: a test build has to
+            // keep the debug key so it installs over the debug app. Without it,
+            // the real key is used when both the keystore and its passwords are
+            // present, and otherwise the APK is left unsigned rather than
+            // quietly signed with something throwaway.
+            signingConfig = when {
+                localReleaseSigning && persistentDebugKeystoreFile.exists() ->
+                    signingConfigs.getByName("persistentDebug")
+
+                releaseKeystoreFile.exists() && System.getenv("STORE_PASSWORD") != null ->
+                    signingConfigs.getByName("release")
+
+                else -> null
             }
         }
         debug {
