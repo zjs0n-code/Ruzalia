@@ -185,6 +185,11 @@
     <string name="edit_playlist_cover_note">NOTE: Your account must be linked to a phone number and verified on YouTube Music to change the playlist cover</string>
     <string name="edit_playlist_cover_note_wait">After selecting an image, please wait a moment for the new cover to appear in your playlist</string>
     <string name="choose_from_library">Choose from library</string>
+    <string name="take_a_photo">Take a photo</string>
+    <string name="playlist_cover">Playlist cover</string>
+    <string name="add_cover">Add a cover</string>
+    <string name="change_cover">Change cover</string>
+    <string name="camera_unavailable">No camera app was found</string>
     <string name="remove_custom_image">Remove custom image</string>
 
     <!-- General -->

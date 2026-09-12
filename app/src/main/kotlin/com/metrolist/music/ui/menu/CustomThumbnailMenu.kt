@@ -22,12 +22,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.metrolist.music.R
 
+/**
+ * Where a playlist cover comes from.
+ *
+ * [onRemove] is null when there is nothing of the user's to remove - a playlist
+ * still showing its songs' artwork has no custom cover to take away.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomThumbnailMenu(
     onEdit: () -> Unit,
-    onRemove: () -> Unit,
+    onRemove: (() -> Unit)?,
     onDismiss: () -> Unit,
+    onTakePhoto: (() -> Unit)? = null,
 ) {
     LazyColumn(
         contentPadding = PaddingValues(
@@ -54,22 +61,43 @@ fun CustomThumbnailMenu(
                 }
             )
         }
-        item {
-            ListItem(
-                content = {
-                    Text(text = stringResource(R.string.remove_custom_image))
-                },
-                leadingContent = {
-                    Icon(
-                        painter = painterResource(R.drawable.delete),
-                        contentDescription = null,
-                    )
-                },
-                modifier = Modifier.clickable {
-                    onRemove()
-                    onDismiss()
-                }
-            )
+        if (onTakePhoto != null) {
+            item {
+                ListItem(
+                    content = {
+                        Text(text = stringResource(R.string.take_a_photo))
+                    },
+                    leadingContent = {
+                        Icon(
+                            painter = painterResource(R.drawable.photo_camera),
+                            contentDescription = null,
+                        )
+                    },
+                    modifier = Modifier.clickable {
+                        onTakePhoto()
+                        onDismiss()
+                    }
+                )
+            }
+        }
+        if (onRemove != null) {
+            item {
+                ListItem(
+                    content = {
+                        Text(text = stringResource(R.string.remove_custom_image))
+                    },
+                    leadingContent = {
+                        Icon(
+                            painter = painterResource(R.drawable.delete),
+                            contentDescription = null,
+                        )
+                    },
+                    modifier = Modifier.clickable {
+                        onRemove()
+                        onDismiss()
+                    }
+                )
+            }
         }
     }
 }

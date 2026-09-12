@@ -25,6 +25,12 @@
         <intent>
             <action android:name="android.media.action.DISPLAY_AUDIO_EFFECT_CONTROL_PANEL" />
         </intent>
+        <!-- Taking a playlist cover with the camera. Deliberately no CAMERA
+             permission: declaring it would make ACTION_IMAGE_CAPTURE demand a
+             runtime grant we do not otherwise need. -->
+        <intent>
+            <action android:name="android.media.action.IMAGE_CAPTURE" />
+        </intent>
         <package android:name="com.google.android.projection.gearhead" />
     </queries>
     <application
