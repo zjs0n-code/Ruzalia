@@ -30,6 +30,13 @@ val workflowDebugKeystoreFile = debugKeystorePathOverride?.let(::file)
 val localReleaseSigning = (providers.gradleProperty("localReleaseSigning").orNull ?: "false").toBoolean()
 val releaseKeystoreFile = file("keystore/release.keystore")
 
+// Signing secrets come from local.properties first and the environment second.
+// local.properties is gitignored, so they never reach the repository, and it
+// spares whoever is building from getting a password past a shell's quoting
+// rules - which differ between PowerShell and cmd and fail unhelpfully.
+fun signingSecret(name: String): String? =
+    (localProperties.getProperty(name) ?: System.getenv(name))?.takeIf { it.isNotBlank() }
+
 plugins {
     id("com.android.application")
     alias(libs.plugins.hilt)
@@ -113,10 +120,10 @@ android {
             keyPassword = debugKeyPassword
         }
         create("release") {
-            storeFile = file("keystore/release.keystore")
-            storePassword = System.getenv("STORE_PASSWORD")
-            keyAlias = System.getenv("KEY_ALIAS")
-            keyPassword = System.getenv("KEY_PASSWORD")
+            storeFile = releaseKeystoreFile
+            storePassword = signingSecret("STORE_PASSWORD")
+            keyAlias = signingSecret("KEY_ALIAS")
+            keyPassword = signingSecret("KEY_PASSWORD")
         }
         getByName("debug") {
             keyAlias = "androiddebugkey"
@@ -145,7 +152,7 @@ android {
                 localReleaseSigning && persistentDebugKeystoreFile.exists() ->
                     signingConfigs.getByName("persistentDebug")
 
-                releaseKeystoreFile.exists() && System.getenv("STORE_PASSWORD") != null ->
+                releaseKeystoreFile.exists() && signingSecret("STORE_PASSWORD") != null ->
                     signingConfigs.getByName("release")
 
                 else -> null
