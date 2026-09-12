@@ -47,8 +47,11 @@ android {
         applicationId = applicationIdOverride ?: baseApplicationId
         minSdk = 26
         targetSdk = 36
-        versionCode = 153
-        versionName = "13.7.0"
+        // Ruzalia builds on top of a Metrolist release carry a fourth part, so
+        // 13.7.0.1 is newer than Metrolist 13.7.0 and still older than its
+        // 13.7.1 - a merge from upstream always supersedes our own builds.
+        versionCode = 154
+        versionName = "13.7.0.1"
         val baseVersionName = requireNotNull(versionName)
         buildConfigField("String", "BASE_VERSION_NAME", "\"$baseVersionName\"")
         buildCommit?.let { versionName = "$baseVersionName+$it" }
