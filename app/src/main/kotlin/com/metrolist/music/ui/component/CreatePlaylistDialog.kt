@@ -26,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -66,16 +67,24 @@ fun CreatePlaylistDialog(
     val isSignedIn = innerTubeCookie.isNotEmpty()
 
     // Chosen before the playlist exists, so it is carried on the entity rather
-    // than written afterwards. A cover picked and then abandoned is deleted on
-    // dismiss so it does not sit in storage forever.
-    var coverUri by remember { mutableStateOf<Uri?>(null) }
+    // than written afterwards.
+    val coverUriState = remember { mutableStateOf<Uri?>(null) }
+    val coverUri = coverUriState.value
+    val coverUsed = remember { mutableStateOf(false) }
     val coverPicker = rememberPlaylistCoverPicker { uri ->
-        coverUri?.let { PlaylistCover.delete(context, it.toString()) }
-        coverUri = uri
+        coverUriState.value?.let { PlaylistCover.delete(context, it.toString()) }
+        coverUriState.value = uri
     }
-    val discardUnusedCover = {
-        coverUri?.let { PlaylistCover.delete(context, it.toString()) }
-        coverUri = null
+
+    // Cleanup happens on dispose, not on dismiss. The confirm button calls
+    // onDismiss *before* onDone, so discarding there deleted the image and
+    // cleared it a moment before the playlist that wanted it was created.
+    DisposableEffect(Unit) {
+        onDispose {
+            if (!coverUsed.value) {
+                coverUriState.value?.let { PlaylistCover.delete(context, it.toString()) }
+            }
+        }
     }
 
     val notLoggedInYoutubeStr = stringResource(R.string.not_logged_in_youtube)
@@ -86,17 +95,15 @@ fun CreatePlaylistDialog(
         icon = { Icon(painter = painterResource(R.drawable.add), contentDescription = null) },
         title = { Text(text = stringResource(R.string.create_playlist)) },
         initialTextFieldValue = TextFieldValue(initialTextFieldValue ?: ""),
-        onDismiss = {
-            discardUnusedCover()
-            onDismiss()
-        },
+        onDismiss = onDismiss,
         onDone = { playlistName ->
+            coverUsed.value = true
             syncUtils.createPlaylist(
                 playlist = PlaylistEntity(
                     name = playlistName,
                     bookmarkedAt = LocalDateTime.now(),
                     isEditable = true,
-                    thumbnailUrl = coverUri?.toString(),
+                    thumbnailUrl = coverUriState.value?.toString(),
                 ),
                 syncWithYouTube = syncedPlaylist,
             ) { playlistId, remoteCreated ->
