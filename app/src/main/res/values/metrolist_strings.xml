@@ -187,6 +187,7 @@
     <string name="choose_from_library">Choose from library</string>
     <string name="take_a_photo">Take a photo</string>
     <string name="playlist_cover">Playlist cover</string>
+    <string name="cover_not_synced">Cover saved here. YouTube did not accept it, so it is unchanged there.</string>
     <string name="add_cover">Add a cover</string>
     <string name="change_cover">Change cover</string>
     <string name="camera_unavailable">No camera app was found</string>

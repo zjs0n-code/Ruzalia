@@ -909,48 +909,64 @@ fun LocalPlaylistHeader(
     val currentThumbnail = overrideThumbnail.value ?: playlist.thumbnails.firstOrNull()
     val isCustomThumbnail = PlaylistCover.isCustom(context, currentThumbnail)
 
-    var showEditNoteDialog by remember { mutableStateOf(false) }
+    val coverNotSyncedStr = stringResource(R.string.cover_not_synced)
 
-    // A local playlist keeps its cover on the device; a synced one has to send
-    // it to YouTube, so the same picked image ends up wherever that playlist
-    // actually lives.
+    // The cover is applied here first, always, and only then offered to
+    // YouTube.
+    //
+    // Uploading returns Result<String?> and every step of its response parse is
+    // optional, so a refused upload - an account that is not signed in or not
+    // verified, or a playlist saved from someone else - comes back as *success*
+    // carrying null. That null used to be written straight in as the new
+    // thumbnail, which is why changing the cover of a saved YouTube playlist
+    // appeared to do nothing at all.
     val coverPicker = rememberPlaylistCoverPicker { uri ->
         scope.launch(Dispatchers.IO) {
             val browseId = playlist.playlist.browseId
-            if (browseId == null) {
-                val previous = playlist.playlist.thumbnailUrl
-                overrideThumbnail.value = uri.toString()
-                database.query { update(playlist.playlist.copy(thumbnailUrl = uri.toString())) }
-                PlaylistCover.delete(context, previous)
-            } else {
-                val bytes = uriToByteArray(context, uri) ?: return@launch
-                YouTube
-                    .uploadCustomThumbnailLink(browseId, bytes)
-                    .onSuccess { newThumbnailUrl ->
-                        overrideThumbnail.value = newThumbnailUrl
-                        database.query { update(playlist.playlist.copy(thumbnailUrl = newThumbnailUrl)) }
-                    }.onFailure {
-                        if (it is ClientRequestException) {
-                            snackbarHostState.showSnackbar("${it.response.status.value} ${it.response.status.description}")
-                        }
-                        reportException(it)
+            val previous = playlist.playlist.thumbnailUrl
+
+            overrideThumbnail.value = uri.toString()
+            database.query { update(playlist.playlist.copy(thumbnailUrl = uri.toString())) }
+            PlaylistCover.delete(context, previous)
+
+            if (browseId == null) return@launch
+
+            val bytes = uriToByteArray(context, uri) ?: return@launch
+            YouTube
+                .uploadCustomThumbnailLink(browseId, bytes)
+                .onSuccess { remoteUrl ->
+                    if (remoteUrl != null) {
+                        // YouTube took it, so prefer its copy and drop ours.
+                        overrideThumbnail.value = remoteUrl
+                        database.query { update(playlist.playlist.copy(thumbnailUrl = remoteUrl)) }
+                        PlaylistCover.delete(context, uri.toString())
+                    } else {
+                        snackbarHostState.showSnackbar(coverNotSyncedStr)
                     }
-            }
+                }.onFailure {
+                    snackbarHostState.showSnackbar(coverNotSyncedStr)
+                    reportException(it)
+                }
         }
     }
 
     val removeCover: () -> Unit = {
         scope.launch(Dispatchers.IO) {
             val browseId = playlist.playlist.browseId
-            if (browseId == null) {
-                val previous = playlist.playlist.thumbnailUrl
-                overrideThumbnail.value = null
-                database.query { update(playlist.playlist.copy(thumbnailUrl = null)) }
-                PlaylistCover.delete(context, previous)
-            } else {
-                YouTube.removeThumbnailPlaylist(browseId).onSuccess { newThumbnailUrl ->
-                    overrideThumbnail.value = newThumbnailUrl
-                    database.query { update(playlist.playlist.copy(thumbnailUrl = newThumbnailUrl)) }
+            val previous = playlist.playlist.thumbnailUrl
+
+            overrideThumbnail.value = null
+            database.query { update(playlist.playlist.copy(thumbnailUrl = null)) }
+            PlaylistCover.delete(context, previous)
+
+            if (browseId != null) {
+                // Same story on the way out: a null result means YouTube kept
+                // its own artwork, which is not a reason to keep showing it here.
+                YouTube.removeThumbnailPlaylist(browseId).onSuccess { remoteUrl ->
+                    if (remoteUrl != null) {
+                        overrideThumbnail.value = remoteUrl
+                        database.query { update(playlist.playlist.copy(thumbnailUrl = remoteUrl)) }
+                    }
                 }
             }
         }
@@ -963,15 +979,7 @@ fun LocalPlaylistHeader(
     var showCoverDialog by remember { mutableStateOf(false) }
     val showCoverSources: () -> Unit = { showCoverDialog = true }
 
-    val openCoverMenu: () -> Unit = {
-        if (playlist.playlist.browseId != null && !isCustomThumbnail) {
-            // A synced playlist needs a verified account before YouTube will
-            // accept a cover, so say so once rather than failing at upload.
-            showEditNoteDialog = true
-        } else {
-            showCoverSources()
-        }
-    }
+    val openCoverMenu: () -> Unit = showCoverSources
 
     LaunchedEffect(songs) {
         if (songs.isEmpty()) return@LaunchedEffect
@@ -1008,30 +1016,6 @@ fun LocalPlaylistHeader(
             )
         }
 
-        if (showEditNoteDialog) {
-            ActionPromptDialog(
-                title = stringResource(R.string.edit_playlist_cover),
-                onDismiss = { showEditNoteDialog = false },
-                onConfirm = {
-                    showEditNoteDialog = false
-                    showCoverSources()
-                },
-                onCancel = { showEditNoteDialog = false },
-            ) {
-                if (playlist.playlist.browseId != null) {
-                    Text(
-                        text = stringResource(R.string.edit_playlist_cover_note),
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                    Spacer(Modifier.height(8.dp))
-                }
-                Text(
-                    text = stringResource(R.string.edit_playlist_cover_note_wait),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                )
-            }
-        }
         // Playlist Thumbnail(s) - Large centered with shadow
         Box(
             modifier = Modifier.padding(top = 8.dp, bottom = 20.dp),
