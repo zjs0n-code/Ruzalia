@@ -13,7 +13,14 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -21,13 +28,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import com.metrolist.music.R
 import com.metrolist.music.ui.screens.settings.DarkMode
 import com.metrolist.music.constants.DarkModeKey
+import com.metrolist.music.ui.theme.nuclear.NuclearButton
+import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
 import com.metrolist.music.utils.rememberEnumPreference
 import com.yalantis.ucrop.UCrop
 import java.io.File
@@ -200,5 +212,89 @@ fun rememberPlaylistCoverPicker(onPicked: (Uri) -> Unit): PlaylistCoverPicker {
                 cameraLauncher.launch(photoUri)
             },
         )
+    }
+}
+
+/**
+ * Where a cover comes from, asked as a dialog rather than a bottom sheet.
+ *
+ * The sheet it replaces was a stack of bare Material list rows - no outline, no
+ * shadow, nothing pressable - which is the one shape the rest of the app does
+ * not have. Each choice is a push button here, and removing is the destructive
+ * variant, so the row that throws something away looks like it.
+ */
+@Composable
+fun PlaylistCoverDialog(
+    onDismiss: () -> Unit,
+    onChooseFromLibrary: () -> Unit,
+    onTakePhoto: () -> Unit,
+    onRemove: (() -> Unit)?,
+) {
+    DefaultDialog(
+        onDismiss = onDismiss,
+        icon = {
+            Icon(
+                painter = painterResource(R.drawable.insert_photo),
+                contentDescription = null,
+            )
+        },
+        title = { Text(stringResource(R.string.playlist_cover)) },
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            NuclearButton(
+                onClick = {
+                    onDismiss()
+                    onChooseFromLibrary()
+                },
+                variant = NuclearButtonVariant.Tertiary,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.insert_photo),
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                )
+                Text(stringResource(R.string.choose_from_library))
+            }
+
+            NuclearButton(
+                onClick = {
+                    onDismiss()
+                    onTakePhoto()
+                },
+                variant = NuclearButtonVariant.Tertiary,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.photo_camera),
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                )
+                Text(stringResource(R.string.take_a_photo))
+            }
+
+            if (onRemove != null) {
+                NuclearButton(
+                    onClick = {
+                        onDismiss()
+                        onRemove()
+                    },
+                    variant = NuclearButtonVariant.Danger,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.delete),
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                    )
+                    Text(stringResource(R.string.remove_custom_image))
+                }
+            }
+        }
     }
 }

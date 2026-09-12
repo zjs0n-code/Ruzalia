@@ -123,6 +123,7 @@ import com.metrolist.music.extensions.toMediaItem
 import com.metrolist.music.playback.ExoDownloadService
 import com.metrolist.music.playback.queues.ListQueue
 import com.metrolist.music.ui.component.rememberPlaylistCoverPicker
+import com.metrolist.music.ui.component.PlaylistCoverDialog
 import com.metrolist.music.ui.component.PlaylistCover
 import com.metrolist.music.ui.component.ActionPromptDialog
 import com.metrolist.music.ui.component.DefaultDialog
@@ -135,7 +136,6 @@ import com.metrolist.music.ui.component.OverlayEditButton
 import com.metrolist.music.ui.component.SongListItem
 import com.metrolist.music.ui.component.SortHeader
 import com.metrolist.music.ui.component.TextFieldDialog
-import com.metrolist.music.ui.menu.CustomThumbnailMenu
 import com.metrolist.music.ui.menu.LocalPlaylistMenu
 import com.metrolist.music.ui.menu.SelectionSongMenu
 import com.metrolist.music.ui.menu.SongMenu
@@ -960,16 +960,8 @@ fun LocalPlaylistHeader(
     // One affordance for every artwork state, the empty one included - that was
     // the case with no way to set a cover at all, which is exactly the playlist
     // someone has just made.
-    val showCoverSources: () -> Unit = {
-        menuState.show {
-            CustomThumbnailMenu(
-                onEdit = coverPicker::pickFromGallery,
-                onTakePhoto = coverPicker::takePhoto,
-                onRemove = if (isCustomThumbnail) removeCover else null,
-                onDismiss = menuState::dismiss,
-            )
-        }
-    }
+    var showCoverDialog by remember { mutableStateOf(false) }
+    val showCoverSources: () -> Unit = { showCoverDialog = true }
 
     val openCoverMenu: () -> Unit = {
         if (playlist.playlist.browseId != null && !isCustomThumbnail) {
@@ -1007,6 +999,15 @@ fun LocalPlaylistHeader(
                 .padding(top = 8.dp, bottom = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        if (showCoverDialog) {
+            PlaylistCoverDialog(
+                onDismiss = { showCoverDialog = false },
+                onChooseFromLibrary = coverPicker::pickFromGallery,
+                onTakePhoto = coverPicker::takePhoto,
+                onRemove = if (isCustomThumbnail) removeCover else null,
+            )
+        }
+
         if (showEditNoteDialog) {
             ActionPromptDialog(
                 title = stringResource(R.string.edit_playlist_cover),
