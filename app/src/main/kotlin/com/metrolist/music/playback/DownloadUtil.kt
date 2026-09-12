@@ -52,6 +52,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import com.metrolist.music.db.entities.LyricsEntity
+import com.metrolist.music.lyrics.LyricsHelper
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import okhttp3.OkHttpClient
@@ -71,6 +74,7 @@ constructor(
     val databaseProvider: DatabaseProvider,
     @DownloadCache val downloadCache: Cache,
     @PlayerCache val playerCache: Cache,
+    private val lyricsHelper: LyricsHelper,
 ) {
     private val TAG = "DownloadUtil"
     private val connectivityManager = context.getSystemService<ConnectivityManager>()!!
@@ -90,6 +94,10 @@ constructor(
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val downloadPreparations = Semaphore(3)
+
+    // One at a time. Downloading an album asks every provider about every
+    // track, and firing twenty of those at once is a good way to get throttled.
+    private val lyricsPrefetches = Semaphore(1)
 
     val downloads = MutableStateFlow<Map<String, Download>>(emptyMap())
 
@@ -363,6 +371,8 @@ constructor(
                     false,
                 )
 
+                prefetchLyrics(mediaMetadata)
+
                 val albumArtwork = database.getSongByIdBlocking(mediaMetadata.id)?.album?.thumbnailUrl
                 downloadArtworkUrls(mediaMetadata.thumbnailUrl, albumArtwork).forEach { artworkUrl ->
                     runCatching {
@@ -377,6 +387,40 @@ constructor(
                         )
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * Puts a song's lyrics in the database alongside its audio.
+     *
+     * Deliberately fire-and-forget on its own coroutine: lyrics come from third
+     * party providers that can be slow or down, and none of that is a reason to
+     * hold up - let alone fail - the download the user actually asked for.
+     */
+    private fun prefetchLyrics(mediaMetadata: MediaMetadata) {
+        scope.launch {
+            lyricsPrefetches.withPermit {
+                runCatching {
+                    // A stored miss does not count as having lyrics. The player
+                    // writes LYRICS_NOT_FOUND when a provider was down or simply
+                    // had nothing, and without this a song that failed once
+                    // would never be looked up again.
+                    val stored = database.lyrics(mediaMetadata.id).first()
+                    if (stored != null && stored.lyrics != LyricsEntity.LYRICS_NOT_FOUND) {
+                        return@withPermit
+                    }
+
+                    val fetched = lyricsHelper.getLyrics(mediaMetadata)
+                    // A miss is never written. Plenty of tracks have no lyrics
+                    // today and do later, and a provider that was merely down
+                    // would otherwise be remembered as "no lyrics" forever.
+                    if (fetched.lyrics != LyricsEntity.LYRICS_NOT_FOUND) {
+                        database.query {
+                            upsert(LyricsEntity(mediaMetadata.id, fetched.lyrics, fetched.provider))
+                        }
+                    }
+                }.onFailure { Timber.tag(TAG).w(it, "Lyrics prefetch failed for ${mediaMetadata.id}") }
             }
         }
     }
