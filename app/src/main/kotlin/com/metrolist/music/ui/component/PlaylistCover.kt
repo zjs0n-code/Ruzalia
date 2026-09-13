@@ -40,6 +40,7 @@ import com.metrolist.music.ui.screens.settings.DarkMode
 import com.metrolist.music.constants.DarkModeKey
 import com.metrolist.music.ui.theme.nuclear.NuclearButton
 import com.metrolist.music.ui.theme.nuclear.NuclearButtonVariant
+import com.metrolist.music.utils.CUSTOM_ARTWORK_DIRECTORY
 import com.metrolist.music.utils.rememberEnumPreference
 import com.yalantis.ucrop.UCrop
 import java.io.File
@@ -53,7 +54,7 @@ import java.io.File
  * would look like data loss.
  */
 object PlaylistCover {
-    private const val DIRECTORY = "playlist_covers"
+    private const val DIRECTORY = CUSTOM_ARTWORK_DIRECTORY
 
     private fun directory(context: Context): File =
         File(context.filesDir, DIRECTORY).apply { mkdirs() }
@@ -124,14 +125,18 @@ class PlaylistCoverPicker internal constructor(
  * growing two that drift apart.
  */
 @Composable
-fun rememberPlaylistCoverPicker(onPicked: (Uri) -> Unit): PlaylistCoverPicker {
+fun rememberPlaylistCoverPicker(
+    title: String? = null,
+    onPicked: (Uri) -> Unit,
+): PlaylistCoverPicker {
     val context = LocalContext.current
     val currentOnPicked by rememberUpdatedState(onPicked)
 
     val (darkMode, _) = rememberEnumPreference(DarkModeKey, defaultValue = DarkMode.AUTO)
     val darkTheme = darkMode == DarkMode.ON || (darkMode == DarkMode.AUTO && isSystemInDarkTheme())
     val scheme = MaterialTheme.colorScheme
-    val cropTitle = stringResource(R.string.edit_playlist_cover)
+    val defaultCropTitle = stringResource(R.string.edit_playlist_cover)
+    val cropTitle = title ?: defaultCropTitle
 
     var pendingCropDestination by remember { mutableStateOf<Uri?>(null) }
     var pendingCameraOutput by remember { mutableStateOf<Uri?>(null) }
@@ -229,7 +234,9 @@ fun PlaylistCoverDialog(
     onChooseFromLibrary: () -> Unit,
     onTakePhoto: () -> Unit,
     onRemove: (() -> Unit)?,
+    title: String? = null,
 ) {
+    val defaultTitle = stringResource(R.string.playlist_cover)
     DefaultDialog(
         onDismiss = onDismiss,
         icon = {
@@ -238,7 +245,7 @@ fun PlaylistCoverDialog(
                 contentDescription = null,
             )
         },
-        title = { Text(stringResource(R.string.playlist_cover)) },
+        title = { Text(title ?: defaultTitle) },
     ) {
         Column(
             modifier = Modifier

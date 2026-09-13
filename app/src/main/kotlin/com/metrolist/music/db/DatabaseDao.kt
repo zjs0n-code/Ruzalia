@@ -17,6 +17,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import androidx.room.Upsert
 import androidx.sqlite.db.SupportSQLiteQuery
+import com.metrolist.music.utils.keepCustomArtwork
 import com.metrolist.innertube.models.PlaylistItem
 import com.metrolist.innertube.models.SongItem
 import com.metrolist.innertube.pages.AlbumPage
@@ -1790,7 +1791,9 @@ interface DatabaseDao {
             song.song.copy(
                 title = if (overwriteTitle) mediaMetadata.title else song.song.title,
                 duration = mediaMetadata.duration,
-                thumbnailUrl = mediaMetadata.thumbnailUrl,
+                // A cover the user chose outlives a refresh from YouTube; this
+                // runs on every download, so without it the cover would vanish.
+                thumbnailUrl = keepCustomArtwork(song.song.thumbnailUrl, mediaMetadata.thumbnailUrl),
                 albumId = mediaMetadata.album?.id,
                 albumName = mediaMetadata.album?.title,
                 libraryAddToken = mediaMetadata.libraryAddToken,
@@ -1870,7 +1873,9 @@ interface DatabaseDao {
                 playlistId = albumPage.album.playlistId,
                 title = albumPage.album.title,
                 year = albumPage.album.year,
-                thumbnailUrl = albumPage.album.thumbnail,
+                // Same rule for albums, whose page is refetched every time the
+                // album screen opens.
+                thumbnailUrl = keepCustomArtwork(album.thumbnailUrl, albumPage.album.thumbnail),
                 songCount = albumPage.songs.size,
                 duration = albumPage.songs.sumOf { it.duration ?: 0 },
                 explicit = albumPage.album.explicit || albumPage.songs.any { it.explicit },

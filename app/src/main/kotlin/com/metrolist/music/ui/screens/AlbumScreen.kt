@@ -69,6 +69,14 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.media3.exoplayer.offline.Download
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import com.metrolist.music.utils.isCustomArtwork
+import com.metrolist.music.utils.CustomArtworkOriginals
+import com.metrolist.music.ui.component.rememberPlaylistCoverPicker
+import com.metrolist.music.ui.component.PlaylistCoverDialog
+import com.metrolist.music.ui.component.PlaylistCover
+import com.metrolist.music.ui.component.OverlayEditButton
 import com.metrolist.music.ui.theme.nuclear.Checkbox
 import com.metrolist.music.ui.theme.nuclear.IconButton
 import com.metrolist.music.LocalDatabase
@@ -188,6 +196,43 @@ fun AlbumScreen(
         }
     }
 
+    // A fully downloaded album can wear a cover of its own.
+    var showAlbumCoverDialog by remember { mutableStateOf(false) }
+    val albumCoverCropTitle = stringResource(R.string.edit_album_cover)
+    val albumCoverPicker = rememberPlaylistCoverPicker(title = albumCoverCropTitle) { uri ->
+        val album = albumWithSongs?.album ?: return@rememberPlaylistCoverPicker
+        scope.launch(Dispatchers.IO) {
+            CustomArtworkOriginals.rememberAlbum(context, album.id, album.thumbnailUrl)
+            database.query { update(album.copy(thumbnailUrl = uri.toString())) }
+            if (album.thumbnailUrl.isCustomArtwork()) PlaylistCover.delete(context, album.thumbnailUrl)
+        }
+    }
+    if (showAlbumCoverDialog) {
+        PlaylistCoverDialog(
+            title = stringResource(R.string.album_cover),
+            onDismiss = { showAlbumCoverDialog = false },
+            onChooseFromLibrary = albumCoverPicker::pickFromGallery,
+            onTakePhoto = albumCoverPicker::takePhoto,
+            onRemove =
+                if (albumWithSongs?.album?.thumbnailUrl.isCustomArtwork()) {
+                    {
+                        val album = albumWithSongs?.album
+                        if (album != null) {
+                            scope.launch(Dispatchers.IO) {
+                                // With no recorded original the cover is cleared,
+                                // and the next album refresh fills it back in.
+                                val original = CustomArtworkOriginals.takeAlbum(context, album.id)
+                                database.query { update(album.copy(thumbnailUrl = original)) }
+                                PlaylistCover.delete(context, album.thumbnailUrl)
+                            }
+                        }
+                    }
+                } else {
+                    null
+                },
+        )
+    }
+
     LazyColumn(
         contentPadding = LocalPlayerAwareWindowInsets.current.asPaddingValues(),
     ) {
@@ -202,12 +247,23 @@ fun AlbumScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     // Album Thumbnail - Large centered with shadow
-                    NuclearArtwork {
-                        AsyncImage(
-                            model = albumWithSongs.album.thumbnailUrl?.resize(1080, 1080),
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize(),
+                    Box {
+                        NuclearArtwork {
+                            AsyncImage(
+                                model = albumWithSongs.album.thumbnailUrl?.resize(1080, 1080),
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize(),
+                            )
+                        }
+                        OverlayEditButton(
+                            // Every track downloaded, by the same rule the Downloaded
+                            // library uses, or by the download index.
+                            visible =
+                                downloadState == Download.STATE_COMPLETED ||
+                                    albumWithSongs.songs.all { it.song.isDownloaded },
+                            alignment = Alignment.BottomEnd,
+                            onClick = { showAlbumCoverDialog = true },
                         )
                     }
 
