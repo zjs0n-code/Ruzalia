@@ -63,6 +63,7 @@ import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadService
 import coil3.compose.AsyncImage
 import androidx.room.withTransaction
+import com.metrolist.music.ui.component.rememberSongCoverEditor
 import com.metrolist.music.utils.isCustomArtwork
 import com.metrolist.music.utils.CustomArtworkOriginals
 import com.metrolist.music.ui.component.rememberPlaylistCoverPicker
@@ -175,56 +176,13 @@ fun SongMenu(
         )
     }
 
-    // Downloaded songs can wear a cover of their own. The menu stays open while
-    // the gallery and crop screens run, which is what keeps these launchers
-    // registered long enough to receive the result.
-    var showCoverDialog by rememberSaveable { mutableStateOf(false) }
+    // Downloaded songs can wear a cover of their own. The editor lives inside
+    // the menu so its gallery and crop launchers stay registered while they run.
+    val openSongCover = rememberSongCoverEditor(song.id)
     // Downloaded means what the Downloaded library shows. That list is driven by
     // the song's own flag, while the download index can lag or be rebuilt, so
     // trusting the index alone hid this option on songs sitting in Downloaded.
     val isSongDownloaded = song.song.isDownloaded || download?.state == Download.STATE_COMPLETED
-    val songCoverCropTitle = stringResource(R.string.edit_song_cover)
-    val songCoverPicker = rememberPlaylistCoverPicker(title = songCoverCropTitle) { uri ->
-        coroutineScope.launch {
-            val current = database.song(song.id).first() ?: return@launch
-            val previous = current.song.thumbnailUrl
-            withContext(Dispatchers.IO) {
-                CustomArtworkOriginals.rememberSong(context, current.id, previous)
-                database.withTransaction { update(current.song.copy(thumbnailUrl = uri.toString())) }
-                if (previous.isCustomArtwork()) PlaylistCover.delete(context, previous)
-            }
-            database.song(current.id).first()?.let(playerConnection::refreshSongMetadata)
-        }
-    }
-    if (showCoverDialog) {
-        PlaylistCoverDialog(
-            title = stringResource(R.string.song_cover),
-            onDismiss = { showCoverDialog = false },
-            onChooseFromLibrary = songCoverPicker::pickFromGallery,
-            onTakePhoto = songCoverPicker::takePhoto,
-            onRemove =
-                if (song.song.thumbnailUrl.isCustomArtwork()) {
-                    {
-                        coroutineScope.launch {
-                            val current = database.song(song.id).first() ?: return@launch
-                            val previous = current.song.thumbnailUrl
-                            withContext(Dispatchers.IO) {
-                                // Songs are YouTube videos, so if the original was
-                                // never recorded its standard thumbnail stands in.
-                                val original =
-                                    CustomArtworkOriginals.takeSong(context, current.id)
-                                        ?: "https://i.ytimg.com/vi/${current.id}/hqdefault.jpg"
-                                database.withTransaction { update(current.song.copy(thumbnailUrl = original)) }
-                                PlaylistCover.delete(context, previous)
-                            }
-                            database.song(current.id).first()?.let(playerConnection::refreshSongMetadata)
-                        }
-                    }
-                } else {
-                    null
-                },
-        )
-    }
 
     if (showEditDialog) {
         TextFieldDialog(
@@ -1026,7 +984,7 @@ fun SongMenu(
                                         contentDescription = null,
                                     )
                                 },
-                                onClick = { showCoverDialog = true },
+                                onClick = { openSongCover() },
                             )
                         } else {
                             null

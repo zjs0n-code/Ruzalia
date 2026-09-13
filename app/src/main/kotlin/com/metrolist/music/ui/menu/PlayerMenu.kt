@@ -72,6 +72,7 @@ import androidx.media3.common.C
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadService
+import com.metrolist.music.ui.component.rememberSongCoverEditor
 import com.metrolist.music.ui.theme.nuclear.FilledTonalButton
 import com.metrolist.music.ui.theme.nuclear.Button
 import com.metrolist.music.ui.theme.nuclear.TextButton
@@ -142,6 +143,9 @@ fun PlayerMenu(
     val download by downloadUtil
         .getDownload(mediaMetadata.id)
         .collectAsStateWithLifecycle(initialValue = null)
+    val isPlayingSongDownloaded =
+        librarySong?.song?.isDownloaded == true || download?.state == Download.STATE_COMPLETED
+    val openSongCover = rememberSongCoverEditor(mediaMetadata.id)
 
     val isPinned by database.speedDialDao.isPinned(mediaMetadata.id).collectAsStateWithLifecycle(initialValue = false)
 
@@ -524,7 +528,7 @@ fun PlayerMenu(
         item {
             Material3MenuGroup(
                 items =
-                    listOf(
+                    listOfNotNull(
                         when (download?.state) {
                             Download.STATE_COMPLETED -> {
                                 Material3MenuItemData(
@@ -586,6 +590,24 @@ fun PlayerMenu(
                                     },
                                 )
                             }
+                        },
+                        // Same editor as the song menu in lists, so a downloaded
+                        // song's cover can be changed from the player too.
+                        if (isPlayingSongDownloaded) {
+                            Material3MenuItemData(
+                                title = { Text(text = stringResource(R.string.change_cover)) },
+                                description = { Text(text = stringResource(R.string.change_cover_song_desc)) },
+                                icon = {
+                                    Icon(
+                                        painter = painterResource(R.drawable.insert_photo),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(24.dp),
+                                    )
+                                },
+                                onClick = { openSongCover() },
+                            )
+                        } else {
+                            null
                         },
                     ),
             )

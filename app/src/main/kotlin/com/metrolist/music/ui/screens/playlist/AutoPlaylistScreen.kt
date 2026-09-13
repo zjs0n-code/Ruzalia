@@ -87,6 +87,11 @@ import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadService
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
+import com.metrolist.music.utils.AutoPlaylistCovers
+import com.metrolist.music.ui.component.rememberPlaylistCoverPicker
+import com.metrolist.music.ui.component.PlaylistCoverDialog
+import com.metrolist.music.ui.component.PlaylistCover
+import com.metrolist.music.ui.component.OverlayEditButton
 import com.metrolist.music.ui.theme.nuclear.Checkbox
 import com.metrolist.music.ui.theme.nuclear.TextButton
 import com.metrolist.music.ui.theme.nuclear.IconButton
@@ -226,6 +231,36 @@ fun AutoPlaylistScreen(
     }
 
     val scope = rememberCoroutineScope()
+
+    // Downloaded is a query, not a playlist, so its cover lives in preferences
+    // under the list's type instead of on a playlist row.
+    val autoCoverKey = playlistType.name
+    var autoCover by remember(autoCoverKey) { mutableStateOf(AutoPlaylistCovers.get(context, autoCoverKey)) }
+    var showAutoCoverDialog by remember { mutableStateOf(false) }
+    val autoCoverCropTitle = stringResource(R.string.edit_playlist_cover)
+    val autoCoverPicker = rememberPlaylistCoverPicker(title = autoCoverCropTitle) { uri ->
+        val previous = autoCover
+        AutoPlaylistCovers.set(context, autoCoverKey, uri.toString())
+        autoCover = uri.toString()
+        PlaylistCover.delete(context, previous)
+    }
+    if (showAutoCoverDialog) {
+        PlaylistCoverDialog(
+            onDismiss = { showAutoCoverDialog = false },
+            onChooseFromLibrary = autoCoverPicker::pickFromGallery,
+            onTakePhoto = autoCoverPicker::takePhoto,
+            onRemove =
+                if (autoCover != null) {
+                    {
+                        PlaylistCover.delete(context, autoCover)
+                        AutoPlaylistCovers.set(context, autoCoverKey, null)
+                        autoCover = null
+                    }
+                } else {
+                    null
+                },
+        )
+    }
 
     // Upload state
     var showUploadDialog by remember { mutableStateOf(false) }
@@ -528,6 +563,13 @@ fun AutoPlaylistScreen(
                                 downloadState = downloadState,
                                 onShowRemoveDownloadDialog = { showRemoveDownloadDialog = true },
                                 menuState = menuState,
+                                coverOverride = if (playlistType == PlaylistType.DOWNLOAD) autoCover else null,
+                                onEditCover =
+                                    if (playlistType == PlaylistType.DOWNLOAD) {
+                                        { showAutoCoverDialog = true }
+                                    } else {
+                                        null
+                                    },
                                 modifier = Modifier.animateItem(),
                             )
                         }
@@ -850,6 +892,8 @@ private fun AutoPlaylistHeader(
     downloadState: Int,
     onShowRemoveDownloadDialog: () -> Unit,
     menuState: com.metrolist.music.ui.component.MenuState,
+    coverOverride: String? = null,
+    onEditCover: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     val playerConnection = LocalPlayerConnection.current ?: return
@@ -869,10 +913,17 @@ private fun AutoPlaylistHeader(
         ) {
             NuclearArtwork {
                 AsyncImage(
-                    model = songs[0].song.thumbnailUrl,
+                    model = coverOverride ?: songs[0].song.thumbnailUrl,
                     contentDescription = null,
                     contentScale = androidx.compose.ui.layout.ContentScale.Crop,
                     modifier = Modifier.fillMaxSize(),
+                )
+            }
+            if (onEditCover != null) {
+                OverlayEditButton(
+                    visible = true,
+                    alignment = Alignment.BottomEnd,
+                    onClick = onEditCover,
                 )
             }
         }

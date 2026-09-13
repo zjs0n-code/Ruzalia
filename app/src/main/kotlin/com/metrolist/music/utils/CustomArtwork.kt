@@ -66,3 +66,26 @@ object CustomArtworkOriginals {
         return original
     }
 }
+
+/**
+ * Covers for the built-in lists such as Downloaded.
+ *
+ * Those lists are queries, not playlists - there is no row anywhere to hold a
+ * thumbnail - so a chosen cover is kept in preferences under the list's type.
+ * Without one they fall back to their first song's artwork, as they always did.
+ */
+object AutoPlaylistCovers {
+    private const val PREFERENCES = "auto_playlist_covers"
+
+    private fun preferences(context: Context) =
+        context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
+
+    fun get(context: Context, list: String): String? = preferences(context).getString(list, null)
+
+    /** Stores [cover] for [list]; null clears it. */
+    fun set(context: Context, list: String, cover: String?) {
+        preferences(context).edit().apply {
+            if (cover == null) remove(list) else putString(list, cover)
+        }.apply()
+    }
+}
